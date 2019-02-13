@@ -33,7 +33,7 @@ struct decodingHandler {
 %endfor
 };
 
-int decodeInstruction(void *aCtx, uint32_t aOpcode, const struct decodingHandler *aHandler);
+int decodeInstruction(void *aCtx, uint32_t aOpcode, const struct decodingHandler *aHandler, FILE *instructionDecodingInfo);
 
 #endif
 // vim: set filetype=c:
