@@ -1,0 +1,1594 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<insnset>
+	<opcode name="adc" variant="adc_imm_T1">
+		<encoding bits="11110 imm 0 1010 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+	</opcode>
+	
+	<opcode name="adc" variant="adc_reg_T1">
+		<encoding bits="010000 0101 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="adc" variant="adc_reg_T2">
+		<encoding bits="11101 01 1010 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+	</opcode>
+
+	<opcode name="add" variant="add_imm_T1">
+		<encoding bits="000 11 1 0 imm{3} Rn{3} Rd{3}" />
+	</opcode>
+	<opcode name="add" variant="add_imm_T2">
+		<encoding bits="001 10 Rdn{3} imm{8}" />
+	</opcode>
+	<opcode name="add" variant="add_imm_T3">
+		<encoding bits="11110 imm 0 1000 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="3" />
+	</opcode>
+	<opcode name="add" variant="add_imm_T4">
+		<encoding bits="11110 imm 1 0000 0 Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="add" variant="add_reg_T1">
+		<encoding bits="000 11 0 0 Rm{3} Rn{3} Rd{3}" />
+	</opcode>
+	<opcode name="add" variant="add_reg_T2">
+		<encoding bits="010001 00 Rdn Rm{4} Rdn{3}" />
+		<order priority="3" />
+	</opcode>
+	<opcode name="add" variant="add_reg_T3">
+		<encoding bits="11101 01 1000 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="add" variant="add_SPi_T1">
+		<encoding bits="1010 1 Rd{3} imm{8}" />
+	</opcode>
+	<opcode name="add" variant="add_SPi_T2">
+		<encoding bits="1011 0000 0 imm{7}" />
+	</opcode>
+	<opcode name="add" variant="add_SPi_T3">
+		<encoding bits="11110 imm 0 1000 S 1101 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="add" variant="add_SPi_T4">
+		<encoding bits="11110 imm 1 0000 0 1101 0 imm{3} Rd{4} imm{8}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="add" variant="add_SPr_T1">
+		<encoding bits="01000100 Rdm 1101 Rdm{3}" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="add" variant="add_SPr_T2">
+		<encoding bits="01000100 1 Rm{4} 101" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="add" variant="add_SPr_T3">
+		<encoding bits="11101011000 S 1101 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="adr" variant="adr_T1">
+		<encoding bits="1010 0 Rd{3} imm{8}" />
+	</opcode>
+	<opcode name="adr" variant="adr_T2">
+		<encoding bits="11110 imm 10101 0 1111 0 imm{3} Rd{4} imm{8}" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="adr" variant="adr_T3">
+		<encoding bits="11110 imm 10000 0 1111 0 imm{3} Rd{4} imm{8}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="and" variant="and_imm_T1">
+		<encoding bits="11110 imm 0 0000 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="and" variant="and_reg_T1">
+		<encoding bits="010000 0000 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="and" variant="and_reg_T2">
+		<encoding bits="11101 01 0000 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="asr" variant="asr_imm_T1">
+		<encoding bits="000 10 imm{5} Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="asr" variant="asr_imm_T2">
+		<encoding bits="11101 01 0010 S 1111 0 imm{3} Rd{4} imm{2} 10 Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="asr" variant="asr_reg_T1">
+		<encoding bits="010000 0100 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="asr" variant="asr_reg_T2">
+		<encoding bits="11111 010 0 10 S Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="b" variant="b_T1">
+		<encoding bits="1101 cond{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="b" variant="b_T2">
+		<encoding bits="11100 imm{11}" />
+	</opcode>
+	<opcode name="b" variant="b_T3">
+		<encoding bits="11110 imm.4 cond{4} imm{6}.1 10 imm.2 0 imm.3 imm{11}.0" />
+		<extend variable="imm" type="SignExtend20" />
+		<order priority="10" />
+	</opcode>
+	<opcode name="b" variant="b_T4">
+		<encoding bits="11110 imm.4 imm{10}.1 10 imm.3 1 imm.2 imm{11}.0" />
+		<extend variable="imm" type="SignExtend24_EOR" />
+		<order priority="10" />
+	</opcode>
+	
+	<opcode name="bfc" variant="bfc_T1">
+		<encoding bits="11110 0? 11 011 0 1111 0 imm{3} Rd{4} imm{2} 0? msb{5}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="bfi" variant="bfi_T1">
+		<encoding bits="11110 0? 11 011 0 Rn{4} 0 imm{3} Rd{4} imm{2} 0? msb{5}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="bic" variant="bic_imm_T1">
+		<encoding bits="11110 imm 0 0001 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+	</opcode>
+	
+	<opcode name="bic" variant="bic_reg_T1">
+		<encoding bits="010000 1110 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="bic" variant="bic_reg_T2">
+		<encoding bits="11101 01 0001 S Rn{4} 0? imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+	</opcode>
+	
+	<opcode name="bkpt" variant="bkpt_T1">
+		<encoding bits="1011 1110 imm{8}" />
+	</opcode>
+	
+	<opcode name="bl" variant="bl_T1">
+		<encoding bits="11110 imm.4 imm{10}.1 11 imm.3 1 imm.2 imm{11}.0" />
+		<extend variable="imm" type="SignExtend24_EOR" />
+		<order priority="10" />
+	</opcode>
+	
+	<opcode name="blx" variant="blx_reg_T1">
+		<encoding bits="010001 11 1 Rm{4} 000?" />
+	</opcode>
+	
+	<opcode name="bx" variant="bx_T1">
+		<encoding bits="010001 11 0 Rm{4} 000?" />
+	</opcode>
+	
+	<opcode name="cbnz" variant="cbnz_T1">
+		<encoding bits="1011 op 0 imm 1 imm{5} Rn{3}" />
+	</opcode>
+	
+	<opcode name="cdp" variant="cdp_T1">
+		<encoding bits="1110 1110 opcA{4} CRn{4} CRd{4} coproc{4} opcB{3} 0 CRm{4}" />
+		<order priority="7" />
+	</opcode>
+	<opcode name="cdp" variant="cdp2_T2">
+		<encoding bits="1111 1110 opcA{4} CRn{4} CRd{4} coproc{4} opcB{3} 0 CRm{4}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="clrex" variant="clrex_T1">
+		<encoding bits="11110 0 111 01 1 1111? 10 0? 0 1111? 0010 1111?" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="clz" variant="clz_T1">
+		<encoding bits="11111 010 1 011 Rmx{4} 1111 Rd{4} 1 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="cmn" variant="cmn_imm_T1">
+		<encoding bits="11110 imm 0 1000 1 Rn{4} 0 imm{3} 1111 imm{8}" />
+		<order priority="1" />
+		<extend variable="imm" type="ThumbExpandImm" />
+	</opcode>
+	
+	<opcode name="cmn" variant="cmn_reg_T1">
+		<encoding bits="010000 1011 Rm{3} Rn{3}" />
+	</opcode>
+	<opcode name="cmn" variant="cmn_reg_T2">
+		<encoding bits="11101 01 1000 1 Rn{4} 0? imm{3} 1111 imm{2} type{2} Rm{4}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="cmp" variant="cmp_imm_T1">
+		<encoding bits="001 01 Rn{3} imm{8}" />
+	</opcode>
+	<opcode name="cmp" variant="cmp_imm_T2">
+		<encoding bits="11110 imm 0 1101 1 Rn{4} 0? imm{3} 1111 imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="8" />
+	</opcode>
+	
+	<opcode name="cmp" variant="cmp_reg_T1">
+		<encoding bits="010000 1010 Rm{3} Rn{3}" />
+	</opcode>
+	<opcode name="cmp" variant="cmp_reg_T2">
+		<encoding bits="010001 01 Rn Rm{4} Rn{3}" />
+	</opcode>
+	<opcode name="cmp" variant="cmp_reg_T3">
+		<encoding bits="11101 01 1101 1 Rn{4} 0 imm{3} 1111 imm{2} type{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="cps" variant="cps_T1">
+		<encoding bits="1011 0110 011 imm 0? 0? I F" />
+	</opcode>
+	
+	<opcode name="dbg" variant="dbg_T1">
+		<encoding bits="11110 0 111 01 0 1111? 10 0? 0 0? 000 1111 option{4}" />
+		<order priority="4" />
+	</opcode>
+	
+	<opcode name="dmb" variant="dmb_T1">
+		<encoding bits="11110 0 111 01 1 1111? 10 0? 0 1111? 0101 option{4}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="dsb" variant="dsb_T1">
+		<encoding bits="11110 0 111 01 1 1111? 10 0? 0 1111? 0100 option{4}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="eor" variant="eor_imm_T1">
+		<encoding bits="11110 imm 0 0100 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="eor" variant="eor_reg_T1">
+		<encoding bits="010000 0001 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="eor" variant="eor_reg_T2">
+		<encoding bits="11101 01 0100 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="isb" variant="isb_T1">
+		<encoding bits="11110 0 111 01 1 1111? 10 0? 0 1111? 0110 option{4}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="it" variant="it_T1">
+		<encoding bits="1011 1111 firstcond{4} mask{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldc" variant="ldc_imm_T1">
+		<encoding bits="1110 110 P U D W 1 Rn{4} CRd{4} coproc{4} imm{8}" />
+		<order priority="7" />
+	</opcode>
+	<opcode name="ldc" variant="ldc2_imm_T2">
+		<encoding bits="1111 110 P U D W 1 Rn{4} CRd{4} coproc{4} imm{8}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="ldc" variant="ldc_lit_T1">
+		<encoding bits="1110 110 P U D W 1 1111 CRd{4} coproc{4} imm{8}" />
+		<order priority="5" />
+	</opcode>
+	<opcode name="ldc" variant="ldc2_lit_T2">
+		<encoding bits="1111 110 P U D W 1 1111 CRd{4} coproc{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldm" variant="ldm_T1">
+		<encoding bits="1100 1 Rn{3} register_list{8}" />
+	</opcode>
+	<opcode name="ldm" variant="ldm_T2">
+		<encoding bits="11101 00 010 W 1 Rn{4} P M 0 register_list{13}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldmdb" variant="ldmdb_T1">
+		<encoding bits="11101 00 100 W 1 Rn{4} P M 0 register_list{13}" />
+	</opcode>
+	
+	<opcode name="ldr" variant="ldr_imm_T1">
+		<encoding bits="011 0 1 imm{5} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldr" variant="ldr_imm_T2">
+		<encoding bits="1001 1 Rt{3} imm{8}" />
+	</opcode>
+	<opcode name="ldr" variant="ldr_imm_T3">
+		<encoding bits="11111 00 0 1 10 1 Rn{4} Rt{4} imm{12}" />
+		<order priority="6" />
+	</opcode>
+	<opcode name="ldr" variant="ldr_imm_T4">
+		<encoding bits="11111 00 0 0 10 1 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="ldr" variant="ldr_lit_T1">
+		<encoding bits="01001 Rt{3} imm{8}" />
+	</opcode>
+	<opcode name="ldr" variant="ldr_lit_T2">
+		<encoding bits="11111 00 0 U 10 1 1111 Rt{4} imm{12}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldr" variant="ldr_reg_T1">
+		<encoding bits="0101 100 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldr" variant="ldr_reg_T2">
+		<encoding bits="11111 00 0 0 10 1 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="ldrb" variant="ldrb_imm_T1">
+		<encoding bits="011 1 1 imm{5} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldrb" variant="ldrb_imm_T2">
+		<encoding bits="11111 00 0 1 00 1 Rn{4} Rt{4} imm{12}" />
+		<order priority="9" />
+	</opcode>
+	<opcode name="ldrb" variant="ldrb_imm_T3">
+		<encoding bits="11111 00 0 0 00 1 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="7" />
+	</opcode>
+	
+	<opcode name="ldrb" variant="ldrb_lit_T1">
+		<encoding bits="11111 00 0 U 00 1 1111 Rt{4} imm{12}" />
+		<order priority="8" />
+	</opcode>
+	
+	<opcode name="ldrb" variant="ldrb_reg_T1">
+		<encoding bits="0101 110 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldrb" variant="ldrb_reg_T2">
+		<encoding bits="11111 00 0 0 00 1 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="ldrbt" variant="ldrbt_T1">
+		<encoding bits="11111 00 0 0 00 1 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="6" />
+	</opcode>
+	
+	<opcode name="ldrd" variant="ldrd_imm_T1">
+		<encoding bits="11101 00 P U 1 W 1 Rn{4} Rt{4} Rtx{4} imm{8}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="ldrd" variant="ldrd_lit_T1">
+		<encoding bits="11101 00 P U 1 W 1 1111 Rt{4} Rtx{4} imm{8}" />
+		<order priority="4" />
+	</opcode>
+	
+	<opcode name="ldrex" variant="ldrex_T1">
+		<encoding bits="11101 00 0 0 1 0 1 Rn{4} Rt{4} 1 1 1 1 imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldrexb" variant="ldrexb_T1">
+		<encoding bits="11101 000110 1 Rn{4} Rt{4} 1111 0100 1111" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="ldrexh" variant="ldrexh_T1">
+		<encoding bits="11101 000110 1 Rn{4} Rt{4} 1111 0101 1111" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="ldrh" variant="ldrh_imm_T1">
+		<encoding bits="1000 1 imm{5} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldrh" variant="ldrh_imm_T2">
+		<encoding bits="11111 00 0 1 01 1 Rn{4} Rt{4} imm{12}" />
+		<order priority="5" />
+	</opcode>
+	<opcode name="ldrh" variant="ldrh_imm_T3">
+		<encoding bits="11111 00 0 0 01 1 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="4" />
+	</opcode>
+
+	<opcode name="ldrh" variant="ldrh_lit_T1">
+		<encoding bits="11111 00 0 U 01 1 1111 Rt{4} imm{12}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="ldrh" variant="ldrh_reg_T1">
+		<encoding bits="0101 101 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldrh" variant="ldrh_reg_T2">
+		<encoding bits="11111 00 0 0 01 1 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="ldrht" variant="ldrht_T1">
+		<encoding bits="11111 00 0 0 01 1 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldrsb" variant="ldrsb_imm_T1">
+		<encoding bits="11111 00 1 1 00 1 Rn{4} Rt{4} imm{12}" />
+		<order priority="8" />
+	</opcode>
+	<opcode name="ldrsb" variant="ldrsb_imm_T2">
+		<encoding bits="11111 00 1 0 00 1 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="7" />
+	</opcode>
+	
+	<opcode name="ldrsb" variant="ldrsb_lit_T1">
+		<encoding bits="11111 00 1 U 00 1 1111 Rt{4} imm{12}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldrsb" variant="ldrsb_reg_T1">
+		<encoding bits="0101 011 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldrsb" variant="ldrsb_reg_T2">
+		<encoding bits="11111 00 1 0 00 1 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+		<order priority="5" />
+	</opcode>
+	
+	<opcode name="ldrsbt" variant="ldrsbt_T1">
+		<encoding bits="11111 00 1 0 00 1 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="6" />
+	</opcode>
+	
+	<opcode name="ldrsh" variant="ldrsh_imm_T1">
+		<encoding bits="11111 00 1 1 01 1 Rn{4} Rt{4} imm{12}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="ldrsh" variant="ldrsh_imm_T2">
+		<encoding bits="11111 00 1 0 01 1 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ldrsh" variant="ldrsh_lit_T1">
+		<encoding bits="11111 00 1 U 01 1 1111 Rt{4} imm{12}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="ldrsh" variant="ldrsh_reg_T1">
+		<encoding bits="0101 111 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="ldrsh" variant="ldrsh_reg_T2">
+		<encoding bits="11111 00 1 0 01 1 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="ldrsht" variant="ldrsh_T1">
+		<encoding bits="11111 00 1 0 01 1 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="ldrt" variant="ldrt_T1">
+		<encoding bits="11111 00 0 0 10 1 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="4" />
+	</opcode>
+
+	<opcode name="lsl" variant="lsl_imm_T1">
+		<encoding bits="00000 imm{5} Rm{3} Rd{3}" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="lsl" variant="lsl_imm_T2">
+		<encoding bits="11101 01 0010 S 1111 0 imm{3} Rd{4} imm{2} 00 Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="lsl" variant="lsl_reg_T1">
+		<encoding bits="010000 0010 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="lsl" variant="lsl_reg_T2">
+		<encoding bits="11111 010 0 00 S Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="lsr" variant="lsr_imm_T1">
+		<encoding bits="000 01 imm{5} Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="lsr" variant="lsr_imm_T2">
+		<encoding bits="11101 01 0010 S 1111 0 imm{3} Rd{4} imm{2} 01 Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="lsr" variant="lsr_reg_T1">
+		<encoding bits="010000 0011 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="lsr" variant="lsr_reg_T2">
+		<encoding bits="11111 010 0 01 S Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="mcr" variant="mcr_T1">
+		<encoding bits="1110 1110 opcA{3} 0 CRn{4} Rt{4} coproc{4} opcB{3} 1 CRm{4}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="mcr" variant="mcr2_T2">
+		<encoding bits="1111 1110 opcA{3} 0 CRn{4} Rt{4} coproc{4} opcB{3} 1 CRm{4}" />
+	</opcode>
+	
+	<opcode name="mcrr" variant="mcrr_T1">
+		<encoding bits="1110 110 0 0 1 0 0 RtB{4} Rt{4} coproc{4} opcA{4} CRm{4}" />
+		<order priority="6" />
+	</opcode>
+	<opcode name="mcrr" variant="mcrr2_T2">
+		<encoding bits="1111 110 0 0 1 0 0 RtB{4} Rt{4} coproc{4} opcA{4} CRm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="mla" variant="mla_T1">
+		<encoding bits="11111 0110 000 Rn{4} Ra{4} Rd{4} 0000 Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="mls" variant="mls_T1">
+		<encoding bits="11111 0110 000 Rn{4} Ra{4} Rd{4} 0001 Rm{4}" />
+	</opcode>
+	
+	<opcode name="mov" variant="mov_imm_T1">
+		<encoding bits="00100 Rd{3} imm{8}" />
+	</opcode>
+	
+	<opcode name="mov" variant="mov_imm_T2">
+		<encoding bits="11110 imm 00010 S 11110 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<illegal values="13, 15" variable="Rd" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="mov" variant="mov_imm_T3">
+		<encoding bits="11110 imm.2 10 0 1 0 0 imm{4}.3 0 imm{3}.1 Rd{4} imm{8}.0" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="mov" variant="mov_reg_T1">
+		<encoding bits="010001 10 Rd Rm{4} Rd{3}" />
+	</opcode>
+	<opcode name="mov" variant="mov_reg_T2">
+		<encoding bits="000 00 00000 Rm{3} Rd{3}" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="mov" variant="mov_reg_T3">
+		<encoding bits="11110 01 0010 S 1111 0000 Rd{4} 0000 Rm{4}" />
+		<illegal values="13, 15" variable="Rd" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="movt" variant="movt_T1">
+		<encoding bits="11110 imm.2 10 1 1 0 0 imm{4}.3 0 imm{3}.1 Rd{4} imm{8}.0" />
+	</opcode>
+	
+	<opcode name="mrc" variant="mrc_T1">
+		<encoding bits="1110 1110 opcA{3} 1 Crn{4} Rt{4} coproc{4} opcB{3} 1 CRm{4}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="mrc" variant="mrc2_T2">
+		<encoding bits="1111 1110 opcA{3} 1 Crn{4} Rt{4} coproc{4} opcB{3} 1 CRm{4}" />
+	</opcode>
+	
+	<opcode name="mrrc" variant="mrrc_T1">
+		<encoding bits="1110 110 0 0 1 0 1 RtB{4} Rt{4} coproc{4} opcA{4} CRm{4}" />
+		<order priority="6" />
+	</opcode>
+	<opcode name="mrrc" variant="mrrc2_T2">
+		<encoding bits="1111 110 0 0 1 0 1 RtB{4} Rt{4} coproc{4} opcA{4} CRm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="mrs" variant="mrs_T1">
+		<encoding bits="11110 0 1111 1 0? 1111? 10 0? 0 Rd{4} SYSm{8}" />
+		<order priority="6" />
+	</opcode>
+	
+	<opcode name="msr" variant="msr_T1">
+		<encoding bits="11110 0 1110 0 0? Rn{4} 10 0? 0 mask{2} 0? 0? SYSm{8}" />
+		<order priority="6" />
+	</opcode>
+	
+	<opcode name="mul" variant="mul_T1">
+		<encoding bits="010000 1101 Rn{3} Rdm{3}" />
+	</opcode>
+	<opcode name="mul" variant="mul_T2">
+		<encoding bits="11111 0110 000 Rn{4} 1111 Rd{4} 0000 Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="mvn" variant="mvn_imm_T1">
+		<encoding bits="11110 imm 0 0011 S 1111 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="mvn" variant="mvn_reg_T1">
+		<encoding bits="010000 1111 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="mvn" variant="mvn_reg_T2">
+		<encoding bits="11101 01 0011 S 1111 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="nop" variant="nop_T1">
+		<encoding bits="1011 1111 0000 0000" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="nop" variant="nop_T2">
+		<encoding bits="11110 0 111 01 0 1111 10 0 0 0 000 00000000" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="orn" variant="orn_imm_T1">
+		<encoding bits="11110 imm 0 0011 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="orn" variant="orn_reg_T1">
+		<encoding bits="11101 01 0011 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="orr" variant="orr_imm_T1">
+		<encoding bits="11110 imm 0 0010 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="orr" variant="orr_reg_T1">
+		<encoding bits="010000 1100 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="orr" variant="orr_reg_T2">
+		<encoding bits="11101 01 0010 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="pkhbt" variant="pkhbt_T1">
+		<encoding bits="11101 01 0110 S Rn{4} 0? imm{3} Rd{4} imm{2} tb T Rm{4}" />
+	</opcode>
+	
+	<opcode name="pld" variant="pld_imm_T1">
+		<encoding bits="11111 00 0 1 0 0 1 Rn{4} 1111 imm{12}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="pld" variant="pld_imm_T2">
+		<encoding bits="11111 00 0 0 0 0 1 Rn{4} 1111 1 100 imm{8}" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="pld" variant="pld_lit_T1">
+		<encoding bits="11111 00 0 U 00 1 1111 1111 imm{12}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="pld" variant="pld_reg_T1">
+		<encoding bits="11111 00 0 0 00 1 Rn{4} 1111 0 00000 imm{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="pli" variant="pld_immlit_T1">
+		<encoding bits="11111 00 1 1 00 1 Rn{4} 1111 imm{12}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="pli" variant="pld_immlit_T2">
+		<encoding bits="11111 00 1 0 00 1 Rn{4} 1111 1 100 imm{8}" />
+		<order priority="3" />
+	</opcode>
+	<opcode name="pli" variant="pld_immlit_T3">
+		<encoding bits="11111 00 1 U 00 1 1111 1111 imm{12}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="pop" variant="pop_T1">
+		<encoding bits="1011 1 10 P register_list{8}" />
+	</opcode>
+	<opcode name="pop" variant="pop_T2">
+		<encoding bits="11101 00 010 1 1 1101 P M 0 register_list{13}" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="pop" variant="pop_T3">
+		<encoding bits="11111 00 0 0 10 1 1101 Rt{4} 1 011 00000100" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="push" variant="push_T1">
+		<encoding bits="1011 0 10 M register_list{8}" />
+	</opcode>
+	<opcode name="push" variant="push_T2">
+		<encoding bits="11101 00 100 1 0 1101 0 M 0 register_list{13}" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="push" variant="push_T3">
+		<encoding bits="11111 00 0 0 10 0 1101 Rt{4} 1 101 00000100" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="qadd" variant="qadd_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 1 000 Rm{4}" />
+	</opcode>
+
+	<opcode name="qadd" variant="qadd16_T1">
+		<encoding bits="11111 010 1 001 Rn{4} 1111 Rd{4} 0 001 Rm{4}" />
+	</opcode>
+	
+	<opcode name="qadd" variant="qadd8_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 0 001 Rm{4}" />
+	</opcode>
+
+	<opcode name="qasx" variant="qasx_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 001 Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="qdadd" variant="qdadd_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 1 001 Rm{4}" />
+	</opcode>
+
+	<opcode name="qdsub" variant="qdsub_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 1 011 Rm{4}" />
+	</opcode>
+	
+	<opcode name="qsax" variant="qsax_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 001 Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="qsub" variant="qsub_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 1 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="qsub" variant="qsub16_T1">
+		<encoding bits="11111 010 1 101 Rn{4} 1111 Rd{4} 0 001 Rm{4}" />
+	</opcode>
+	
+	<opcode name="qsub" variant="qsub8_T1">
+		<encoding bits="11111 010 1 100 Rn{4} 1111 Rd{4} 0 001 Rm{4}" />
+	</opcode>
+	
+	<opcode name="rbit" variant="rbit_T1">
+		<encoding bits="11111 010 1 001 Rm{4} 1111 Rd{4} 1 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="rev" variant="rev_T1">
+		<encoding bits="1011 1010 00 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="rev" variant="rev_T2">
+		<encoding bits="11111 010 1 001 Rmx{4} 1111 Rd{4} 1 000 Rm{4}" />
+	</opcode>
+
+	<opcode name="rev" variant="rev16_T1">
+		<encoding bits="1011 1010 01 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="rev" variant="rev16_T2">
+		<encoding bits="11111 010 1 001 Rm{4} 1111 Rd{4} 1 001 Rm{4}" />
+	</opcode>
+	
+	<opcode name="revsh" variant="revsh_T1">
+		<encoding bits="1011 1010 11 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="revsh" variant="revsh_T2">
+		<encoding bits="11111 010 1 001 Rm{4} 1111 Rd{4} 1 011 Rm{4}" />
+	</opcode>
+
+	<opcode name="ror" variant="ror_imm_T1">
+		<encoding bits="11101 01 0010 S 1111 0? imm{3} Rd{4} imm{2} 11 Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="ror" variant="ror_reg_T1">
+		<encoding bits="010000 0111 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="ror" variant="ror_reg_T2">
+		<encoding bits="11111 010 0 11 S Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="rrx" variant="rrx_T1">
+		<encoding bits="11101 01 0010 S 1111 0? 000 Rd{4} 00 11 Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="rsb" variant="rsb_imm_T1">
+		<encoding bits="010000 1001 Rn{3} Rd{3}" />
+	</opcode>
+	<opcode name="rsb" variant="rsb_imm_T2">
+		<encoding bits="11110 imm 0 1110 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+	</opcode>
+	
+	<opcode name="rsb" variant="rsb_reg_T1">
+		<encoding bits="11101 01 1110 S Rn{4} 0? imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+	</opcode>
+
+	<opcode name="sadd" variant="sadd16_T1">
+		<encoding bits="11111 010 1 001 Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+
+	<opcode name="sadd" variant="sadd8_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+
+	<opcode name="sasx" variant="sasx_T1">
+		<encoding bits="11111 010 1 010 Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="sbc" variant="sbc_imm_T1">
+		<encoding bits="11110 imm 0 1011 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+	</opcode>
+	
+	<opcode name="sbc" variant="sbc_reg_T1">
+		<encoding bits="010000 0110 Rm{3} Rdn{3}" />
+	</opcode>
+	<opcode name="sbc" variant="sbc_reg_T2">
+		<encoding bits="11101 01 1011 S Rn{4} 0? imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+	</opcode>
+
+	<opcode name="sbfx" variant="sbfx_T1">
+		<encoding bits="11110 0? 11 010 0 Rn{4} 0 imm{3} Rd{4} imm{2} 0? width{5}" />
+	</opcode>
+	
+	<opcode name="sdiv" variant="sdiv_T1">
+		<encoding bits="11111 011100 1 Rn{4} 1111? Rd{4} 1111 Rm{4}" />
+	</opcode>
+	
+	<opcode name="sel" variant="sel_T1">
+		<encoding bits="11111 010 1 010 Rn{4} 1111 Rd{4} 1 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="sev" variant="sev_T1">
+		<encoding bits="1011 1111 0100 0000" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="sev" variant="sev_T2">
+		<encoding bits="11110 0 111 01 0 1111? 10 0? 0 0? 000 00000100" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="shadd" variant="shadd16_T1">
+		<encoding bits="11111 010 1 001 Rn{4} 1111 Rd{4} 0 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="shadd" variant="shadd8_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 0 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="shasx" variant="shasx_T1">
+		<encoding bits="11111 010 1 010 Rn{4} 1111 Rd{4} 0 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="shsax" variant="shsax_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="shsub" variant="shsub16_T1">
+		<encoding bits="11111 010 1 101 Rn{4} 1111 Rd{4} 0 010 Rm{4}" />
+	</opcode>
+
+	<opcode name="shsub" variant="shsub8_T1">
+		<encoding bits="11111 010 1 100 Rn{4} 1111 Rd{4} 0 010 Rm{4}" />
+	</opcode>
+	
+	<opcode name="smlabb" variant="smlabb_T1">
+		<encoding bits="11111 0110 001 Rn{4} Ra{4} Rd{4} 00 N M Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="smlad" variant="smlad_T1">
+		<encoding bits="11111 0110 010 Rn{4} Ra{4} Rd{4} 000 M Rm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="smlal" variant="smlal_T1">
+		<encoding bits="11111 0111 1 00 Rn{4} RdLo{4} RdHi{4} 0000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="smlalbb" variant="smlalbb_T1">
+		<encoding bits="11111 0111 100 Rn{4} RdLo{4} RdHi{4} 10 N M Rm{4}" />
+	</opcode>
+	
+	<opcode name="smlald" variant="smlald_T1">
+		<encoding bits="11111 0111 100 Rn{4} RdLo{4} RdHi{4} 110 M Rm{4}" />
+	</opcode>
+
+	<opcode name="smlawb" variant="smlawb_T1">
+		<encoding bits="11111 0110 011 Rn{4} Ra{4} Rd{4} 000 M Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="smlsd" variant="smlsd_T1">
+		<encoding bits="11111 0110 100 Rn{4} Ra{4} Rd{4} 000 M Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="smlsld" variant="smlsld_T1">
+		<encoding bits="11111 0111 1 01 Rn{4} RdLo{4} RdHi{4} 110 M Rm{4}" />
+	</opcode>
+	
+	<opcode name="smmla" variant="smmla_T1">
+		<encoding bits="11111 0110 101 Rn{4} Ra{4} Rd{4} 000 R Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="smmls" variant="smmls_T1">
+		<encoding bits="11111 0110 110 Rn{4} Ra{4} Rd{4} 000 R Rm{4}" />
+	</opcode>
+	
+	<opcode name="smmul" variant="smmul_T1">
+		<encoding bits="11111 0110 101 Rn{4} 1111 Rd{4} 000 R Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="smuad" variant="smuad_T1">
+		<encoding bits="11111 0110 010 Rn{4} 1111 Rd{4} 000 M Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="smulbb" variant="smulbb_T1">
+		<encoding bits="11111 0110 001 Rn{4} 1111 Rd{4} 00 N M Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="smull" variant="smull_T1">
+		<encoding bits="11111 0111 0 00 Rn{4} RdLo{4} RdHi{4} 0000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="smulwb" variant="smulwb_T1">
+		<encoding bits="11111 0110 011 Rn{4} 1111 Rd{4} 000 M Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="smusd" variant="smusd_T1">
+		<encoding bits="11111 0110 100 Rn{4} 1111 Rd{4} 000 M Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="ssat" variant="ssat_T1">
+		<encoding bits="11110 0? 11 00 shift 0 Rn{4} 0 imm{3} Rd{4} imm{2} 0? satimm{5}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="ssat" variant="ssat16_T1">
+		<encoding bits="11110 0? 11 001 0 Rn{4} 0 000 Rd{4} 00 00? satimm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="ssax" variant="ssax_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="ssub" variant="ssub16_T1">
+		<encoding bits="11111 010 1 101 Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="ssub" variant="ssub8_T1">
+		<encoding bits="11111 010 1 100 Rn{4} 1111 Rd{4} 0 000 Rm{4}" />
+	</opcode>
+	
+	<opcode name="stc" variant="stc_T1">
+		<encoding bits="1110 110 P U N W 0 Rn{4} CRd{4} coproc{4} imm{8}" />
+		<order priority="7" />
+	</opcode>
+	<opcode name="stc" variant="stc2_T2">
+		<encoding bits="1111 110 P U N W 0 Rn{4} CRd{4} coproc{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="stm" variant="stm_T1">
+		<encoding bits="1100 0 Rn{3} register_list{8}" />
+	</opcode>
+	<opcode name="stm" variant="stm_T2">
+		<encoding bits="11101 00 010 W 0 Rn{4} 0 M 0 register_list{13}" />
+	</opcode>
+	
+	<opcode name="stmdb" variant="stmdb_T1">
+		<encoding bits="11101 00 100 W 0 Rn{4} 0 M 0 register_list{13}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="str" variant="str_imm_T1">
+		<encoding bits="011 0 0 imm{5} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="str" variant="str_imm_T2">
+		<encoding bits="1001 0 Rt{3} imm{8}" />
+	</opcode>
+	<opcode name="str" variant="str_imm_T3">
+		<encoding bits="11111 00 0 1 10 0 Rn{4} Rt{4} imm{12}" />
+	</opcode>
+	<opcode name="str" variant="str_imm_T4">
+		<encoding bits="11111 00 0 0 10 0 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="str" variant="str_reg_T1">
+		<encoding bits="0101 000 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="str" variant="str_reg_T2">
+		<encoding bits="11111 00 0 0 10 0 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+	</opcode>
+	
+	<opcode name="strb" variant="strb_imm_T1">
+		<encoding bits="011 1 0 imm{5} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="strb" variant="strb_imm_T2">
+		<encoding bits="11111 00 0 1 00 0 Rn{4} Rt{4} imm{12}" />
+	</opcode>
+	<opcode name="strb" variant="strb_imm_T3">
+		<encoding bits="11111 00 0 0 00 0 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="strb" variant="strb_reg_T1">
+		<encoding bits="0101 010 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="strb" variant="strb_reg_T2">
+		<encoding bits="11111 00 0 0 00 0 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+	</opcode>
+	
+	<opcode name="strbt" variant="strb_T1">
+		<encoding bits="11111 00 0 0 00 0 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="strd" variant="strd_imm_T1">
+		<encoding bits="11101 00 P U 1 W 0 Rn{4} Rt{4} Rtx{4} imm{8}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="strex" variant="strex_T1">
+		<encoding bits="11101 00 0 0 1 0 0 Rn{4} Rt{4} Rd{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="strexb" variant="strexb_T1">
+		<encoding bits="11101 000110 0 Rn{4} Rt{4} 1111? 0100 Rd{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="strexh" variant="strexh_T1">
+		<encoding bits="11101 000110 0 Rn{4} Rt{4} 1111? 0101 Rd{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="strh" variant="strh_imm_T1">
+		<encoding bits="1000 0 imm{5} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="strh" variant="strh_imm_T2">
+		<encoding bits="11111 00 0 1 01 0 Rn{4} Rt{4} imm{12}" />
+	</opcode>
+	<opcode name="strh" variant="strh_imm_T3">
+		<encoding bits="11111 00 0 0 01 0 Rn{4} Rt{4} 1 P U W imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="strh" variant="strh_reg_T1">
+		<encoding bits="0101 001 Rm{3} Rn{3} Rt{3}" />
+	</opcode>
+	<opcode name="strh" variant="strh_reg_T2">
+		<encoding bits="11111 00 0 0 01 0 Rn{4} Rt{4} 0 00000 imm{2} Rm{4}" />
+	</opcode>
+	
+	<opcode name="strht" variant="strht_T1">
+		<encoding bits="11111 00 0 0 01 0 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="strt" variant="strt_T1">
+		<encoding bits="11111 00 0 0 10 0 Rn{4} Rt{4} 1 110 imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="sub" variant="sub_imm_T1">
+		<encoding bits="000 11 1 1 imm{3} Rn{3} Rd{3}" />
+	</opcode>
+	<opcode name="sub" variant="sub_imm_T2">
+		<encoding bits="001 11 Rdn{3} imm{8}" />
+	</opcode>
+	<opcode name="sub" variant="sub_imm_T3">
+		<encoding bits="11110 imm 0 1101 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="9" />
+	</opcode>
+	<opcode name="sub" variant="sub_imm_T4">
+		<encoding bits="11110 imm 1 0101 0 Rn{4} 0 imm{3} Rd{4} imm{8}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="sub" variant="sub_reg_T1">
+		<encoding bits="000 11 0 1 Rm{3} Rn{3} Rd{3}" />
+	</opcode>
+	<opcode name="sub" variant="sub_reg_T2">
+		<encoding bits="11101 01 1101 S Rn{4} 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="sub" variant="sub_SPimm_T1">
+		<encoding bits="1011 0000 1 imm{7}" />
+	</opcode>
+	<opcode name="sub" variant="sub_SPimm_T2">
+		<encoding bits="11110 imm 0 1101 S 1101 0 imm{3} Rd{4} imm{8}" />
+		<order priority="7" />
+	</opcode>
+	<opcode name="sub" variant="sub_SPimm_T3">
+		<encoding bits="11110 imm 1 0101 0 1101 0 imm{3} Rd{4} imm{8}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="sub" variant="sub_SPreg_T1">
+		<encoding bits="11101 0 1 1101 S 1101 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="svc" variant="svc_T1">
+		<encoding bits="1101 1111 imm{8}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="sxtab" variant="sxtab_T1">
+		<encoding bits="11111 010 0 100 Rn{4} 1111 Rd{4} 1 0? rotate{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="sxtab16" variant="sxtab16_T1">
+		<encoding bits="11111 010 0 010 Rn{4} 1111 Rd{4} 1 0? rotate{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="sxtah" variant="sxtah_T1">
+		<encoding bits="11111 010 0 000 Rn{4} 1111 Rd{4} 1 0? rotate{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+	
+	<opcode name="sxtb" variant="sxtb_T1">
+		<encoding bits="1011 0010 01 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="sxtb" variant="sxtb_T2">
+		<encoding bits="11111 010 0 100 1111 1111 Rd{4} 1 0 rotate{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="sxtb" variant="sxtb16_T1">
+		<encoding bits="11111 010 0 010 1111 1111 Rd{4} 1 0 rotate{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="sxth" variant="sxth_T1">
+		<encoding bits="1011 0010 00 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="sxth" variant="sxth_T2">
+		<encoding bits="11111 010 0 000 1111 1111 Rd{4} 1 0 rotate{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="tbb" variant="tbb_T1">
+		<encoding bits="11101 00 0 1 1 0 1 Rn{4} 1111? 0000? 000 H Rm{4}" />
+		<order priority="3" />
+	</opcode>
+	
+	<opcode name="teq" variant="teq_imm_T1">
+		<encoding bits="11110 imm 0 0100 1 Rn{4} 0 imm{3} 1111 imm{8}" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="teq" variant="teq_reg_T1">
+		<encoding bits="11101 01 0100 1 Rn{4} 0? imm{3} 1111 imm{2} type{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="tst" variant="tst_imm_T1">
+		<encoding bits="11110 imm 0 0000 1 Rn{4} 0 imm{3} 1111 imm{8}" />
+		<extend variable="imm" type="ThumbExpandImm" />
+		<order priority="1" />
+	</opcode>
+	
+	<opcode name="tst" variant="tst_reg_T1">
+		<encoding bits="010000 1000 Rm{3} Rn{3}" />
+	</opcode>
+	<opcode name="tst" variant="tst_reg_T2">
+		<encoding bits="11101 01 0000 1 Rn{4} 0 imm{3} 1111 imm{2} type{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="uadd" variant="uadd16_T1">
+		<encoding bits="11111 010 1 001 Rn{4} 1111 Rd{4} 0 100 Rm{4}" />
+	</opcode>
+
+	<opcode name="uadd" variant="uadd8_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 0 100 Rm{4}" />
+	</opcode>
+
+	<opcode name="uasx" variant="uasx_T1">
+		<encoding bits="11111 010 1 010 Rn{4} 1111 Rd{4} 0 100 Rm{4}" />
+	</opcode>
+
+	<opcode name="ubfx" variant="ubfx_T1">
+		<encoding bits="11110 0? 11 110 0 Rn{4} 0 imm{3} Rd{4} imm{2} 0? width{5}" />
+	</opcode>
+
+	<opcode name="udf" variant="udf_T1">
+		<encoding bits="1101 1110 imm{8}" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="udf" variant="udf_T2">
+		<encoding bits="111 10 1111111 imm{4} 1 010 imm{12}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="udiv" variant="udiv_T1">
+		<encoding bits="11111 011101 1 Rn{4} 1111? Rd{4} 1111 Rm{4}" />
+	</opcode>
+
+	<opcode name="uhadd" variant="uhadd16_T1">
+		<encoding bits="11111 010 1 001 Rn{4} 1111 Rd{4} 0 110 Rm{4}" />
+	</opcode>
+
+	<opcode name="uhadd" variant="uhadd8_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 0 110 Rm{4}" />
+	</opcode>
+
+	<opcode name="uhasx" variant="uhasx_T1">
+		<encoding bits="11111 010 1 010 Rn{4} 1111 Rd{4} 0 110 Rm{4}" />
+	</opcode>
+
+	<opcode name="uhsax" variant="uhsax_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 110 Rm{4}" />
+	</opcode>
+
+	<opcode name="uhsub" variant="uhsub16_T1">
+		<encoding bits="11111 010 1 101 Rn{4} 1111 Rd{4} 0 110 Rm{4}" />
+	</opcode>
+
+	<opcode name="uhsub" variant="uhsub8_T1">
+		<encoding bits="11111 010 1 100 Rn{4} 1111 Rd{4} 0 110 Rm{4}" />
+	</opcode>
+
+	<opcode name="umaal" variant="umaal_T1">
+		<encoding bits="11111 0111 110 Rn{4} RdLo{4} RdHi{4} 0110 Rm{4}" />
+	</opcode>
+
+	<opcode name="umlal" variant="umlal_T1">
+		<encoding bits="11111 0111 110 Rn{4} RdLo{4} RdHi{4} 0000 Rm{4}" />
+	</opcode>
+
+	<opcode name="umull" variant="umull_T1">
+		<encoding bits="11111 0111 010 Rn{4} RdLo{4} RdHi{4} 0000 Rm{4}" />
+	</opcode>
+
+	<opcode name="uqadd" variant="uqadd16_T1">
+		<encoding bits="11111 010 1 001 Rn{4} 1111 Rd{4} 0 101 Rm{4}" />
+	</opcode>
+
+	<opcode name="uqadd" variant="uqadd8_T1">
+		<encoding bits="11111 010 1 000 Rn{4} 1111 Rd{4} 0 101 Rm{4}" />
+	</opcode>
+
+	<opcode name="uqasx" variant="uqasx_T1">
+		<encoding bits="11111 010 1 010 Rn{4} 1111 Rd{4} 0 101 Rm{4}" />
+	</opcode>
+
+	<opcode name="uqsax" variant="uqsax_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 101 Rm{4}" />
+	</opcode>
+
+	<opcode name="uqsub" variant="uqsub16_T1">
+		<encoding bits="11111 010 1 101 Rn{4} 1111 Rd{4} 0 101 Rm{4}" />
+	</opcode>
+
+	<opcode name="uqsub" variant="uqsub8_T1">
+		<encoding bits="11111 010 1 100 Rn{4} 1111 Rd{4} 0 101 Rm{4}" />
+	</opcode>
+
+	<opcode name="usad8" variant="usad8_T1">
+		<encoding bits="11111 0110 111 Rn{4} 1111 Rd{4} 0000 Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="usada8" variant="usada8_T1">
+		<encoding bits="11111 0110 111 Rn{4} Ra{4} Rd{4} 0000 Rm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="usat" variant="usat_T1">
+		<encoding bits="11110 0? 11 10 shift 0 Rn{4} 0 imm{3} Rd{4} imm{2} 0? satimm{5}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="usat" variant="usat16_T1">
+		<encoding bits="11110 0? 11 101 0 Rn{4} 0 000 Rd{4} 00 00? satimm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="usax" variant="usax_T1">
+		<encoding bits="11111 010 1 110 Rn{4} 1111 Rd{4} 0 100 Rm{4}" />
+	</opcode>
+
+	<opcode name="usub" variant="usub16_T1">
+		<encoding bits="11111 010 1 101 Rn{4} 1111 Rd{4} 0 100 Rm{4}" />
+	</opcode>
+
+	<opcode name="usub" variant="usub8_T1">
+		<encoding bits="11111 010 1 100 Rn{4} 1111 Rd{4} 0 100 Rm{4}" />
+	</opcode>
+
+	<opcode name="uxtab" variant="uxtab_T1">
+		<encoding bits="11111 010 0 101 Rn{4} 1111 Rd{4} 1 0? rotate{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="uxtab" variant="uxtab16_T1">
+		<encoding bits="11111 010 0 011 Rn{4} 1111 Rd{4} 1 0? rotate{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="uxtah" variant="uxtah_T1">
+		<encoding bits="11111 010 0 001 Rn{4} 1111 Rd{4} 1 0? rotate{2} Rm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="uxtb" variant="uxtb_T1">
+		<encoding bits="1011 0010 11 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="uxtb" variant="uxtb_T2">
+		<encoding bits="11111 010 0 101 1111 1111 Rd{4} 1 0 rotate{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="uxtb" variant="uxtb16_T1">
+		<encoding bits="11111 010 0 011 1111 1111 Rd{4} 1 0 rotate{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="uxth" variant="uxth_T1">
+		<encoding bits="1011 0010 10 Rm{3} Rd{3}" />
+	</opcode>
+	<opcode name="uxth" variant="uxth_T2">
+		<encoding bits="11111 010 0 001 1111 1111 Rd{4} 1 0 rotate{2} Rm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vabs" variant="vabs_T1">
+		<encoding bits="1110 11101 D 11 0000 Vd{4} 101 sz 1 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vadd" variant="vadd_T1">
+		<encoding bits="1110 11100 D 11 Vn{4} Vd{4} 101 sz N 0 M 0 Vm{4}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="vcmp" variant="vcmp_T1">
+		<encoding bits="1110 11101 D 11 0100 Vd{4} 101 sz E 1 M 0 Vm{4}" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="vcmp" variant="vcmp_T2">
+		<encoding bits="1110 11101 D 11 0101 Vd{4} 101 sz E 1 0? 0 0000?" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vcvta" variant="vcvta_T1">
+		<encoding bits="1111 11101 D 1111 RM{2} Vd{4} 101 sz op 1 M 0 Vm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vcvt" variant="vcvt_fltint_T1">
+		<encoding bits="1111 11101 D 1111 RM{2} Vd{4} 101 sz op 1 M 0 Vm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vcvt" variant="vcvt_fltfpt_T1">
+		<encoding bits="1110 1110 1 D 11 1 op 1 U Vd{4} 101 sf sx 1 imm.0 0 imm{4}.1" />
+		<order priority="4" />
+	</opcode>
+
+	<opcode name="vcvt" variant="vcvt_dpsp_T1">
+		<encoding bits="1110 1110 1 D 11 011 1 Vd{4} 101 sz 1 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vcvtb" variant="vcvtb_T1">
+		<encoding bits="1110 11101 D 11001 op Vd{4} 101 sz T 1 M 0 Vm{4}" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="vdiv" variant="vdiv_T1">
+		<encoding bits="1110 11101 D 00 Vn{4} Vd{4} 101 sz N 0 M 0 Vm{4}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="vfma" variant="vfma_T1">
+		<encoding bits="1110 11101 D 10 Vn{4} Vd{4} 101 sz N op M 0 Vm{4}" />
+		<order priority="6" />
+	</opcode>
+
+	<opcode name="vfnma" variant="vfnma_T1">
+		<encoding bits="1110 11101 D 01 Vn{4} Vd{4} 101 sz N op M 0 Vm{4}" />
+		<order priority="6" />
+	</opcode>
+
+	<opcode name="vldm" variant="vldm_T1">
+		<encoding bits="1110 110 P U D W 1 Rn{4} Vd{4} 1011 imm{8}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="vldm" variant="vldm_T2">
+		<encoding bits="1110 110 P U D W 1 Rn{4} Vd{4} 1010 imm{8}" />
+		<order priority="4" />
+	</opcode>
+
+	<opcode name="vldr" variant="vldr_T1">
+		<encoding bits="1110 1101 U D 0 1 Rn{4} Vd{4} 1011 imm{8}" />
+		<order priority="3" />
+	</opcode>
+	<opcode name="vldr" variant="vldr_T2">
+		<encoding bits="1110 1101 U D 0 1 Rn{4} Vd{4} 1010 imm{8}" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="vmaxnm" variant="vmaxnm_T1">
+		<encoding bits="1111 11101 D 00 Vn{4} Vd{4} 101 sz N op M 0 Vm{4}" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="vmla" variant="vmla_T1">
+		<encoding bits="1110 11100 D 00 Vn{4} Vd{4} 101 sz N op M 0 Vm{4}" />
+		<order priority="6" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_imm_T1">
+		<encoding bits="1110 11101 D 11 imm{4} Vd{4} 101 sz 0? 0 0? 0 imm{4}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_reg_T1">
+		<encoding bits="1110 11101 D 11 0000 Vd{4} 101 sz 0 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_armscl_T1">
+		<encoding bits="1110 1110 0 0 H 0 Vd{4} Rt{4} 1011 D 00 1 0000?" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_sclarm_T1">
+		<encoding bits="1110 1110 0 0 H 1 Vd{4} Rt{4} 1011 D 00 1 0000?" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_armsp_T1">
+		<encoding bits="1110 1110 000 op Vn{4} Rt{4} 1010 N 00? 1 0000?" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_2arm2sp_T1">
+		<encoding bits="1110 1100 010 op Rtx{4} Rt{4} 1010 00 M 1 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vmov" variant="vmov_2armdw_T1">
+		<encoding bits="1110 1100 010 op Rtx{4} Rt{4} 1011 00 M 1 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vmrs" variant="vmrs_T1">
+		<encoding bits="1110 11101111 0001? Rt{4} 1010 0? 00? 1 0000?" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vmsr" variant="vmsr_T1">
+		<encoding bits="1110 11101110 0001? Rt{4} 1010 0? 00? 1 0000?" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vmul" variant="vmul_T1">
+		<encoding bits="1110 11100 D 10 Vn{4} Vd{4} 101 sz N 0 M 0 Vm{4}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="vneg" variant="vneg_T1">
+		<encoding bits="1110 11101 D 11 0001 Vd{4} 101 sz 0 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vnmla" variant="vnmla_T1">
+		<encoding bits="1110 11100 D 01 Vn{4} Vd{4} 101 sz N op M 0 Vm{4}" />
+		<order priority="6" />
+	</opcode>
+	<opcode name="vnmla" variant="vnmla_T2">
+		<encoding bits="1110 11100 D 10 Vn{4} Vd{4} 101 sz N 1 M 0 Vm{4}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="vpop" variant="vpop_T1">
+		<encoding bits="1110 110 0 1 D 1 1 1101 Vd{4} 1011 imm{8}" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="vpop" variant="vpop_T2">
+		<encoding bits="1110 110 0 1 D 1 1 1101 Vd{4} 1010 imm{8}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vpush" variant="vpush_T1">
+		<encoding bits="1110 110 1 0 D 1 0 1101 Vd{4} 1011 imm{8}" />
+		<order priority="2" />
+	</opcode>
+	<opcode name="vpush" variant="vpush_T2">
+		<encoding bits="1110 110 1 0 D 1 0 1101 Vd{4} 1010 imm{8}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vrinta" variant="vrinta_T1">
+		<encoding bits="1111 11101 D 1110 RM{2} Vd{4} 101 sz 0 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vrintx" variant="vrintx_T1">
+		<encoding bits="1110 11101 D 11011 1 Vd{4} 101 sz 0 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vrintz" variant="vrintz_T1">
+		<encoding bits="1110 11101 D 11011 0 Vd{4} 101 sz op 1 M 0 Vm{4}" />
+		<order priority="2" />
+	</opcode>
+
+	<opcode name="vsel" variant="vsel_T1">
+		<encoding bits="1111 11100 D cond{2} Vn{4} Vd{4} 101 sz N 0 M 0 Vm{4}" />
+		<order priority="4" />
+	</opcode>
+
+	<opcode name="vsqrt" variant="vsqrt_T1">
+		<encoding bits="1110 11101 D 11 0001 Vd{4} 101 sz 1 1 M 0 Vm{4}" />
+		<order priority="1" />
+	</opcode>
+
+	<opcode name="vstm" variant="vstm_T1">
+		<encoding bits="1110 110 P U D W 0 Rn{4} Vd{4} 1011 imm{8}" />
+		<order priority="4" />
+	</opcode>
+	<opcode name="vstm" variant="vstm_T2">
+		<encoding bits="1110 110 P U D W 0 Rn{4} Vd{4} 1010 imm{8}" />
+		<order priority="4" />
+	</opcode>
+
+	<opcode name="vstr" variant="vstr_T1">
+		<encoding bits="1110 1101 U D 0 0 Rn{4} Vd{4} 1011 imm{8}" />
+		<order priority="3" />
+	</opcode>
+	<opcode name="vstr" variant="vstr_T2">
+		<encoding bits="1110 1101 U D 0 0 Rn{4} Vd{4} 1010 imm{8}" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="vsub" variant="vsub_T1">
+		<encoding bits="1110 11100 D 11 Vn{4} Vd{4} 101 sz N 1 M 0 Vm{4}" />
+		<order priority="5" />
+	</opcode>
+
+	<opcode name="wfe" variant="wfe_T1">
+		<encoding bits="1011 1111 0010 0000" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="wfe" variant="wfe_T2">
+		<encoding bits="11110 0 111 01 0 1111? 10 0? 0 0? 000 00000010" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="wfi" variant="wfi_T1">
+		<encoding bits="1011 1111 0011 0000" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="wfi" variant="wfi_T2">
+		<encoding bits="11110 0 111 01 0 1111? 10 0? 0 0? 000 00000011" />
+		<order priority="3" />
+	</opcode>
+
+	<opcode name="yield" variant="yield_T1">
+		<encoding bits="1011 1111 0001 0000" />
+		<order priority="1" />
+	</opcode>
+	<opcode name="yield" variant="yield_T2">
+		<encoding bits="11110 0 111 01 0 1111? 10 0? 0 0? 000 00000001" />
+		<order priority="3" />
+	</opcode>
+</insnset>
