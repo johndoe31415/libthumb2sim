@@ -29,7 +29,6 @@
 #include "cpu_cm3.h"
 #include "address_space.h"
 #include "hexdump.h"
-#include "MD5.h"
 #include "config.h"
 #include "decoder.h"
 #include "impl_emulation.h"
@@ -105,20 +104,6 @@ void dumpCPUState(const struct CM3CPUState *aCPUState) {
 	fprintf(stderr, "\n");
 }
 
-
-void getMemoryHash(const struct CM3CPUState *aCPUState, char aHashStr[48]) {
-	unsigned char digest[16];
-	MD5_CTX ctx;
-	const uint8_t *data = getMemoryAt(&aCPUState->addrSpace, 0x20000000);	
-	md5Init(&ctx);
-	md5Update(&ctx, data, 64 * 1024);
-	md5Final(&ctx, digest);
-	for (int i = 0; i < 16; i++) {
-		sprintf(aHashStr + (2 * i), "%02x", digest[i]);
-	}
-	aHashStr[32] = 0;
-}
-
 void traceCPUStateFull(const struct emulationContext *aCtx, uint32_t aPreviousPC) {
 	struct LocalContext *lctx = (struct LocalContext*)aCtx->localContext;
 	if (lctx->traceFile) {
@@ -127,11 +112,7 @@ void traceCPUStateFull(const struct emulationContext *aCtx, uint32_t aPreviousPC
 		for (int i = 0; i < 16; i++) {
 			fprintf(lctx->traceFile, "r%d=%-8x ", i, aCtx->cpu->reg[i]);
 		}
-		fprintf(lctx->traceFile, "PSR=%-8x ", aCtx->cpu->psr);
-
-		char memHash[48];
-		getMemoryHash(aCtx->cpu, memHash);
-		fprintf(lctx->traceFile, "MH=%s\n", memHash);
+		fprintf(lctx->traceFile, "PSR=%-8x\n", aCtx->cpu->psr);
 	}
 }
 

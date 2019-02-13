@@ -4,7 +4,7 @@ CC := gcc
 CFLAGS := -Wall -O3 -pthread -std=c11 -g -D_XOPEN_SOURCE=500
 LDFLAGS :=
 
-OBJS := address_space.o app_initialization.o cpu_cm3.o hexdump.o MD5.o decoder.o impl_disassembly.o impl_emulation.o rdtsc.o
+OBJS := address_space.o app_initialization.o cpu_cm3.o hexdump.o decoder.o impl_disassembly.o impl_emulation.o rdtsc.o
 
 all: simulator
 
