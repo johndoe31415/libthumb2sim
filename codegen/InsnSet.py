@@ -1,3 +1,24 @@
+#	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
+#	Copyright (C) 2014-2019 Johannes Bauer
+#
+#	This file is part of libthumb2sim.
+#
+#	libthumb2sim is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; this program is ONLY licensed under
+#	version 3 of the License, later versions are explicitly excluded.
+#
+#	libthumb2sim is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with libthumb2sim; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#	Johannes Bauer <JohannesBauer@gmx.de>
+
 import tpg
 import itertools
 import collections
@@ -31,11 +52,11 @@ class FieldShift(object):
 	def _cshl(self, expr, shl):
 		shl -= self._shl
 		if shl > 0:
-			return "((%s) << %d)" % (expr, shl) 
+			return "((%s) << %d)" % (expr, shl)
 		elif shl == 0:
-			return "(%s)" % (expr) 
+			return "(%s)" % (expr)
 		else:
-			return "((%s) >> %d)" % (expr, -shl) 
+			return "((%s) >> %d)" % (expr, -shl)
 
 	def ctype(self):
 		if self._extend is not None:
@@ -66,8 +87,8 @@ class FieldShift(object):
 		assert(len(self._components) == 1)
 		assert(0 in self._components)
 		return self._components[0].srcmask
-	
-		
+
+
 	def origcexpression(self, varname = "inval"):
 		# Group by shift first
 		result = [ ]
@@ -75,7 +96,7 @@ class FieldShift(object):
 			result.append(self._cshl("%s & 0x%x" % (varname, component.srcmask << self._shl), shl))
 		result = " | ".join(result)
 		return result
-	
+
 	def cexpression(self, varname = "inval"):
 		result = self.origcexpression(varname)
 		if self._extend is not None:
@@ -85,7 +106,7 @@ class FieldShift(object):
 	@property
 	def hasextension(self):
 		return self._extend is not None
-	
+
 	def setextend(self, extension):
 		self._extend = extension
 
@@ -107,7 +128,7 @@ class Bitfield(object):
 		"tb",
 		"RM",
 		"H", "D", "E", "P", "N", "M", "F", "I", "R", "S", "T", "U", "W",
-		"j", "k", 
+		"j", "k",
 		"sf", "sx", "sz",
 		"msb", "option", "width",
 		"Rmx",
@@ -130,7 +151,7 @@ class Bitfield(object):
 					element.setposition(newpos)
 					variables[element.name] += 1
 
-		
+
 		elements = [ ]
 		shiftpos = 0
 		for element in reversed(self._elements):
@@ -261,7 +282,7 @@ class _Opcode(object):
 			var = self.getvar(varname)
 			proto.append("%s %s" % (var.ctype(), varname))
 		return ", ".join(proto)
-	
+
 	@property
 	def basename(self):
 		return self._name
@@ -279,7 +300,7 @@ class _Opcode(object):
 		return self._bitfield
 
 	def getvar(self, varname):
-		return self._bitfield[varname]		
+		return self._bitfield[varname]
 
 	def itervars(self):
 		for varname in self.variablenames:
@@ -332,7 +353,7 @@ class InsnSet(object):
 				print("Opcode ignored, parsing error: %s" % (e))
 		self._opcodes.sort(key = lambda x: (x.priority, x.name))
 		self._opcodesbyname = { opcode.name: opcode for opcode in self._opcodes }
-	
+
 	def getopcode(self, name):
 		return self._opcodesbyname[name]
 

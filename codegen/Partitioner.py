@@ -1,3 +1,24 @@
+#	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
+#	Copyright (C) 2014-2019 Johannes Bauer
+#
+#	This file is part of libthumb2sim.
+#
+#	libthumb2sim is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; this program is ONLY licensed under
+#	version 3 of the License, later versions are explicitly excluded.
+#
+#	libthumb2sim is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with libthumb2sim; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#	Johannes Bauer <JohannesBauer@gmx.de>
+
 import collections
 import itertools
 
@@ -9,7 +30,7 @@ class Partition(object):
 		self._if_set = if_elements
 		self._else_set = else_elements
 		self._len = len(self._if_set) + len(self._else_set)
-		
+
 	def partition(self):
 		print("Partition: %s %s" % (type(self._if_set), type(self._else_set)))
 
@@ -74,7 +95,7 @@ class PartitionableSet(object):
 
 	def discriminatorcnt(self, mask):
 		return len(list(element for element in self._elements if ((element.bitvalue & mask) == 0)))
-	
+
 	def discriminate(self, mask):
 		return [ PartitionableSet(element for element in self._elements if ((element.bitvalue & mask) == 0)),
 				PartitionableSet(element for element in self._elements if ((element.bitvalue & mask) != 0))
@@ -98,7 +119,7 @@ class PartitionableSet(object):
 			mask = sum(mask)
 			discriminatorcnt = self.discriminatorcnt(mask)
 			remaining = len(self) - discriminatorcnt
-			
+
 			if (discriminatorcnt == 0) or (remaining == 0):
 				# Unfit!
 				continue
@@ -121,7 +142,7 @@ class PartitionableSet(object):
 				print("Cannot further partition set of %d elements, no solution.")
 			else:
 				print("Cannot further partition set of %d elements, minscore %.1f" % (len(self), minscore))
-	
+
 	def dump(self, indent = 0):
 		indent_str = ("   " * indent)
 		print(indent_str + "%d: [ %s ]" % (len(self), ", ".join(x.identifier for x in self._elements)))

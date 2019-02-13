@@ -1,0 +1,9 @@
+__pycache__
+.*.swp
+*.o
+simulator
+codegen/cpu_stub.c
+codegen/decoder.c
+codegen/decoder.h
+codegen/implementation.c
+codegen/implementation.h
