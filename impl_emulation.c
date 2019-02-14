@@ -28,6 +28,7 @@
 #include "decoder.h"
 #include "impl_emulation.h"
 #include "cpu_cm3.h"
+#include "address_space.h"
 
 #define OPCODE_WIDE						(1 << 0)
 #define OPCODE_NARROW					(1 << 1)
@@ -423,8 +424,8 @@ static void emulation_i32_bic_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 
 static void emulation_i16_bkpt_T1(void *vctx, uint8_t imm) {
 	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
-	if (ctx->breakpointCallback) {
-		ctx->breakpointCallback(ctx, imm);
+	if (ctx->bkpt_callback) {
+		ctx->bkpt_callback(ctx, imm);
 	}
 	ctx->cpu->reg[REG_PC] += 2;
 }

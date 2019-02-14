@@ -26,20 +26,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#define MAX_ADDRESS_SLICES		4
-
-struct address_slice_t {
-	uint32_t begin;
-	uint32_t end;
-	uint8_t *data;
-	bool readOnly;
-};
-
-struct addrspace_t {
-	int sliceCnt;
-	struct address_slice_t slices[MAX_ADDRESS_SLICES];
-};
+#include <thumb2sim.h>
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
 const uint8_t *addrspace_memptr(const struct addrspace_t *address_space, uint32_t address);

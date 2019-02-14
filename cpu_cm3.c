@@ -49,13 +49,6 @@ struct LocalContext {
 	uint32_t registerCopy[16];
 };
 
-static void addTracePoint(struct LocalContext *aLCtx, uint16_t aPoint) {
-	if (aLCtx->tracePointCnt < aLCtx->maxTracePointCnt) {
-		aLCtx->tracePoints[aLCtx->tracePointCnt] = aPoint;
-		aLCtx->tracePointCnt++;
-	}
-}
-
 static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, ...) {
 	va_list ap;
 	va_start(ap, aMsg);
@@ -66,7 +59,7 @@ static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, 
 
 
 #define INTERCEPT_BKPT 1
-static void breakpointCallback(struct emu_ctx_t *ctx, uint8_t aBreakpoint) {
+static void bkpt_callback(struct emu_ctx_t *ctx, uint8_t aBreakpoint) {
 	struct LocalContext *lctx = (struct LocalContext*)ctx->localContext;
 	static uint64_t begin = 0;
 	if (aBreakpoint == INTERCEPT_BKPT) {
@@ -88,7 +81,7 @@ static void breakpointCallback(struct emu_ctx_t *ctx, uint8_t aBreakpoint) {
 	ctx->countNextInstruction = false;
 }
 
-void dumpCPUState(const struct cm3_cpu_state_t *cpu_state) {
+void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
 	for (int i = 0; i < 16; i++) {
 		fprintf(stderr, "r%-2d = %8x    ", i, cpu_state->reg[i]);
 		if ((i % 4) == 3) {
@@ -117,12 +110,12 @@ static void traceCPUStateFull(const struct emu_ctx_t *emu_ctx, uint32_t previous
 	}
 }
 
-void dumpMemoryAt(struct cm3_cpu_state_t *cpu_state, uint32_t address, uint16_t length) {
+void cpu_dump_memory(struct cm3_cpu_state_t *cpu_state, uint32_t address, uint16_t length) {
 	const uint8_t *data = addrspace_memptr(&cpu_state->addr_space, address);
 	hexdump_data(data, length);
 }
 
-void dumpMemoryToFile(struct cm3_cpu_state_t *cpu_state, const char *filename) {
+void cpu_dump_memory_file(struct cm3_cpu_state_t *cpu_state, const char *filename) {
 	FILE *f = fopen(filename, "w");
 	if (!f) {
 		perror(filename);
@@ -170,7 +163,7 @@ static void executeNextInstruction(struct emu_ctx_t *ctx) {
 		fprintf(stderr, "\n");
 	
 		if (instructionDebug) {
-			dumpCPUState(ctx->cpu);
+			cpu_dump_state(ctx->cpu);
 		}
 	}
 
@@ -200,19 +193,8 @@ static void executeNextInstruction(struct emu_ctx_t *ctx) {
 	}
 
 	if (instructionDebug) {
-//		dumpCPUState(ctx->cpu);
+//		cpu_dump_state(ctx->cpu);
 	}
-}
-
-static uint8_t hammingWeight(uint32_t value) {
-	uint8_t weight = 0;
-	while (value) {
-		if (value & 1) {
-			weight += 1;
-		}
-		value >>= 1;
-	}
-	return weight;
 }
 
 void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bool runUntilSentinel) {
@@ -229,7 +211,7 @@ void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bo
 
 	struct emu_ctx_t ctx = {
 		.localContext = &localContext,
-		.breakpointCallback = breakpointCallback,
+		.bkpt_callback = bkpt_callback,
 		.cpu = cpu_state,
 	};
 	while (localContext.simulationState != STATE_FINISHED) {
@@ -243,49 +225,7 @@ void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bo
 		}
 #endif
 
-		if ((ctx.countNextInstruction) && (localContext.simulationState == STATE_SIMULATING)) {
-			/* Emit tracepoint */
-			int tracePointWeight = 0;
-			for (int i = 0; i < TRACE_CONSIDER_REGISTER_CNT; i++) {
-				tracePointWeight += hammingWeight(localContext.registerCopy[i] ^ cpu_state->reg[i]);
-			}
-			addTracePoint(&localContext, tracePointWeight);
-		}
-
-		if (localContext.simulationState == STATE_FINISHED) {
-//			fprintf(stderr, "Simulation in %s finished successfuly after %d instructions and %d tracepoints.\n", aTraceOutputFile, cpu_state->clockcycle, localContext.tracePointCnt);
-			printf("INSNS %d\n", localContext.tracePointCnt);
-			break;
-		}
-		if (runUntilSentinel && localContext.simulationState == STATE_SIMULATING) {
-			fprintf(stderr, "Simulation hit sentinel point.\n");
-			cpu_state->reg[REG_PC] = prevLoc;
-			break;
-		}
-		
-		if (cpu_state->reg[REG_PC] == prevLoc) {
-			fprintf(stderr, "Simulation terminated with an infinite loop after %d instructions at 0x%x.\n", cpu_state->clockcycle, prevLoc);
-			dumpCPUState(cpu_state);
-			dumpMemoryToFile(cpu_state, "output.bin");
-			exit(EXIT_SUCCESS);
-		}
-
-
 	}
-
-	if (localContext.traceFile) {
-		int ptIndex = 0;
-		for (int i = 0; i < localContext.tracePointCnt; i++) {	
-			if (localContext.tracePoints[i] != 0xffff) {
-				fprintf(localContext.traceFile, "%d %d\n", ptIndex, localContext.tracePoints[i]);
-				ptIndex++;
-			} else {
-				fprintf(localContext.traceFile, "# Sync hint\n");
-			}
-		}
-		fclose(localContext.traceFile);		
-	}
-	free(localContext.tracePoints);
 }
 
 void cpu_reset(struct cm3_cpu_state_t *cpu_state) {

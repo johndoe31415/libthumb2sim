@@ -30,7 +30,7 @@ typedef void (*breakptFnc_t)(struct emu_ctx_t *ctx, uint8_t aBreakpoint);
 struct emu_ctx_t {
 	struct cm3_cpu_state_t *cpu;
 	void *localContext;
-	breakptFnc_t breakpointCallback;
+	breakptFnc_t bkpt_callback;
 	bool countNextInstruction;
 	bool shiftInstructionITState;
 };

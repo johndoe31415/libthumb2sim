@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CFLAGS := -O3 -std=c11 -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wimplicit-fallthrough -Wshadow
+CFLAGS := -O3 -std=c11 -Iinclude -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wimplicit-fallthrough -Wshadow
 CFLAGS += -g -D_XOPEN_SOURCE=500
 LDFLAGS :=
 
