@@ -40,7 +40,7 @@ struct loadedFile {
 	uint32_t length;
 };
 
-struct loadedFile loadFile(const char *aFilename, uint32_t aMaxSize, bool aAllocMax) {
+static struct loadedFile loadFile(const char *aFilename, uint32_t aMaxSize, bool aAllocMax) {
 	struct loadedFile lfile;
 	memset(&lfile, 0, sizeof(lfile));
 

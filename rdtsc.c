@@ -21,9 +21,10 @@
 	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdbool.h>
+#include "rdtsc.h"
 
 uint64_t rdtsc(void) {
 	uint64_t value;

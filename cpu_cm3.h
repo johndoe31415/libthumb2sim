@@ -84,9 +84,7 @@ struct CM3CPUState {
 };
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-struct LocalContext;
 void dumpCPUState(const struct CM3CPUState *aCPUState);
-void getMemoryHash(const struct CM3CPUState *aCPUState, char aHashStr[48]);
 void dumpMemoryAt(struct CM3CPUState *aCPUState, uint32_t aAddress, uint16_t aLength);
 void dumpMemoryToFile(struct CM3CPUState *aCPUState, const char *aFilename);
 void cpuRun(struct CM3CPUState *aCPUState, const char *aTraceOutputFile, bool runUntilSentinel);

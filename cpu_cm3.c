@@ -33,6 +33,7 @@
 #include "decoder.h"
 #include "impl_emulation.h"
 #include "impl_disassembly.h"
+#include "rdtsc.h"
 
 #define STATE_WAITING			0
 #define STATE_SIMULATING		1
@@ -104,7 +105,7 @@ void dumpCPUState(const struct CM3CPUState *aCPUState) {
 	fprintf(stderr, "\n");
 }
 
-void traceCPUStateFull(const struct emulationContext *aCtx, uint32_t aPreviousPC) {
+static void traceCPUStateFull(const struct emulationContext *aCtx, uint32_t aPreviousPC) {
 	struct LocalContext *lctx = (struct LocalContext*)aCtx->localContext;
 	if (lctx->traceFile) {
 		fprintf(lctx->traceFile, "%d ", aCtx->cpu->clockcycle);

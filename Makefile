@@ -1,7 +1,7 @@
 .PHONY: all clean
 
-CC := gcc
-CFLAGS := -Wall -O3 -pthread -std=c11 -g -D_XOPEN_SOURCE=500
+CFLAGS := -O3 -std=c11 -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wimplicit-fallthrough -Wshadow
+CFLAGS += -g -D_XOPEN_SOURCE=500
 LDFLAGS :=
 
 OBJS := address_space.o app_initialization.o cpu_cm3.o hexdump.o decoder.o impl_disassembly.o impl_emulation.o rdtsc.o

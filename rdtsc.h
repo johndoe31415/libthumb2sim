@@ -24,6 +24,8 @@
 #ifndef __RDTSC_H__
 #define __RDTSC_H__
 
+#include <stdint.h>
+
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
 uint64_t rdtsc(void);
 /***************  AUTO GENERATED SECTION ENDS   ***************/

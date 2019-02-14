@@ -29,13 +29,12 @@
 typedef void yieldFunction_t(void *aYieldData, const char *aFilename);
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-struct appContext;
-struct supposedRun;
 void* appInitContext(void);
 const char *appInitialization(void *aAppCtx, struct CM3CPUState *aCPUState);
 void appPostRun(void *aAppCtx, struct CM3CPUState *aCPUState);
 void appPreSentinelDetection(void *aAppCtx, struct CM3CPUState *aCPUState);
 void appPostSentinelDetection(void *aAppCtx, struct CM3CPUState *aCPUState);
+const char *hexifyBuffer(char *cBuf, const uint8_t *aData, int aLength);
 void appRunData(void *aAppCtx, struct CM3CPUState *aCPUState, yieldFunction_t aYield, void *aYieldData);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 

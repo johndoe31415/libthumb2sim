@@ -21,8 +21,9 @@
 	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
+#include "hexdump.h"
 
 static char hexdumpChar(char aInChar) {
 	if ((aInChar <= 32) || (aInChar >= 127)) {

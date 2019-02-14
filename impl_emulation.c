@@ -150,7 +150,7 @@ static uint32_t addCondCode(uint32_t aX, uint32_t aY) {
 	uint32_t condCode = 0;
 	uint32_t result = aX + aY;
 	condCode |= (result == 0) ? FLAG_ZERO : 0;
-	condCode |= (aY > aY) ? FLAG_NEGATIVE : 0;
+	condCode |= (aY > aY) ? FLAG_NEGATIVE : 0;			/* TODO: THIS SEEMS LIKE A BUG, one of these aYs should probably be aX */
 	condCode |= ((result < aX) || (result < aY)) ? FLAG_CARRY: 0;
 	condCode |= ((aX ^ result) & (aY ^ result) & 0x80000000) ? FLAG_OVERFLOW : 0;
 	return condCode;
