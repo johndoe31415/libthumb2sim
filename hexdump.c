@@ -25,15 +25,15 @@
 #include <stdint.h>
 #include "hexdump.h"
 
-static char hexdumpChar(char aInChar) {
-	if ((aInChar <= 32) || (aInChar >= 127)) {
+static char hexdump_char(char chararcter) {
+	if ((chararcter <= 32) || (chararcter >= 127)) {
 		return '.';
 	} else {
-		return aInChar;
+		return chararcter;
 	}
 }
 
-void hexdumpData(const unsigned char *data, uint16_t length) {
+void hexdump_data(const unsigned char *data, uint16_t length) {
 	uint16_t i;
 	fprintf(stderr, "%d bytes (0x%x) follow:\r\n", length, length);
 	for (i = 0; i < length; i++) {
@@ -45,7 +45,7 @@ void hexdumpData(const unsigned char *data, uint16_t length) {
 			uint16_t j;
 			fprintf(stderr, "   ");
 			for (j = i - 15; j <= i; j++) {
-				fprintf(stderr, "%c", hexdumpChar(data[j]));
+				fprintf(stderr, "%c", hexdump_char(data[j]));
 			}
 			fprintf(stderr, "\r\n");
 		} else if (((i + 1) % 8) == 0) {
@@ -68,15 +68,15 @@ void hexdumpData(const unsigned char *data, uint16_t length) {
 		}
 		fprintf(stderr, "   ");
 		for (j = length - (length % 16); j < length; j++) {
-			fprintf(stderr, "%c", hexdumpChar(data[j]));
+			fprintf(stderr, "%c", hexdump_char(data[j]));
 		}
 		fprintf(stderr, "\r\n");
 	}
 }
 
-void hexdumpDataLead(const char *aLead, const unsigned char *data, uint16_t length) {
-	fprintf(stderr, "%s ", aLead);
-	hexdumpData(data, length);
+void hexdump_nameddata(const char *name, const unsigned char *data, uint16_t length) {
+	fprintf(stderr, "%s ", name);
+	hexdump_data(data, length);
 	fprintf(stderr, "\n");
 }
 
@@ -84,7 +84,7 @@ void hexdumpDataLead(const char *aLead, const unsigned char *data, uint16_t leng
 int main(int argc, char **argv) {
 	int i;
 	for (i = 0; i < 34; i++) {
-		hexdumpData((unsigned char*)"Hallo du da. Wie geht es dir", i);
+		hexdump_data((unsigned char*)"Hallo du da. Wie geht es dir", i);
 	}
 	return 0;
 }

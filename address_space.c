@@ -29,7 +29,7 @@
 
 //#define DEBUG_MEMORY_ACCESS
 
-static struct address_slice_t *getSlice(struct addressSpace *address_space, uint32_t address) {
+static struct address_slice_t *addrspace_getslice(struct addrspace_t *address_space, uint32_t address) {
 	for (int i = 0; i < address_space->sliceCnt; i++) {
 		if ((address >= address_space->slices[i].begin) && (address < address_space->slices[i].end)) {
 			return address_space->slices + i;
@@ -40,13 +40,13 @@ static struct address_slice_t *getSlice(struct addressSpace *address_space, uint
 	return NULL;
 }
 
-const uint8_t *getMemoryAt(const struct addressSpace *address_space, uint32_t address) {
-	struct address_slice_t *slice = getSlice((struct addressSpace*)address_space, address);
+const uint8_t *addrspace_memptr(const struct addrspace_t *address_space, uint32_t address) {
+	struct address_slice_t *slice = addrspace_getslice((struct addrspace_t*)address_space, address);
 	return slice->data + (address - slice->begin);
 }
 
-uint8_t memRead8(struct addressSpace *address_space, uint32_t address) {
-	struct address_slice_t *slice = getSlice(address_space, address);
+uint8_t addrspace_read8(struct addrspace_t *address_space, uint32_t address) {
+	struct address_slice_t *slice = addrspace_getslice(address_space, address);
 	uint8_t value = slice->data[address - slice->begin];
 #ifdef DEBUG_MEMORY_ACCESS
 	fprintf(stderr, "Read  8: [0x%x] = 0x%02x\n", address, value);
@@ -54,19 +54,19 @@ uint8_t memRead8(struct addressSpace *address_space, uint32_t address) {
 	return value;
 }
 
-void memWrite8(struct addressSpace *address_space, uint32_t address, uint8_t aValue) {
-	struct address_slice_t *slice = getSlice(address_space, address);
-	slice->data[address - slice->begin] = aValue;
+void addrspace_write8(struct addrspace_t *address_space, uint32_t address, uint8_t value) {
+	struct address_slice_t *slice = addrspace_getslice(address_space, address);
+	slice->data[address - slice->begin] = value;
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Write 8: [0x%x] = 0x%02x\n", address, aValue);
+	fprintf(stderr, "Write 8: [0x%x] = 0x%02x\n", address, value);
 #endif
 }
 
-void memWrite16(struct addressSpace *address_space, uint32_t address, uint16_t aValue) {
-	struct address_slice_t *sliceBegin = getSlice(address_space, address);
+void addrspace_write16(struct addrspace_t *address_space, uint32_t address, uint16_t value) {
+	struct address_slice_t *slice_begin = addrspace_getslice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct address_slice_t *sliceEnd = getSlice(address_space, address + 1);
-	if (sliceBegin != sliceEnd) {
+	struct address_slice_t *slice_end = addrspace_getslice(address_space, address + 1);
+	if (slice_begin != slice_end) {
 		fprintf(stderr, "Out of bounds access for 16 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
@@ -76,20 +76,20 @@ void memWrite16(struct addressSpace *address_space, uint32_t address, uint16_t a
 	fprintf(stderr, "Write 16: [0x%x] = 0x%04x\n", address, value);
 #endif
 	
-	uint16_t *location = (uint16_t*)(sliceBegin->data + address - sliceBegin->begin);
-	*location = aValue;
+	uint16_t *location = (uint16_t*)(slice_begin->data + address - slice_begin->begin);
+	*location = value;
 }
 
-uint16_t memRead16(struct addressSpace *address_space, uint32_t address) {
-	struct address_slice_t *sliceBegin = getSlice(address_space, address);
+uint16_t addrspace_read16(struct addrspace_t *address_space, uint32_t address) {
+	struct address_slice_t *slice_begin = addrspace_getslice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct address_slice_t *sliceEnd = getSlice(address_space, address + 1);
-	if (sliceBegin != sliceEnd) {
+	struct address_slice_t *slice_end = addrspace_getslice(address_space, address + 1);
+	if (slice_begin != slice_end) {
 		fprintf(stderr, "Out of bounds access for 16 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
 #endif
-	uint32_t value = *((uint16_t*)(sliceBegin->data + address - sliceBegin->begin));
+	uint32_t value = *((uint16_t*)(slice_begin->data + address - slice_begin->begin));
 
 #ifdef DEBUG_MEMORY_ACCESS
 	fprintf(stderr, "Read 16: [0x%x] = 0x%04x\n", address, value);
@@ -97,40 +97,40 @@ uint16_t memRead16(struct addressSpace *address_space, uint32_t address) {
 	return value;
 }
 
-uint32_t memRead32(struct addressSpace *address_space, uint32_t address) {
-	struct address_slice_t *sliceBegin = getSlice(address_space, address);
+uint32_t addrspace_read32(struct addrspace_t *address_space, uint32_t address) {
+	struct address_slice_t *slice_begin = addrspace_getslice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct address_slice_t *sliceEnd = getSlice(address_space, address + 3);
-	if (sliceBegin != sliceEnd) {
+	struct address_slice_t *slice_end = addrspace_getslice(address_space, address + 3);
+	if (slice_begin != slice_end) {
 		fprintf(stderr, "Out of bounds access for 32 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
 #endif
-	uint32_t value = *((uint32_t*)(sliceBegin->data + address - sliceBegin->begin));
+	uint32_t value = *((uint32_t*)(slice_begin->data + address - slice_begin->begin));
 #ifdef DEBUG_MEMORY_ACCESS
 	fprintf(stderr, "Read 32: [0x%x] = 0x%08x\n", address, value);
 #endif
 	return value;
 }
 
-void memWrite32(struct addressSpace *address_space, uint32_t address, uint32_t aValue) {
-	struct address_slice_t *sliceBegin = getSlice(address_space, address);
+void addrspace_write32(struct addrspace_t *address_space, uint32_t address, uint32_t value) {
+	struct address_slice_t *slice_begin = addrspace_getslice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct address_slice_t *sliceEnd = getSlice(address_space, address);
-	if (sliceBegin != sliceEnd) {
+	struct address_slice_t *slice_end = addrspace_getslice(address_space, address);
+	if (slice_begin != slice_end) {
 		fprintf(stderr, "Out of bounds access for 32 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
 #endif
-	//fprintf(stderr, "Write 32: [0x%x] = 0x%08x\n", address, aValue);
+	//fprintf(stderr, "Write 32: [0x%x] = 0x%08x\n", address, value);
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Write 32: [0x%x 0x%x 0x%x 0x%x] = 0x%08x\n", address, address + 1, address + 2, address + 3, aValue);
+	fprintf(stderr, "Write 32: [0x%x 0x%x 0x%x 0x%x] = 0x%08x\n", address, address + 1, address + 2, address + 3, value);
 #endif
-	uint32_t *location = (uint32_t*)(sliceBegin->data + address - sliceBegin->begin);
-	*location = aValue;
+	uint32_t *location = (uint32_t*)(slice_begin->data + address - slice_begin->begin);
+	*location = value;
 }
 
-void addMemory(struct addressSpace *address_space, uint32_t aStartAddress, uint32_t length, uint8_t *data, bool aReadOnly) {
+void addrspace_add_region(struct addrspace_t *address_space, uint32_t start_addr, uint32_t length, uint8_t *data, bool read_only) {
 	if (address_space->sliceCnt == MAX_ADDRESS_SLICES) {
 		fprintf(stderr, "Cannot add memory: Slices exhausted\n");
 		exit(EXIT_FAILURE);
@@ -138,14 +138,14 @@ void addMemory(struct addressSpace *address_space, uint32_t aStartAddress, uint3
 
 	int sliceNo = address_space->sliceCnt;
 	address_space->sliceCnt++;
-	address_space->slices[sliceNo].begin = aStartAddress;
-	address_space->slices[sliceNo].end = aStartAddress + length;
+	address_space->slices[sliceNo].begin = start_addr;
+	address_space->slices[sliceNo].end = start_addr + length;
 	address_space->slices[sliceNo].data = data;
-	address_space->slices[sliceNo].readOnly = aReadOnly;
-	fprintf(stderr, "Added memory: at 0x%x len %x Readonly %d\n", aStartAddress, length, aReadOnly);
+	address_space->slices[sliceNo].readOnly = read_only;
+	fprintf(stderr, "Added memory: at 0x%x len %x Readonly %d\n", start_addr, length, read_only);
 }
 
-void initAddressSpace(struct addressSpace *address_space) {
-	memset(address_space, 0, sizeof(struct addressSpace));
+void addrspace_init(struct addrspace_t *address_space) {
+	memset(address_space, 0, sizeof(struct addrspace_t));
 	
 }

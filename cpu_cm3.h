@@ -42,7 +42,7 @@
 #define TYPE_ASR		2
 #define TYPE_ROR		3
 
-enum CondExec {
+enum it_cond_t {
 	CONDITION_EQ = 0,		// Equal (==)						Z == 1
 	CONDITION_NE = 1,		// Not equal (!=)					Z == 0
 	CONDITION_CS = 2,		// Carry set (>= or unordered)		C == 1
@@ -60,7 +60,7 @@ enum CondExec {
 	CONDITION_AL = 14,		// Always
 };
 
-enum ITState {
+enum it_state_t {
 	IT_NONE = 0,
 	IT_THEN = 1,
 	IT_ELSE = 2
@@ -74,21 +74,21 @@ enum ITState {
 #define RAM_SIZE			(128 * 1024)
 //#define RAM_SIZE			(256 * 1024)
 
-struct CM3CPUState {
+struct cm3_cpu_state_t {
 	uint32_t reg[16];
 	uint32_t psr;
 	uint32_t clockcycle;
-	uint8_t itCond;
-	uint8_t itState;
-	struct addressSpace addrSpace;
+	uint8_t it_cond;
+	uint8_t it_state;
+	struct addrspace_t addr_space;
 };
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-void dumpCPUState(const struct CM3CPUState *aCPUState);
-void dumpMemoryAt(struct CM3CPUState *aCPUState, uint32_t address, uint16_t length);
-void dumpMemoryToFile(struct CM3CPUState *aCPUState, const char *aFilename);
-void cpuRun(struct CM3CPUState *aCPUState, const char *aTraceOutputFile, bool runUntilSentinel);
-void cpuReset(struct CM3CPUState *aCPUState);
+void dumpCPUState(const struct cm3_cpu_state_t *cpu_state);
+void dumpMemoryAt(struct cm3_cpu_state_t *cpu_state, uint32_t address, uint16_t length);
+void dumpMemoryToFile(struct cm3_cpu_state_t *cpu_state, const char *filename);
+void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bool runUntilSentinel);
+void cpu_reset(struct cm3_cpu_state_t *cpu_state);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 
 #endif

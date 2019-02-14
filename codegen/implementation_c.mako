@@ -29,7 +29,7 @@
 
 %for opcode in sorted(i.getopcodes()):
 static void implementation_i${len(opcode)}_${opcode.name}(${opcode.getfullprototype()}) {
-	struct implementationContext *ctx = (struct implementationContext*)aCtx;
+	struct implementationContext *ctx = (struct implementationContext*)ctx;
 }
 
 %endfor

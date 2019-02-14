@@ -50,9 +50,9 @@ static int32_t thumb_expand_imm(uint16_t imm) {
 	}
 }
 
-static int32_t thumb_sign_extend(uint32_t imm, uint8_t aBitLen) {
-	if (imm & (1 << (aBitLen - 1))) {
-		return imm | ~((1 << aBitLen) - 1);
+static int32_t thumb_sign_extend(uint32_t imm, uint8_t bit_length) {
+	if (imm & (1 << (bit_length - 1))) {
+		return imm | ~((1 << bit_length) - 1);
 	} else {
 		return imm;
 	}

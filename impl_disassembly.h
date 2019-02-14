@@ -24,11 +24,11 @@
 #ifndef __IMPL_IMPLEMENTATION__
 #define __IMPL_IMPLEMENTATION__
 
-struct disassemblyContext {
-	void (*printDisassembly)(struct disassemblyContext *aCtx, const char *aMsg, ...);
+struct disas_ctx_t {
+	void (*printDisassembly)(struct disas_ctx_t *ctx, const char *aMsg, ...);
 	uint32_t pc;
-	uint8_t itState;
-	uint8_t itCond;
+	uint8_t it_state;
+	uint8_t it_cond;
 	char disasBuffer[128];
 };
 

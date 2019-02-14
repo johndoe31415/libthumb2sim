@@ -40,20 +40,20 @@
 
 #define MAX_ELEMENTS		32
 
-static void outputFnc(struct disassemblyContext *aCtx, const char *aMsg, ...) {
+static void outputFnc(struct disas_ctx_t *ctx, const char *aMsg, ...) {
 	va_list ap;
 	va_start(ap, aMsg);
-	int l = strlen(aCtx->disasBuffer);
-	vsnprintf(aCtx->disasBuffer + l, 128 - l, aMsg, ap);
+	int l = strlen(ctx->disasBuffer);
+	vsnprintf(ctx->disasBuffer + l, 128 - l, aMsg, ap);
 	va_end(ap);
 }
 
-static int parseHexStr(const char *aHexStr, uint8_t *data, int aMaxLen) {
+static int parseHexStr(const char *aHexStr, uint8_t *data, int max_length) {
 	int l = strlen(aHexStr);
 	if ((l % 2) == 1) {
 		return -1;
 	}
-	if (l / 2 > aMaxLen) {
+	if (l / 2 > max_length) {
 		return -1;
 	}
 	for (int i = 0; i < l; i += 2) {
@@ -98,11 +98,11 @@ static bool executeLine(int aElemCnt, char **aElements) {
 	}	
 
 
-	struct disassemblyContext ctx = {
+	struct disas_ctx_t ctx = {
 		.printDisassembly = outputFnc,
 		.pc = pc,
-		.itState = (condCode == -1) ? IT_NONE : IT_THEN,
-		.itCond = condCode,
+		.it_state = (condCode == -1) ? IT_NONE : IT_THEN,
+		.it_cond = condCode,
 	};
 	ctx.disasBuffer[0] = 0;
 	decodeInstruction(&ctx, binOpcode, &disassemblyCallbacks);

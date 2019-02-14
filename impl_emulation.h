@@ -24,18 +24,18 @@
 #ifndef __IMPL_EMULATION_H__
 #define __IMPL_EMULATION_H__
 
-struct emulationContext;
-typedef void (*breakptFnc_t)(struct emulationContext *aCtx, uint8_t aBreakpoint);
+struct emu_ctx_t;
+typedef void (*breakptFnc_t)(struct emu_ctx_t *ctx, uint8_t aBreakpoint);
 
-struct emulationContext {
-	struct CM3CPUState *cpu;
+struct emu_ctx_t {
+	struct cm3_cpu_state_t *cpu;
 	void *localContext;
 	breakptFnc_t breakpointCallback;
 	bool countNextInstruction;
 	bool shiftInstructionITState;
 };
 
-bool conditionallyExecuteInstruction(const struct emulationContext *aCtx);
+bool conditionallyExecuteInstruction(const struct emu_ctx_t *ctx);
 extern const struct decoding_handler_t decodeOnlyCallbacks;
 extern const struct decoding_handler_t emulationCallbacks;
 
