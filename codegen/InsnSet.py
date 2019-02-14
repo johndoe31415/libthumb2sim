@@ -61,10 +61,10 @@ class FieldShift(object):
 	def ctype(self):
 		if self._extend is not None:
 			return {
-				"ThumbExpandImm":	"int32_t",
-				"SignExtend20":		"int32_t",
-				"SignExtend24":		"int32_t",
-				"SignExtend24_EOR":	"int32_t",
+				"thumb_expand_imm":			"int32_t",
+				"thumb_sign_extend20":		"int32_t",
+				"thumb_sign_extend24":		"int32_t",
+				"thumb_sign_extend24_EOR":	"int32_t",
 			}[self._extend]
 
 		length = len(self)

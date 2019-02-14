@@ -27,13 +27,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct decodingHandler {
+struct decoding_handler_t {
 %for opcode in sorted(i.getopcodes()):
 	void (*i${len(opcode)}_${opcode.name})(${opcode.getfullprototype()});
 %endfor
 };
 
-int decodeInstruction(void *aCtx, uint32_t aOpcode, const struct decodingHandler *aHandler, FILE *instructionDecodingInfo);
+int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *handler, FILE *insn_debugging_info);
 
 #endif
 // vim: set filetype=c:

@@ -27,79 +27,79 @@
 #include "decoder.h"
 #include "config.h"
 
-static uint32_t ror32(uint32_t aIn, uint8_t aRor) {
-	uint32_t aLoMask = (1 << aRor) - 1;
-	uint32_t aHiMask = ((1 << (32 - aRor)) - 1) << aRor;
-	return ((aIn & aLoMask) << (32 - aRor)) | ((aIn & aHiMask) >> aRor);
+static uint32_t ror32(uint32_t in_value, uint8_t rotate) {
+	uint32_t lo_mask = (1 << rotate) - 1;
+	uint32_t hi_mask = ((1 << (32 - rotate)) - 1) << rotate;
+	return ((in_value & lo_mask) << (32 - rotate)) | ((in_value & hi_mask) >> rotate);
 }
 
-static int32_t ThumbExpandImm(uint16_t aImm) {
-	if ((aImm & 0xc00) == 0x0) {
-		if ((aImm & 0x300) == 0x0) {
-			return aImm & 0xff;
-		} else if ((aImm & 0x300) == 0x100) {
-			return ((aImm & 0xff) << 16) | (aImm & 0xff);
-		} else if ((aImm & 0x300) == 0x200) {
-			return ((aImm & 0xff) << 24) | ((aImm & 0xff) << 8);
+static int32_t thumb_expand_imm(uint16_t imm) {
+	if ((imm & 0xc00) == 0x0) {
+		if ((imm & 0x300) == 0x0) {
+			return imm & 0xff;
+		} else if ((imm & 0x300) == 0x100) {
+			return ((imm & 0xff) << 16) | (imm & 0xff);
+		} else if ((imm & 0x300) == 0x200) {
+			return ((imm & 0xff) << 24) | ((imm & 0xff) << 8);
 		} else {
-			return ((aImm & 0xff) << 24) | ((aImm & 0xff) << 16) | ((aImm & 0xff) << 8) | ((aImm & 0xff) << 0);
+			return ((imm & 0xff) << 24) | ((imm & 0xff) << 16) | ((imm & 0xff) << 8) | ((imm & 0xff) << 0);
 		}
 	} else {
 		/* Rotate thingy */
-		return ror32(0x80 | (aImm & 0x7f), (aImm & 0xf80) >> 7);
+		return ror32(0x80 | (imm & 0x7f), (imm & 0xf80) >> 7);
 	}
 }
 
-static int32_t SignExtend(uint32_t aImm, uint8_t aBitLen) {
-	if (aImm & (1 << (aBitLen - 1))) {
-		return aImm | ~((1 << aBitLen) - 1);
+static int32_t thumb_sign_extend(uint32_t imm, uint8_t aBitLen) {
+	if (imm & (1 << (aBitLen - 1))) {
+		return imm | ~((1 << aBitLen) - 1);
 	} else {
-		return aImm;
+		return imm;
 	}
 }
 
-static int32_t SignExtend20(uint32_t aImm) {
-	return SignExtend(aImm, 20);
+static int32_t thumb_sign_extend20(uint32_t imm) {
+	return thumb_sign_extend(imm, 20);
 }
 
-static int32_t SignExtend24_EOR(uint32_t aImm) {
-	aImm ^= ((1 << 21) ^ ((aImm & (1 << 23)) >> 2));
-	aImm ^= ((1 << 22) ^ ((aImm & (1 << 23)) >> 1));
-	return SignExtend(aImm, 24);
+static int32_t thumb_sign_extend24_EOR(uint32_t imm) {
+	imm ^= ((1 << 21) ^ ((imm & (1 << 23)) >> 2));
+	imm ^= ((1 << 22) ^ ((imm & (1 << 23)) >> 1));
+	return thumb_sign_extend(imm, 24);
 }
 
-int decodeInstruction(void *aCtx, uint32_t aOpcode, const struct decodingHandler *aHandler, FILE *instructionDebuggingInfo) {
-	int decodedInstructionLength = 0;
+int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *handler, FILE *insn_debugging_info) {
+	int decoded_insn_length = 0;
 	if (1 == 0) {
 		// Just for easier code generation
 %for opcode in i.getopcodes():
-	} else if ((aOpcode & ${"%#x" % (opcode.bitfield.constantmask)}) == ${"%#x" % (opcode.bitfield.constantcmp)}) {
+	} else if ((opcode & ${"%#x" % (opcode.bitfield.constantmask)}) == ${"%#x" % (opcode.bitfield.constantcmp)}) {
 		// ${opcode.name}
-		decodedInstructionLength = ${len(opcode) // 8};
-		if (aHandler->i${len(opcode)}_${opcode.name}) {
+		decoded_insn_length = ${len(opcode) // 8};
+		if (handler->i${len(opcode)}_${opcode.name}) {
 			%for (varname, variable) in opcode.itervars():
-			${variable.ctype()} ${varname} = ${variable.cexpression("aOpcode")};
+			${variable.ctype()} ${varname} = ${variable.cexpression("opcode")};
 			%endfor
-			if (instructionDebuggingInfo) {
-				fprintf(instructionDebuggingInfo, "Insn 0x%04x: ${len(opcode)} ${opcode.name} ", aOpcode);
+			if (insn_debugging_info) {
+				fprintf(insn_debugging_info, "Insn 0x%04x: ${len(opcode)} ${opcode.name} ", opcode);
 				%for (varname, variable) in opcode.itervars():
 				%if not variable.hasextension:
-				fprintf(instructionDebuggingInfo, "${varname} = 0x%x ", ${varname});
+				fprintf(insn_debugging_info, "${varname} = 0x%x ", ${varname});
 				%else:
-				fprintf(instructionDebuggingInfo, "${varname} = 0x%x [orig 0x%x] ", ${varname}, ${variable.origcexpression("aOpcode")});
+				fprintf(insn_debugging_info, "${varname} = 0x%x [orig 0x%x] ", ${varname}, ${variable.origcexpression("opcode")});
 				%endif
 				%endfor
-				fprintf(instructionDebuggingInfo, "\t");
+				fprintf(insn_debugging_info, "\t");
 			}
-			aHandler->i${len(opcode)}_${opcode.name}(${", ".join([ "aCtx" ] + opcode.variablenames)});
+			handler->i${len(opcode)}_${opcode.name}(${", ".join([ "vctx" ] + opcode.variablenames)});
 		}
 %endfor
 	} else {
-		if (instructionDebuggingInfo) {
-			fprintf(instructionDebuggingInfo, "No decoding possible for opcode 0x%x\n", aOpcode);
+		if (insn_debugging_info) {
+			fprintf(insn_debugging_info, "No decoding possible for opcode 0x%x\n", opcode);
 		}
 	}
-	return decodedInstructionLength;
+	return decoded_insn_length;
 }
 
 // vim: set filetype=c:

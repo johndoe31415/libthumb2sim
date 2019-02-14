@@ -24,7 +24,7 @@
 <insnset>
 	<opcode name="adc" variant="adc_imm_T1">
 		<encoding bits="11110 imm 0 1010 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 	</opcode>
 	
 	<opcode name="adc" variant="adc_reg_T1">
@@ -42,7 +42,7 @@
 	</opcode>
 	<opcode name="add" variant="add_imm_T3">
 		<encoding bits="11110 imm 0 1000 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="3" />
 	</opcode>
 	<opcode name="add" variant="add_imm_T4">
@@ -70,7 +70,7 @@
 	</opcode>
 	<opcode name="add" variant="add_SPi_T3">
 		<encoding bits="11110 imm 0 1000 S 1101 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="2" />
 	</opcode>
 	<opcode name="add" variant="add_SPi_T4">
@@ -105,7 +105,7 @@
 	
 	<opcode name="and" variant="and_imm_T1">
 		<encoding bits="11110 imm 0 0000 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="2" />
 	</opcode>
 	
@@ -141,12 +141,12 @@
 	</opcode>
 	<opcode name="b" variant="b_T3">
 		<encoding bits="11110 imm.4 cond{4} imm{6}.1 10 imm.2 0 imm.3 imm{11}.0" />
-		<extend variable="imm" type="SignExtend20" />
+		<extend variable="imm" type="thumb_sign_extend20" />
 		<order priority="10" />
 	</opcode>
 	<opcode name="b" variant="b_T4">
 		<encoding bits="11110 imm.4 imm{10}.1 10 imm.3 1 imm.2 imm{11}.0" />
-		<extend variable="imm" type="SignExtend24_EOR" />
+		<extend variable="imm" type="thumb_sign_extend24_EOR" />
 		<order priority="10" />
 	</opcode>
 	
@@ -162,7 +162,7 @@
 
 	<opcode name="bic" variant="bic_imm_T1">
 		<encoding bits="11110 imm 0 0001 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 	</opcode>
 	
 	<opcode name="bic" variant="bic_reg_T1">
@@ -178,7 +178,7 @@
 	
 	<opcode name="bl" variant="bl_T1">
 		<encoding bits="11110 imm.4 imm{10}.1 11 imm.3 1 imm.2 imm{11}.0" />
-		<extend variable="imm" type="SignExtend24_EOR" />
+		<extend variable="imm" type="thumb_sign_extend24_EOR" />
 		<order priority="10" />
 	</opcode>
 	
@@ -215,7 +215,7 @@
 	<opcode name="cmn" variant="cmn_imm_T1">
 		<encoding bits="11110 imm 0 1000 1 Rn{4} 0 imm{3} 1111 imm{8}" />
 		<order priority="1" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 	</opcode>
 	
 	<opcode name="cmn" variant="cmn_reg_T1">
@@ -223,7 +223,7 @@
 	</opcode>
 	<opcode name="cmn" variant="cmn_reg_T2">
 		<encoding bits="11101 01 1000 1 Rn{4} 0? imm{3} 1111 imm{2} type{2} Rm{4}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="1" />
 	</opcode>
 	
@@ -232,7 +232,7 @@
 	</opcode>
 	<opcode name="cmp" variant="cmp_imm_T2">
 		<encoding bits="11110 imm 0 1101 1 Rn{4} 0? imm{3} 1111 imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="8" />
 	</opcode>
 	
@@ -268,7 +268,7 @@
 	
 	<opcode name="eor" variant="eor_imm_T1">
 		<encoding bits="11110 imm 0 0100 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="2" />
 	</opcode>
 	
@@ -558,7 +558,7 @@
 	
 	<opcode name="mov" variant="mov_imm_T2">
 		<encoding bits="11110 imm 00010 S 11110 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<illegal values="13, 15" variable="Rd" />
 		<order priority="1" />
 	</opcode>
@@ -622,7 +622,7 @@
 	
 	<opcode name="mvn" variant="mvn_imm_T1">
 		<encoding bits="11110 imm 0 0011 S 1111 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="1" />
 	</opcode>
 	
@@ -631,7 +631,7 @@
 	</opcode>
 	<opcode name="mvn" variant="mvn_reg_T2">
 		<encoding bits="11101 01 0011 S 1111 0 imm{3} Rd{4} imm{2} type{2} Rm{4}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="1" />
 	</opcode>
 
@@ -656,7 +656,7 @@
 	
 	<opcode name="orr" variant="orr_imm_T1">
 		<encoding bits="11110 imm 0 0010 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="2" />
 	</opcode>
 
@@ -817,7 +817,7 @@
 	</opcode>
 	<opcode name="rsb" variant="rsb_imm_T2">
 		<encoding bits="11110 imm 0 1110 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 	</opcode>
 	
 	<opcode name="rsb" variant="rsb_reg_T1">
@@ -838,7 +838,7 @@
 	
 	<opcode name="sbc" variant="sbc_imm_T1">
 		<encoding bits="11110 imm 0 1011 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 	</opcode>
 	
 	<opcode name="sbc" variant="sbc_reg_T1">
@@ -1110,7 +1110,7 @@
 	</opcode>
 	<opcode name="sub" variant="sub_imm_T3">
 		<encoding bits="11110 imm 0 1101 S Rn{4} 0 imm{3} Rd{4} imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="9" />
 	</opcode>
 	<opcode name="sub" variant="sub_imm_T4">
@@ -1201,7 +1201,7 @@
 
 	<opcode name="tst" variant="tst_imm_T1">
 		<encoding bits="11110 imm 0 0000 1 Rn{4} 0 imm{3} 1111 imm{8}" />
-		<extend variable="imm" type="ThumbExpandImm" />
+		<extend variable="imm" type="thumb_expand_imm" />
 		<order priority="1" />
 	</opcode>
 	

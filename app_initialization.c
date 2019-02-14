@@ -160,11 +160,11 @@ void appPostSentinelDetection(void *aAppCtx, struct CM3CPUState *aCPUState) {
 	}
 }
 
-const char *hexifyBuffer(char *cBuf, const uint8_t *aData, int aLength) {
+const char *hexifyBuffer(char *cBuf, const uint8_t *data, int length) {
 	char *writePtr = cBuf;
 	writePtr[0] = 0;
-	for (int i = 0; i < aLength; i++) {
-		writePtr += sprintf(writePtr, "%02x", aData[i]);
+	for (int i = 0; i < length; i++) {
+		writePtr += sprintf(writePtr, "%02x", data[i]);
 	}	
 	return cBuf;
 }

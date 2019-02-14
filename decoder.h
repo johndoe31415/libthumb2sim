@@ -27,7 +27,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct decodingHandler {
+struct decoding_handler_t {
 	void (*i32_adc_imm_T1)(void *aCtx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S);
 	void (*i16_adc_reg_T1)(void *aCtx, uint8_t Rdn, uint8_t Rm);
 	void (*i32_adc_reg_T2)(void *aCtx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S);
@@ -395,7 +395,7 @@ struct decodingHandler {
 	void (*i32_yield_T2)(void *aCtx);
 };
 
-int decodeInstruction(void *aCtx, uint32_t aOpcode, const struct decodingHandler *aHandler, FILE *instructionDecodingInfo);
+int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *handler, FILE *insn_debugging_info);
 
 #endif
 // vim: set filetype=c:

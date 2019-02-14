@@ -29,43 +29,43 @@
 
 //#define DEBUG_MEMORY_ACCESS
 
-static struct addressSlice *getSlice(struct addressSpace *aAddressSpace, uint32_t aAddress) {
-	for (int i = 0; i < aAddressSpace->sliceCnt; i++) {
-		if ((aAddress >= aAddressSpace->slices[i].begin) && (aAddress < aAddressSpace->slices[i].end)) {
-			return aAddressSpace->slices + i;
+static struct address_slice_t *getSlice(struct addressSpace *address_space, uint32_t address) {
+	for (int i = 0; i < address_space->sliceCnt; i++) {
+		if ((address >= address_space->slices[i].begin) && (address < address_space->slices[i].end)) {
+			return address_space->slices + i;
 		}
 	}
-	fprintf(stderr, "Page fault: Ilegal access to 0x%x (no mapped slice).\n", aAddress);
+	fprintf(stderr, "Page fault: Ilegal access to 0x%x (no mapped slice).\n", address);
 	exit(EXIT_FAILURE);
 	return NULL;
 }
 
-const uint8_t *getMemoryAt(const struct addressSpace *aAddressSpace, uint32_t aAddress) {
-	struct addressSlice *slice = getSlice((struct addressSpace*)aAddressSpace, aAddress);
-	return slice->data + (aAddress - slice->begin);
+const uint8_t *getMemoryAt(const struct addressSpace *address_space, uint32_t address) {
+	struct address_slice_t *slice = getSlice((struct addressSpace*)address_space, address);
+	return slice->data + (address - slice->begin);
 }
 
-uint8_t memRead8(struct addressSpace *aAddressSpace, uint32_t aAddress) {
-	struct addressSlice *slice = getSlice(aAddressSpace, aAddress);
-	uint8_t value = slice->data[aAddress - slice->begin];
+uint8_t memRead8(struct addressSpace *address_space, uint32_t address) {
+	struct address_slice_t *slice = getSlice(address_space, address);
+	uint8_t value = slice->data[address - slice->begin];
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Read  8: [0x%x] = 0x%02x\n", aAddress, value);
+	fprintf(stderr, "Read  8: [0x%x] = 0x%02x\n", address, value);
 #endif
 	return value;
 }
 
-void memWrite8(struct addressSpace *aAddressSpace, uint32_t aAddress, uint8_t aValue) {
-	struct addressSlice *slice = getSlice(aAddressSpace, aAddress);
-	slice->data[aAddress - slice->begin] = aValue;
+void memWrite8(struct addressSpace *address_space, uint32_t address, uint8_t aValue) {
+	struct address_slice_t *slice = getSlice(address_space, address);
+	slice->data[address - slice->begin] = aValue;
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Write 8: [0x%x] = 0x%02x\n", aAddress, aValue);
+	fprintf(stderr, "Write 8: [0x%x] = 0x%02x\n", address, aValue);
 #endif
 }
 
-void memWrite16(struct addressSpace *aAddressSpace, uint32_t aAddress, uint16_t aValue) {
-	struct addressSlice *sliceBegin = getSlice(aAddressSpace, aAddress);
+void memWrite16(struct addressSpace *address_space, uint32_t address, uint16_t aValue) {
+	struct address_slice_t *sliceBegin = getSlice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct addressSlice *sliceEnd = getSlice(aAddressSpace, aAddress + 1);
+	struct address_slice_t *sliceEnd = getSlice(address_space, address + 1);
 	if (sliceBegin != sliceEnd) {
 		fprintf(stderr, "Out of bounds access for 16 bit read.\n");
 		exit(EXIT_FAILURE);
@@ -73,79 +73,79 @@ void memWrite16(struct addressSpace *aAddressSpace, uint32_t aAddress, uint16_t 
 #endif
 
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Write 16: [0x%x] = 0x%04x\n", aAddress, value);
+	fprintf(stderr, "Write 16: [0x%x] = 0x%04x\n", address, value);
 #endif
 	
-	uint16_t *location = (uint16_t*)(sliceBegin->data + aAddress - sliceBegin->begin);
+	uint16_t *location = (uint16_t*)(sliceBegin->data + address - sliceBegin->begin);
 	*location = aValue;
 }
 
-uint16_t memRead16(struct addressSpace *aAddressSpace, uint32_t aAddress) {
-	struct addressSlice *sliceBegin = getSlice(aAddressSpace, aAddress);
+uint16_t memRead16(struct addressSpace *address_space, uint32_t address) {
+	struct address_slice_t *sliceBegin = getSlice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct addressSlice *sliceEnd = getSlice(aAddressSpace, aAddress + 1);
+	struct address_slice_t *sliceEnd = getSlice(address_space, address + 1);
 	if (sliceBegin != sliceEnd) {
 		fprintf(stderr, "Out of bounds access for 16 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
 #endif
-	uint32_t value = *((uint16_t*)(sliceBegin->data + aAddress - sliceBegin->begin));
+	uint32_t value = *((uint16_t*)(sliceBegin->data + address - sliceBegin->begin));
 
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Read 16: [0x%x] = 0x%04x\n", aAddress, value);
+	fprintf(stderr, "Read 16: [0x%x] = 0x%04x\n", address, value);
 #endif
 	return value;
 }
 
-uint32_t memRead32(struct addressSpace *aAddressSpace, uint32_t aAddress) {
-	struct addressSlice *sliceBegin = getSlice(aAddressSpace, aAddress);
+uint32_t memRead32(struct addressSpace *address_space, uint32_t address) {
+	struct address_slice_t *sliceBegin = getSlice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct addressSlice *sliceEnd = getSlice(aAddressSpace, aAddress + 3);
+	struct address_slice_t *sliceEnd = getSlice(address_space, address + 3);
 	if (sliceBegin != sliceEnd) {
 		fprintf(stderr, "Out of bounds access for 32 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
 #endif
-	uint32_t value = *((uint32_t*)(sliceBegin->data + aAddress - sliceBegin->begin));
+	uint32_t value = *((uint32_t*)(sliceBegin->data + address - sliceBegin->begin));
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Read 32: [0x%x] = 0x%08x\n", aAddress, value);
+	fprintf(stderr, "Read 32: [0x%x] = 0x%08x\n", address, value);
 #endif
 	return value;
 }
 
-void memWrite32(struct addressSpace *aAddressSpace, uint32_t aAddress, uint32_t aValue) {
-	struct addressSlice *sliceBegin = getSlice(aAddressSpace, aAddress);
+void memWrite32(struct addressSpace *address_space, uint32_t address, uint32_t aValue) {
+	struct address_slice_t *sliceBegin = getSlice(address_space, address);
 #ifdef DEBUG_MEMORY_ACCESS
-	struct addressSlice *sliceEnd = getSlice(aAddressSpace, aAddress);
+	struct address_slice_t *sliceEnd = getSlice(address_space, address);
 	if (sliceBegin != sliceEnd) {
 		fprintf(stderr, "Out of bounds access for 32 bit read.\n");
 		exit(EXIT_FAILURE);
 	}
 #endif
-	//fprintf(stderr, "Write 32: [0x%x] = 0x%08x\n", aAddress, aValue);
+	//fprintf(stderr, "Write 32: [0x%x] = 0x%08x\n", address, aValue);
 #ifdef DEBUG_MEMORY_ACCESS
-	fprintf(stderr, "Write 32: [0x%x 0x%x 0x%x 0x%x] = 0x%08x\n", aAddress, aAddress + 1, aAddress + 2, aAddress + 3, aValue);
+	fprintf(stderr, "Write 32: [0x%x 0x%x 0x%x 0x%x] = 0x%08x\n", address, address + 1, address + 2, address + 3, aValue);
 #endif
-	uint32_t *location = (uint32_t*)(sliceBegin->data + aAddress - sliceBegin->begin);
+	uint32_t *location = (uint32_t*)(sliceBegin->data + address - sliceBegin->begin);
 	*location = aValue;
 }
 
-void addMemory(struct addressSpace *aAddressSpace, uint32_t aStartAddress, uint32_t aLength, uint8_t *aData, bool aReadOnly) {
-	if (aAddressSpace->sliceCnt == MAX_ADDRESS_SLICES) {
+void addMemory(struct addressSpace *address_space, uint32_t aStartAddress, uint32_t length, uint8_t *data, bool aReadOnly) {
+	if (address_space->sliceCnt == MAX_ADDRESS_SLICES) {
 		fprintf(stderr, "Cannot add memory: Slices exhausted\n");
 		exit(EXIT_FAILURE);
 	}
 
-	int sliceNo = aAddressSpace->sliceCnt;
-	aAddressSpace->sliceCnt++;
-	aAddressSpace->slices[sliceNo].begin = aStartAddress;
-	aAddressSpace->slices[sliceNo].end = aStartAddress + aLength;
-	aAddressSpace->slices[sliceNo].data = aData;
-	aAddressSpace->slices[sliceNo].readOnly = aReadOnly;
-	fprintf(stderr, "Added memory: at 0x%x len %x Readonly %d\n", aStartAddress, aLength, aReadOnly);
+	int sliceNo = address_space->sliceCnt;
+	address_space->sliceCnt++;
+	address_space->slices[sliceNo].begin = aStartAddress;
+	address_space->slices[sliceNo].end = aStartAddress + length;
+	address_space->slices[sliceNo].data = data;
+	address_space->slices[sliceNo].readOnly = aReadOnly;
+	fprintf(stderr, "Added memory: at 0x%x len %x Readonly %d\n", aStartAddress, length, aReadOnly);
 }
 
-void initAddressSpace(struct addressSpace *aAddressSpace) {
-	memset(aAddressSpace, 0, sizeof(struct addressSpace));
+void initAddressSpace(struct addressSpace *address_space) {
+	memset(address_space, 0, sizeof(struct addressSpace));
 	
 }

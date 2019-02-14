@@ -29,7 +29,7 @@
 
 #define MAX_ADDRESS_SLICES		4
 
-struct addressSlice {
+struct address_slice_t {
 	uint32_t begin;
 	uint32_t end;
 	uint8_t *data;
@@ -38,19 +38,19 @@ struct addressSlice {
 
 struct addressSpace {
 	int sliceCnt;
-	struct addressSlice slices[MAX_ADDRESS_SLICES];
+	struct address_slice_t slices[MAX_ADDRESS_SLICES];
 };
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-const uint8_t *getMemoryAt(const struct addressSpace *aAddressSpace, uint32_t aAddress);
-uint8_t memRead8(struct addressSpace *aAddressSpace, uint32_t aAddress);
-void memWrite8(struct addressSpace *aAddressSpace, uint32_t aAddress, uint8_t aValue);
-void memWrite16(struct addressSpace *aAddressSpace, uint32_t aAddress, uint16_t aValue);
-uint16_t memRead16(struct addressSpace *aAddressSpace, uint32_t aAddress);
-uint32_t memRead32(struct addressSpace *aAddressSpace, uint32_t aAddress);
-void memWrite32(struct addressSpace *aAddressSpace, uint32_t aAddress, uint32_t aValue);
-void addMemory(struct addressSpace *aAddressSpace, uint32_t aStartAddress, uint32_t aLength, uint8_t *aData, bool aReadOnly);
-void initAddressSpace(struct addressSpace *aAddressSpace);
+const uint8_t *getMemoryAt(const struct addressSpace *address_space, uint32_t address);
+uint8_t memRead8(struct addressSpace *address_space, uint32_t address);
+void memWrite8(struct addressSpace *address_space, uint32_t address, uint8_t aValue);
+void memWrite16(struct addressSpace *address_space, uint32_t address, uint16_t aValue);
+uint16_t memRead16(struct addressSpace *address_space, uint32_t address);
+uint32_t memRead32(struct addressSpace *address_space, uint32_t address);
+void memWrite32(struct addressSpace *address_space, uint32_t address, uint32_t aValue);
+void addMemory(struct addressSpace *address_space, uint32_t aStartAddress, uint32_t length, uint8_t *data, bool aReadOnly);
+void initAddressSpace(struct addressSpace *address_space);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 
 #endif

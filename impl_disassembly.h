@@ -32,6 +32,6 @@ struct disassemblyContext {
 	char disasBuffer[128];
 };
 
-extern const struct decodingHandler disassemblyCallbacks;
+extern const struct decoding_handler_t disassemblyCallbacks;
 
 #endif

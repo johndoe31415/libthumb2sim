@@ -36,7 +36,7 @@ struct emulationContext {
 };
 
 bool conditionallyExecuteInstruction(const struct emulationContext *aCtx);
-extern const struct decodingHandler decodeOnlyCallbacks;
-extern const struct decodingHandler emulationCallbacks;
+extern const struct decoding_handler_t decodeOnlyCallbacks;
+extern const struct decoding_handler_t emulationCallbacks;
 
 #endif

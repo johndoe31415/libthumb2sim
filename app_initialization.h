@@ -34,7 +34,7 @@ const char *appInitialization(void *aAppCtx, struct CM3CPUState *aCPUState);
 void appPostRun(void *aAppCtx, struct CM3CPUState *aCPUState);
 void appPreSentinelDetection(void *aAppCtx, struct CM3CPUState *aCPUState);
 void appPostSentinelDetection(void *aAppCtx, struct CM3CPUState *aCPUState);
-const char *hexifyBuffer(char *cBuf, const uint8_t *aData, int aLength);
+const char *hexifyBuffer(char *cBuf, const uint8_t *data, int length);
 void appRunData(void *aAppCtx, struct CM3CPUState *aCPUState, yieldFunction_t aYield, void *aYieldData);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 

@@ -85,7 +85,7 @@ struct CM3CPUState {
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
 void dumpCPUState(const struct CM3CPUState *aCPUState);
-void dumpMemoryAt(struct CM3CPUState *aCPUState, uint32_t aAddress, uint16_t aLength);
+void dumpMemoryAt(struct CM3CPUState *aCPUState, uint32_t address, uint16_t length);
 void dumpMemoryToFile(struct CM3CPUState *aCPUState, const char *aFilename);
 void cpuRun(struct CM3CPUState *aCPUState, const char *aTraceOutputFile, bool runUntilSentinel);
 void cpuReset(struct CM3CPUState *aCPUState);

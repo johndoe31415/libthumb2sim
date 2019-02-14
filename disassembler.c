@@ -48,7 +48,7 @@ static void outputFnc(struct disassemblyContext *aCtx, const char *aMsg, ...) {
 	va_end(ap);
 }
 
-static int parseHexStr(const char *aHexStr, uint8_t *aData, int aMaxLen) {
+static int parseHexStr(const char *aHexStr, uint8_t *data, int aMaxLen) {
 	int l = strlen(aHexStr);
 	if ((l % 2) == 1) {
 		return -1;
@@ -63,7 +63,7 @@ static int parseHexStr(const char *aHexStr, uint8_t *aData, int aMaxLen) {
 		nextChar[2] = 0;
 		int parsedChar;
 		parsedChar = strtoul(nextChar, NULL, 16);
-		aData[i / 2] = parsedChar;
+		data[i / 2] = parsedChar;
 	}
 	return l / 2;
 }

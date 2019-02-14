@@ -117,9 +117,9 @@ static void traceCPUStateFull(const struct emulationContext *aCtx, uint32_t aPre
 	}
 }
 
-void dumpMemoryAt(struct CM3CPUState *aCPUState, uint32_t aAddress, uint16_t aLength) {
-	const uint8_t *data = getMemoryAt(&aCPUState->addrSpace, aAddress);
-	hexdumpData(data, aLength);
+void dumpMemoryAt(struct CM3CPUState *aCPUState, uint32_t address, uint16_t length) {
+	const uint8_t *data = getMemoryAt(&aCPUState->addrSpace, address);
+	hexdumpData(data, length);
 }
 
 void dumpMemoryToFile(struct CM3CPUState *aCPUState, const char *aFilename) {
@@ -151,11 +151,11 @@ static void executeNextInstruction(struct emulationContext *aCtx) {
 			.disasBuffer = { 0 }
 		};
 		FILE *decodeInfos = instructionDebug ? stderr : NULL;
-		decodeInstruction(&disasCtx, insnWord, &disassemblyCallbacks, decodeInfos);
+		decode_insn(&disasCtx, insnWord, &disassemblyCallbacks, decodeInfos);
 		if (disasCtx.disasBuffer[0] == 0) {
 			fprintf(stderr, "Warning: Cannot disassemble instruction at 0x%x\n", aCtx->cpu->reg[REG_PC]);
 			if (!instructionDebug) {
-				decodeInstruction(&disasCtx, insnWord, &disassemblyCallbacks, stderr);
+				decode_insn(&disasCtx, insnWord, &disassemblyCallbacks, stderr);
 			}
 		}
 		if (instructionDebug) {
@@ -175,10 +175,10 @@ static void executeNextInstruction(struct emulationContext *aCtx) {
 	}
 
 	if (conditionallyExecuteInstruction(aCtx)) {
-		decodeInstruction(aCtx, insnWord, &emulationCallbacks, NULL);
+		decode_insn(aCtx, insnWord, &emulationCallbacks, NULL);
 	} else {
 		/* Skip instruction, decode to find out how long it is */
-		int length = decodeInstruction(aCtx, insnWord, &decodeOnlyCallbacks, NULL);
+		int length = decode_insn(aCtx, insnWord, &decodeOnlyCallbacks, NULL);
 		aCtx->cpu->reg[REG_PC] += length;
 	}
 

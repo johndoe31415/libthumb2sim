@@ -33,19 +33,19 @@ static char hexdumpChar(char aInChar) {
 	}
 }
 
-void hexdumpData(const unsigned char *aData, uint16_t aLength) {
+void hexdumpData(const unsigned char *data, uint16_t length) {
 	uint16_t i;
-	fprintf(stderr, "%d bytes (0x%x) follow:\r\n", aLength, aLength);
-	for (i = 0; i < aLength; i++) {
+	fprintf(stderr, "%d bytes (0x%x) follow:\r\n", length, length);
+	for (i = 0; i < length; i++) {
 		if ((i % 16) == 0) {
 			fprintf(stderr, "%4x   ", i);
 		}
-		fprintf(stderr, "%02x ", aData[i]);
+		fprintf(stderr, "%02x ", data[i]);
 		if (((i + 1) % 16) == 0) {
 			uint16_t j;
 			fprintf(stderr, "   ");
 			for (j = i - 15; j <= i; j++) {
-				fprintf(stderr, "%c", hexdumpChar(aData[j]));
+				fprintf(stderr, "%c", hexdumpChar(data[j]));
 			}
 			fprintf(stderr, "\r\n");
 		} else if (((i + 1) % 8) == 0) {
@@ -54,29 +54,29 @@ void hexdumpData(const unsigned char *aData, uint16_t aLength) {
 			fprintf(stderr, " ");
 		}
 	}
-	if (aLength % 16) {
+	if (length % 16) {
 		uint16_t j;
-		for (j = 0; j < 16 - (aLength % 16); j++) {
+		for (j = 0; j < 16 - (length % 16); j++) {
 			fprintf(stderr, "   ");
 		}
-		if ((aLength % 16) < 4) {
+		if ((length % 16) < 4) {
 			fprintf(stderr, "     ");
-		} else if ((aLength % 16) < 8) {
+		} else if ((length % 16) < 8) {
 			fprintf(stderr, "    ");
-		} else if ((aLength % 16) < 12) {
+		} else if ((length % 16) < 12) {
 			fprintf(stderr, " ");
 		}
 		fprintf(stderr, "   ");
-		for (j = aLength - (aLength % 16); j < aLength; j++) {
-			fprintf(stderr, "%c", hexdumpChar(aData[j]));
+		for (j = length - (length % 16); j < length; j++) {
+			fprintf(stderr, "%c", hexdumpChar(data[j]));
 		}
 		fprintf(stderr, "\r\n");
 	}
 }
 
-void hexdumpDataLead(const char *aLead, const unsigned char *aData, uint16_t aLength) {
+void hexdumpDataLead(const char *aLead, const unsigned char *data, uint16_t length) {
 	fprintf(stderr, "%s ", aLead);
-	hexdumpData(aData, aLength);
+	hexdumpData(data, length);
 	fprintf(stderr, "\n");
 }
 
