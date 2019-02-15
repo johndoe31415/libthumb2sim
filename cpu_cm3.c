@@ -39,16 +39,6 @@
 #define STATE_SIMULATING		1
 #define STATE_FINISHED			2
 
-struct emu_ctx_t {
-	char disassemblyBuffer[128];
-	int simulationState;
-	FILE *traceFile;
-	uint16_t *tracePoints;
-	uint32_t tracePointCnt;
-	uint32_t maxTracePointCnt;
-	uint32_t registerCopy[16];
-};
-
 static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, ...) {
 	va_list ap;
 	va_start(ap, aMsg);
@@ -74,6 +64,7 @@ void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
 	fprintf(stderr, "\n");
 }
 
+#if 0
 static void traceCPUStateFull(const struct insn_emu_ctx_t *emu_ctx, uint32_t previous_pc) {
 	struct emu_ctx_t *lctx = (struct emu_ctx_t*)emu_ctx->localContext;
 	if (lctx->traceFile) {
@@ -85,32 +76,43 @@ static void traceCPUStateFull(const struct insn_emu_ctx_t *emu_ctx, uint32_t pre
 		fprintf(lctx->traceFile, "PSR=%-8x\n", emu_ctx->cpu->psr);
 	}
 }
+#endif
 
-void cpu_dump_memory(struct cm3_cpu_state_t *cpu_state, uint32_t address, uint16_t length) {
-	const uint8_t *data = addrspace_memptr(&cpu_state->addr_space, address);
+void cpu_dump_memory(struct emu_ctx_t *emu_ctx, uint32_t address, uint16_t length) {
+	const uint8_t *data = addrspace_memptr(&emu_ctx->addr_space, address);
 	hexdump_data(data, length);
 }
 
-void cpu_dump_memory_file(struct cm3_cpu_state_t *cpu_state, const char *filename) {
+void cpu_dump_memory_file(struct emu_ctx_t *emu_ctx, const char *filename) {
 	FILE *f = fopen(filename, "w");
 	if (!f) {
 		perror(filename);
 		return;
 	}
-	const uint8_t *data = addrspace_memptr(&cpu_state->addr_space, RAM_BASE);
+#if 0
+	const uint8_t *data = addrspace_memptr(&emu_ctx->addr_space, RAM_BASE);
 	if (fwrite(data, RAM_SIZE, 1, f) != 1) {
 		perror("fwrite");
 	}
+#endif
 	fclose(f);
 }
 
-static void executeNextInstruction(struct insn_emu_ctx_t *ctx) {
-//	bool instructionDebug = (ctx->cpu->clockcycle + 1 == 2363);
-	bool instructionDebug = true;
-	uint32_t insnWord = (addrspace_read16(&ctx->cpu->addr_space, ctx->cpu->reg[REG_PC]) << 16) | addrspace_read16(&ctx->cpu->addr_space, ctx->cpu->reg[REG_PC] + 2);
-	ctx->countNextInstruction = true;
-	ctx->shiftInstructionITState = true;
+static uint32_t addrspace_read_insn_word(struct addrspace_t *addr_space, uint32_t pc) {
+	return (addrspace_read16(addr_space, pc) << 16) | addrspace_read16(addr_space, pc + 2);
+}
 
+static void executeNextInstruction(struct emu_ctx_t *emu_ctx) {
+	struct insn_emu_ctx_t insn_ctx = {
+		.emu_ctx = emu_ctx,
+		.countNextInstruction = true,
+		.shiftInstructionITState = true,
+	};
+//	bool instructionDebug = (ctx->cpu->clockcycle + 1 == 2363);
+//	bool instructionDebug = true;
+	uint32_t insnWord = addrspace_read_insn_word(&emu_ctx->addr_space, emu_ctx->cpu.reg[REG_PC]);
+
+#if 0
 	if (instructionDebug) {
 		struct disas_ctx_t disasCtx = {
 			.pc = ctx->cpu->reg[REG_PC],
@@ -142,75 +144,57 @@ static void executeNextInstruction(struct insn_emu_ctx_t *ctx) {
 			cpu_dump_state(ctx->cpu);
 		}
 	}
+#endif
 
-	if (conditionallyExecuteInstruction(ctx)) {
-		decode_insn(ctx, insnWord, &emulationCallbacks, NULL);
+	if (conditionallyExecuteInstruction(&insn_ctx)) {
+		decode_insn(&insn_ctx, insnWord, &emulationCallbacks, NULL);
 	} else {
 		/* Skip instruction, decode to find out how long it is */
-		int length = decode_insn(ctx, insnWord, &decodeOnlyCallbacks, NULL);
-		ctx->cpu->reg[REG_PC] += length;
+		int length = decode_insn(&insn_ctx, insnWord, &decodeOnlyCallbacks, NULL);
+		emu_ctx->cpu.reg[REG_PC] += length;
 	}
 
-	if (ctx->countNextInstruction) {
-		ctx->cpu->clockcycle++;
+	if (insn_ctx.countNextInstruction) {
+		emu_ctx->cpu.clockcycle++;
 	}
-	if (ctx->shiftInstructionITState) {
-		ctx->cpu->it_state >>= 2;
+	if (insn_ctx.shiftInstructionITState) {
+		emu_ctx->cpu.it_state >>= 2;
 	}
 
-	ctx->cpu->psr &= ~0xff00;
-	if (ctx->cpu->it_state == 0) {
-		ctx->cpu->psr |= 0x0100;
+	emu_ctx->cpu.psr &= ~0xff00;
+	if (emu_ctx->cpu.it_state == 0) {
+		emu_ctx->cpu.psr |= 0x0100;
 	} else {
-		ctx->cpu->psr |= 0x0900 | (ctx->cpu->it_cond << 12);
-		if (ctx->cpu->it_state == 5) {
-			ctx->cpu->psr |= 0x400;
+		emu_ctx->cpu.psr |= 0x0900 | (emu_ctx->cpu.it_cond << 12);
+		if (emu_ctx->cpu.it_state == 5) {
+			emu_ctx->cpu.psr |= 0x400;
 		}
-	}
-
-	if (instructionDebug) {
-//		cpu_dump_state(ctx->cpu);
 	}
 }
 
-void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bool runUntilSentinel) {
-	struct emu_ctx_t localContext = {
-		.simulationState = STATE_WAITING,
-		.tracePointCnt = 0,
-		.maxTracePointCnt = 128 * 1024,
-		.traceFile = NULL,
-	};
-	if (aTraceOutputFile) {
-		localContext.traceFile = fopen(aTraceOutputFile, "w");
-	}
-	localContext.tracePoints = malloc(localContext.maxTracePointCnt * sizeof(uint16_t));
+void cpu_run(struct emu_ctx_t *emu_ctx) {
+	while (true) {
+//		uint32_t prevLoc = emu_ctx->cpu.reg[REG_PC];
 
-	struct insn_emu_ctx_t ctx = {
-		.localContext = &localContext,
-		//.bkpt_callback = bkpt_callback,
-		.cpu = cpu_state,
-	};
-	while (localContext.simulationState != STATE_FINISHED) {
-		uint32_t prevLoc = cpu_state->reg[REG_PC];
-		memcpy(localContext.registerCopy, cpu_state->reg, sizeof(uint32_t) * 16);
-		localContext.disassemblyBuffer[0] = 0;
-		executeNextInstruction(&ctx);
+	//	memcpy(localContext.registerCopy, cpu_state->reg, sizeof(uint32_t) * 16);
+	//	localContext.disassemblyBuffer[0] = 0;
+		executeNextInstruction(emu_ctx);
+#if 0
 #if DO_TRACE == 1
 		if (ctx.countNextInstruction) {
 			traceCPUStateFull(&ctx, prevLoc);
 		}
 #endif
-
+#endif
 	}
 }
 
-void cpu_reset(struct cm3_cpu_state_t *cpu_state) {
-	memset(cpu_state->reg, 0, 64);
-	cpu_state->psr = 0x173;
-	cpu_state->clockcycle = 0;
+void cpu_reset(struct emu_ctx_t *emu_ctx) {
+	memset(emu_ctx->cpu.reg, 0, 16 * sizeof(uint32_t));
+	emu_ctx->cpu.psr = 0x173;
+	emu_ctx->cpu.clockcycle = 0;
 
 	/* Load stack pointer and program counter */
-	cpu_state->reg[REG_SP] = addrspace_read32(&cpu_state->addr_space, ROM_BASE + 0);
-	cpu_state->reg[REG_PC] = addrspace_read32(&cpu_state->addr_space, ROM_BASE + 4) & ~1;
+	emu_ctx->cpu.reg[REG_SP] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 0);
+	emu_ctx->cpu.reg[REG_PC] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 4) & ~1;
 }
-

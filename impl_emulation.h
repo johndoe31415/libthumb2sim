@@ -24,13 +24,10 @@
 #ifndef __IMPL_EMULATION_H__
 #define __IMPL_EMULATION_H__
 
-struct insn_emu_ctx_t;
-typedef void (*breakptFnc_t)(struct insn_emu_ctx_t *ctx, uint8_t aBreakpoint);
+#include <thumb2sim.h>
 
 struct insn_emu_ctx_t {
-	struct cm3_cpu_state_t *cpu;
-	void *localContext;
-	breakptFnc_t bkpt_callback;
+	struct emu_ctx_t *emu_ctx;	
 	bool countNextInstruction;
 	bool shiftInstructionITState;
 };

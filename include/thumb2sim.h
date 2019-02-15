@@ -81,21 +81,25 @@ enum it_state_t {
 	IT_ELSE = 2
 };
 
-#define ROM_BASE			0
-#define ROM_SIZE			(1024 * 1024)
-//#define ROM_BASE			0x08000000
-
-#define RAM_BASE			0x20000000
-#define RAM_SIZE			(128 * 1024)
-//#define RAM_SIZE			(256 * 1024)
-
 struct cm3_cpu_state_t {
 	uint32_t reg[16];
 	uint32_t psr;
 	uint32_t clockcycle;
 	uint8_t it_cond;
 	uint8_t it_state;
+};
+
+struct emu_ctx_t;
+
+typedef void (*bkpt_callback_t)(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number);
+
+struct emu_ctx_t {
+	struct cm3_cpu_state_t cpu;
 	struct addrspace_t addr_space;
+	uint32_t ivt_base_address;
+	bkpt_callback_t bkpt_callback;
+	void *user;
+	//uint32_t registerCopy[16];
 };
 
 #endif

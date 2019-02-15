@@ -28,10 +28,10 @@
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
 void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state);
-void cpu_dump_memory(struct cm3_cpu_state_t *cpu_state, uint32_t address, uint16_t length);
-void cpu_dump_memory_file(struct cm3_cpu_state_t *cpu_state, const char *filename);
-void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bool runUntilSentinel);
-void cpu_reset(struct cm3_cpu_state_t *cpu_state);
+void cpu_dump_memory(struct emu_ctx_t *emu_ctx, uint32_t address, uint16_t length);
+void cpu_dump_memory_file(struct emu_ctx_t *emu_ctx, const char *filename);
+void cpu_run(struct emu_ctx_t *emu_ctx);
+void cpu_reset(struct emu_ctx_t *emu_ctx);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 
 #endif
