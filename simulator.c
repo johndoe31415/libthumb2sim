@@ -79,6 +79,9 @@ static struct loadedFile loadFile(const char *filename, uint32_t max_size, bool 
 	return lfile;
 }
 
+#define ROM_SIZE	(128 * 1024)
+#define RAM_SIZE	(128 * 1024)
+
 int main(int argc, char **argv) {
 	if (argc < 3) {
 		fprintf(stderr, "%s [ROM-Image] [RAM-Image]\n", argv[0]);
@@ -109,13 +112,14 @@ int main(int argc, char **argv) {
 	}
 
 	fprintf(stderr, "RAM at %p (0x%x bytes), ROM at %p (0x%x bytes)\n", ram.data, ram.length, rom.data, rom.length);
-	
+
+#if 0	
 	struct cm3_cpu_state_t cpuState;
 	memset(&cpuState, 0, sizeof(struct cm3_cpu_state_t));
 	addrspace_init(&cpuState.addr_space);
-	addrspace_add_region(&cpuState.addr_space, ROM_BASE, rom.length, rom.data, true);
+	addrspace_add_region(&cpuState.addr_space, 0x0, rom.length, rom.data, true);
 	addrspace_add_region(&cpuState.addr_space, 0x08000000, rom.length, rom.data, true);
-	addrspace_add_region(&cpuState.addr_space, RAM_BASE, ram.length, ram.data, false);
+	addrspace_add_region(&cpuState.addr_space, 0x20000000, ram.length, ram.data, false);
 	fprintf(stderr, "Address space initialized.\n");
 
 //	void *appContext = appInitContext();
@@ -134,6 +138,7 @@ int main(int argc, char **argv) {
 		cpu_run(&cpuState, NULL, false);
 //		cpu_run(&cpuState, "tracefile.txt", true);
 	}
+#endif
 	return 0;
 }
 

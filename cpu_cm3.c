@@ -65,7 +65,7 @@ void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
 }
 
 #if 0
-static void traceCPUStateFull(const struct insn_emu_ctx_t *emu_ctx, uint32_t previous_pc) {
+static void traceCPUStateFull(const struct insn_emu_ctx_t *insn_emu_ctx, uint32_t previous_pc) {
 	struct emu_ctx_t *lctx = (struct emu_ctx_t*)emu_ctx->localContext;
 	if (lctx->traceFile) {
 		fprintf(lctx->traceFile, "%d ", emu_ctx->cpu->clockcycle);
