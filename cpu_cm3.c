@@ -39,7 +39,7 @@
 #define STATE_SIMULATING		1
 #define STATE_FINISHED			2
 
-struct LocalContext {
+struct emu_ctx_t {
 	char disassemblyBuffer[128];
 	int simulationState;
 	FILE *traceFile;
@@ -55,30 +55,6 @@ static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, 
 	int l = strlen(ctx->disasBuffer);
 	vsnprintf(ctx->disasBuffer + l, 128 - l, aMsg, ap);
 	va_end(ap);
-}
-
-
-#define INTERCEPT_BKPT 1
-static void bkpt_callback(struct emu_ctx_t *ctx, uint8_t aBreakpoint) {
-	struct LocalContext *lctx = (struct LocalContext*)ctx->localContext;
-	static uint64_t begin = 0;
-	if (aBreakpoint == INTERCEPT_BKPT) {
-		begin = rdtsc();
-		lctx->simulationState = STATE_SIMULATING;
-	} else if (aBreakpoint == INTERCEPT_BKPT + 1) {
-		uint64_t now = rdtsc();
-		printf("CLOCKS %lu\n", now - begin);
-		lctx->simulationState = STATE_FINISHED;
-	}
-	/*
-	if (aBreakpoint == 1) {
-		lctx->simulationState = STATE_SIMULATING;
-	} else if (aBreakpoint == 2) {
-		addTracePoint(lctx, 0xffff);
-	} else if (aBreakpoint == 3) {
-	}
-	*/
-	ctx->countNextInstruction = false;
 }
 
 void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
@@ -98,8 +74,8 @@ void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
 	fprintf(stderr, "\n");
 }
 
-static void traceCPUStateFull(const struct emu_ctx_t *emu_ctx, uint32_t previous_pc) {
-	struct LocalContext *lctx = (struct LocalContext*)emu_ctx->localContext;
+static void traceCPUStateFull(const struct insn_emu_ctx_t *emu_ctx, uint32_t previous_pc) {
+	struct emu_ctx_t *lctx = (struct emu_ctx_t*)emu_ctx->localContext;
 	if (lctx->traceFile) {
 		fprintf(lctx->traceFile, "%d ", emu_ctx->cpu->clockcycle);
 		fprintf(lctx->traceFile, "%x ", previous_pc);
@@ -128,7 +104,7 @@ void cpu_dump_memory_file(struct cm3_cpu_state_t *cpu_state, const char *filenam
 	fclose(f);
 }
 
-static void executeNextInstruction(struct emu_ctx_t *ctx) {
+static void executeNextInstruction(struct insn_emu_ctx_t *ctx) {
 //	bool instructionDebug = (ctx->cpu->clockcycle + 1 == 2363);
 	bool instructionDebug = true;
 	uint32_t insnWord = (addrspace_read16(&ctx->cpu->addr_space, ctx->cpu->reg[REG_PC]) << 16) | addrspace_read16(&ctx->cpu->addr_space, ctx->cpu->reg[REG_PC] + 2);
@@ -198,7 +174,7 @@ static void executeNextInstruction(struct emu_ctx_t *ctx) {
 }
 
 void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bool runUntilSentinel) {
-	struct LocalContext localContext = {
+	struct emu_ctx_t localContext = {
 		.simulationState = STATE_WAITING,
 		.tracePointCnt = 0,
 		.maxTracePointCnt = 128 * 1024,
@@ -209,9 +185,9 @@ void cpu_run(struct cm3_cpu_state_t *cpu_state, const char *aTraceOutputFile, bo
 	}
 	localContext.tracePoints = malloc(localContext.maxTracePointCnt * sizeof(uint16_t));
 
-	struct emu_ctx_t ctx = {
+	struct insn_emu_ctx_t ctx = {
 		.localContext = &localContext,
-		.bkpt_callback = bkpt_callback,
+		//.bkpt_callback = bkpt_callback,
 		.cpu = cpu_state,
 	};
 	while (localContext.simulationState != STATE_FINISHED) {

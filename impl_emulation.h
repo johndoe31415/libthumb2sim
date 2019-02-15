@@ -24,10 +24,10 @@
 #ifndef __IMPL_EMULATION_H__
 #define __IMPL_EMULATION_H__
 
-struct emu_ctx_t;
-typedef void (*breakptFnc_t)(struct emu_ctx_t *ctx, uint8_t aBreakpoint);
+struct insn_emu_ctx_t;
+typedef void (*breakptFnc_t)(struct insn_emu_ctx_t *ctx, uint8_t aBreakpoint);
 
-struct emu_ctx_t {
+struct insn_emu_ctx_t {
 	struct cm3_cpu_state_t *cpu;
 	void *localContext;
 	breakptFnc_t bkpt_callback;
@@ -35,7 +35,7 @@ struct emu_ctx_t {
 	bool shiftInstructionITState;
 };
 
-bool conditionallyExecuteInstruction(const struct emu_ctx_t *ctx);
+bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *ctx);
 extern const struct decoding_handler_t decodeOnlyCallbacks;
 extern const struct decoding_handler_t emulationCallbacks;
 

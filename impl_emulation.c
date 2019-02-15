@@ -71,7 +71,7 @@ static struct barrel_shifterOutput barrel_shift(uint32_t aInValue, uint8_t aType
 	return outValue;
 }
 
-static void storeRegisters(struct emu_ctx_t *emu_ctx, uint8_t aBaseRegister, uint16_t aRegisters, bool aIncrementAfter, bool aWriteback) {
+static void storeRegisters(struct insn_emu_ctx_t *emu_ctx, uint8_t aBaseRegister, uint16_t aRegisters, bool aIncrementAfter, bool aWriteback) {
 	uint32_t addr = emu_ctx->cpu->reg[aBaseRegister];
 	int regNo = aIncrementAfter ? 0 : 15;
 	for (int i = 0; i < 16; i++) {
@@ -91,7 +91,7 @@ static void storeRegisters(struct emu_ctx_t *emu_ctx, uint8_t aBaseRegister, uin
 	}
 }
 
-static void loadRegisters(struct emu_ctx_t *emu_ctx, uint8_t aBaseRegister, uint16_t aRegisters, bool aWriteback) {
+static void loadRegisters(struct insn_emu_ctx_t *emu_ctx, uint8_t aBaseRegister, uint16_t aRegisters, bool aWriteback) {
 	uint32_t addr = emu_ctx->cpu->reg[aBaseRegister];
 	for (int i = 0; i < 16; i++) {
 		if (aRegisters & (1 << i)) {
@@ -108,12 +108,12 @@ static void loadRegisters(struct emu_ctx_t *emu_ctx, uint8_t aBaseRegister, uint
 	}
 }
 
-static void setCondCode(const struct emu_ctx_t *emu_ctx, uint32_t value) {
+static void setCondCode(const struct insn_emu_ctx_t *emu_ctx, uint32_t value) {
 	emu_ctx->cpu->psr &= ~FLAG_MASK;
 	emu_ctx->cpu->psr |= value;
 }
 
-static bool condSatisfied(const struct emu_ctx_t *emu_ctx, uint8_t aCond) {
+static bool condSatisfied(const struct insn_emu_ctx_t *emu_ctx, uint8_t aCond) {
 	switch (aCond) {
 		case CONDITION_EQ:	return (emu_ctx->cpu->psr & FLAG_ZERO) == FLAG_ZERO;
 		case CONDITION_NE:	return (emu_ctx->cpu->psr & FLAG_ZERO) == 0;
@@ -134,7 +134,7 @@ static bool condSatisfied(const struct emu_ctx_t *emu_ctx, uint8_t aCond) {
 	return true;
 }
 
-bool conditionallyExecuteInstruction(const struct emu_ctx_t *emu_ctx) {
+bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *emu_ctx) {
 	uint8_t currentItState = (emu_ctx->cpu->it_state & 0x03);
 	bool doExecute = (currentItState == IT_NONE) 
 					|| ((currentItState == IT_THEN) && (condSatisfied(emu_ctx, emu_ctx->cpu->it_cond)))
@@ -143,7 +143,7 @@ bool conditionallyExecuteInstruction(const struct emu_ctx_t *emu_ctx) {
 	return doExecute;
 }
 
-static bool executionIsUnconditional(const struct emu_ctx_t *emu_ctx) {
+static bool executionIsUnconditional(const struct insn_emu_ctx_t *emu_ctx) {
 	return (emu_ctx->cpu->it_state & 0x03) == IT_NONE;
 }
 
@@ -175,39 +175,39 @@ static uint32_t movCondCode(uint32_t aX) {
 	return condCode;
 }
 
-static void setMovCondCode(const struct emu_ctx_t *emu_ctx, bool always_set, uint32_t value) {
+static void setMovCondCode(const struct insn_emu_ctx_t *emu_ctx, bool always_set, uint32_t value) {
 	if (always_set || executionIsUnconditional(emu_ctx)) {
 		emu_ctx->cpu->psr &= ~(FLAG_NEGATIVE | FLAG_ZERO);
 		emu_ctx->cpu->psr |= movCondCode(value);
 	}
 }
 
-static void setLslCondCode(const struct emu_ctx_t *emu_ctx, bool always_set, uint32_t value, bool aCarry) {
+static void setLslCondCode(const struct insn_emu_ctx_t *emu_ctx, bool always_set, uint32_t value, bool aCarry) {
 	if (always_set || executionIsUnconditional(emu_ctx)) {
 		emu_ctx->cpu->psr &= ~(FLAG_NEGATIVE | FLAG_ZERO | FLAG_CARRY);
 		emu_ctx->cpu->psr |= movCondCode(value) | (aCarry ? FLAG_CARRY : 0);
 	}
 }
 
-static void setSubCondCode(const struct emu_ctx_t *emu_ctx, bool always_set, uint32_t valueA, uint32_t valueB) {
+static void setSubCondCode(const struct insn_emu_ctx_t *emu_ctx, bool always_set, uint32_t valueA, uint32_t valueB) {
 	if (always_set || executionIsUnconditional(emu_ctx)) {
 		setCondCode(emu_ctx, subCondCode(valueA, valueB));
 	}
 }
 
-static void setAddCondCode(const struct emu_ctx_t *emu_ctx, bool always_set, uint32_t valueA, uint32_t valueB) {
+static void setAddCondCode(const struct insn_emu_ctx_t *emu_ctx, bool always_set, uint32_t valueA, uint32_t valueB) {
 	if (always_set || executionIsUnconditional(emu_ctx)) {
 		setCondCode(emu_ctx, addCondCode(valueA, valueB));
 	}
 }
 
-static bool conditionForExecutionSatisfied(const struct emu_ctx_t *emu_ctx) {
+static bool conditionForExecutionSatisfied(const struct insn_emu_ctx_t *emu_ctx) {
 	return true;
 }
 
 
 static void emulation_i32_adc_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	imm += (ctx->cpu->psr & FLAG_CARRY) ? 1 : 0;
 	if (S) {
 		setAddCondCode(ctx, true, ctx->cpu->reg[Rn], imm + 1);
@@ -223,19 +223,19 @@ static void emulation_i32_adc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_add_SPi_T1(void *vctx, uint8_t Rd, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[REG_SP] + (imm * 4);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_add_SPi_T2(void *vctx, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_SP] += imm * 4;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_add_SPi_T3(void *vctx, uint8_t Rd, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (S) {
 		setAddCondCode(ctx, true, ctx->cpu->reg[REG_SP], imm);
 	}
@@ -256,21 +256,21 @@ static void emulation_i32_add_SPr_T3(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i16_add_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setAddCondCode(ctx, false, ctx->cpu->reg[Rn], imm);
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] + imm;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_add_imm_T2(void *vctx, uint8_t Rdn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setAddCondCode(ctx, false, ctx->cpu->reg[Rdn], imm);
 	ctx->cpu->reg[Rdn] = ctx->cpu->reg[Rdn] + imm;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_add_imm_T3(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (S) {
 		setAddCondCode(ctx, true, ctx->cpu->reg[Rn], imm);
 	}
@@ -282,20 +282,20 @@ static void emulation_i32_add_imm_T4(void *vctx, uint8_t Rd, uint8_t Rn, uint16_
 }
 
 static void emulation_i16_add_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm];
 	setAddCondCode(ctx, false, ctx->cpu->reg[Rn], ctx->cpu->reg[Rm]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_add_reg_T2(void *vctx, uint8_t Rdn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rdn] += ctx->cpu->reg[Rm];
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_add_reg_T3(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 	if (S) {
 		setAddCondCode(ctx, true, ctx->cpu->reg[Rn], bsOut.value);
@@ -314,7 +314,7 @@ static void emulation_i32_adr_T3(void *vctx, uint8_t Rd, uint16_t imm) {
 }
 
 static void emulation_i32_and_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if ((Rd == REG_PC) && S) {
 		setMovCondCode(ctx, true, ctx->cpu->reg[Rn] & imm);
 	} else {		
@@ -327,14 +327,14 @@ static void emulation_i32_and_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i16_and_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rdn] &= ctx->cpu->reg[Rm];
 	setMovCondCode(ctx, true, ctx->cpu->reg[Rdn]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_and_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (Rd != REG_PC) {	
 		struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 		ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] & bsOut.value;
@@ -346,7 +346,7 @@ static void emulation_i32_and_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_asr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	bool carry = ctx->cpu->reg[Rm] & (1 << (imm - 1));
 	ctx->cpu->reg[Rd] = (int32_t)ctx->cpu->reg[Rm] >> imm;
 	setLslCondCode(ctx, false, ctx->cpu->reg[Rd], carry);
@@ -363,7 +363,7 @@ static void emulation_i32_asr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	
 	if (condSatisfied(ctx, cond)) {
 		ctx->cpu->reg[REG_PC] = relBranchTarget(ctx->cpu->reg[REG_PC], imm, 8);
@@ -373,12 +373,12 @@ static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
 }
 
 static void emulation_i16_b_T2(void *vctx, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_PC] = relBranchTarget(ctx->cpu->reg[REG_PC], imm, 11);
 }
 
 static void emulation_i32_b_T3(void *vctx, int32_t imm, uint8_t cond) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	
 	if (condSatisfied(ctx, cond)) {
 		ctx->cpu->reg[REG_PC] = ctx->cpu->reg[REG_PC] + 2 * imm + 4;
@@ -388,7 +388,7 @@ static void emulation_i32_b_T3(void *vctx, int32_t imm, uint8_t cond) {
 }
 
 static void emulation_i32_b_T4(void *vctx, int32_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_PC] = ctx->cpu->reg[REG_PC] + 2 * imm + 4;
 }
 
@@ -399,7 +399,7 @@ static void emulation_i32_bfi_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm
 }
 
 static void emulation_i32_bic_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] & ~imm;
 	if (S) {
 		setMovCondCode(ctx, true, ctx->cpu->reg[Rd]);
@@ -411,7 +411,7 @@ static void emulation_i16_bic_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 }
 
 static void emulation_i32_bic_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (Rd != REG_PC) {	
 		struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 		ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] & ~bsOut.value;
@@ -423,7 +423,7 @@ static void emulation_i32_bic_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_bkpt_T1(void *vctx, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (ctx->bkpt_callback) {
 		ctx->bkpt_callback(ctx, imm);
 	}
@@ -431,7 +431,7 @@ static void emulation_i16_bkpt_T1(void *vctx, uint8_t imm) {
 }
 
 static void emulation_i32_bl_T1(void *vctx, int32_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_LR] = (ctx->cpu->reg[REG_PC] + 4) | 1;
 	ctx->cpu->reg[REG_PC] = ctx->cpu->reg[REG_PC] + (2 * imm) + 4;
 }
@@ -440,12 +440,12 @@ static void emulation_i16_blx_reg_T1(void *vctx, uint8_t Rm) {
 }
 
 static void emulation_i16_bx_T1(void *vctx, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_PC] = ctx->cpu->reg[Rm] & ~1;
 }
 
 static void emulation_i16_cbnz_T1(void *vctx, uint8_t Rn, uint8_t imm, bool op) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	
 	if ((ctx->cpu->reg[Rn] == 0) ^ op) {
 		/* Branch */
@@ -467,7 +467,7 @@ static void emulation_i32_clrex_T1(void *vctx) {
 
 static void emulation_i32_clz_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t Rmx) {
 	// TODO: Rmx?
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t mask = (1 << 31);
 	uint32_t leadingZeros = 32;
 	for (int i = 0; i < 32; i++) {
@@ -491,25 +491,25 @@ static void emulation_i32_cmn_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm, int32_t
 }
 
 static void emulation_i16_cmp_imm_T1(void *vctx, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, true, ctx->cpu->reg[Rn], imm);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_cmp_imm_T2(void *vctx, uint8_t Rn, int32_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, true, ctx->cpu->reg[Rn], imm);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i16_cmp_reg_T1(void *vctx, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, true, ctx->cpu->reg[Rn], ctx->cpu->reg[Rm]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_cmp_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, true, ctx->cpu->reg[Rn], ctx->cpu->reg[Rm]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
@@ -530,7 +530,7 @@ static void emulation_i32_dsb_T1(void *vctx, uint8_t option) {
 }
 
 static void emulation_i32_eor_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] ^ imm;
 	if (S) {
 		setMovCondCode(ctx, true, ctx->cpu->reg[Rd]);
@@ -539,14 +539,14 @@ static void emulation_i32_eor_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i16_eor_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rdn] ^= ctx->cpu->reg[Rm];
 	setMovCondCode(ctx, false, ctx->cpu->reg[Rdn]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_eor_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 
 	if (Rd != REG_PC) {	
 		struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
@@ -563,7 +563,7 @@ static void emulation_i32_isb_T1(void *vctx, uint8_t option) {
 }
 
 static void emulation_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	
 	int len = 3;
 	for (int i = 0; i < 3; i++) {
@@ -600,13 +600,13 @@ static void emulation_i32_ldc_lit_T1(void *vctx, uint8_t imm, uint8_t coproc, ui
 }
 
 static void emulation_i16_ldm_T1(void *vctx, uint8_t Rn, uint8_t register_list) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	loadRegisters(ctx, Rn, register_list, (register_list & (1 << Rn)) == 0);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldm_T2(void *vctx, uint8_t Rn, uint16_t register_list, bool P, bool M, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (P) {
 		register_list |= (1 << REG_PC);
 	}
@@ -621,28 +621,28 @@ static void emulation_i32_ldmdb_T1(void *vctx, uint8_t Rn, uint16_t register_lis
 }
 
 static void emulation_i16_ldr_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (4 * imm);
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_ldr_imm_T2(void *vctx, uint8_t Rt, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[REG_SP] + (4 * imm) + 0;
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldr_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i32_ldr_imm_T4(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (P ? 1 : 0) * (U ? 1 : -1) * imm;
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	if (W) {
@@ -652,49 +652,49 @@ static void emulation_i32_ldr_imm_T4(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_ldr_lit_T1(void *vctx, uint8_t Rt, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = (ctx->cpu->reg[REG_PC] & ~3) + (imm * 4) + 4;
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldr_lit_T2(void *vctx, uint8_t Rt, uint16_t imm, bool U) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = (ctx->cpu->reg[REG_PC] & ~3) + (U ? 1 : -1) * imm + 4;
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i16_ldr_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm];
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldr_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (ctx->cpu->reg[Rm] << imm);
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i16_ldrb_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	ctx->cpu->reg[Rt] = addrspace_read8(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldrb_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	ctx->cpu->reg[Rt] = addrspace_read8(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i32_ldrb_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (P ? 1 : 0) * (U ? 1 : -1) * imm;
 	ctx->cpu->reg[Rt] = addrspace_read8(&ctx->cpu->addr_space, target);
 	if (W) {
@@ -707,14 +707,14 @@ static void emulation_i32_ldrb_lit_T1(void *vctx, uint8_t Rt, uint16_t imm, bool
 }
 
 static void emulation_i16_ldrb_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm];
 	ctx->cpu->reg[Rt] = addrspace_read8(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldrb_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm];
 	uint32_t value = addrspace_read8(&ctx->cpu->addr_space, target);
 	if (imm) {
@@ -729,7 +729,7 @@ static void emulation_i32_ldrbt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t i
 }
 
 static void emulation_i32_ldrd_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rtx, uint8_t imm, bool P, bool U, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (P ? 1 : 0) * (U ? 1 : -1) * (4 * imm);
 	ctx->cpu->reg[Rt] = addrspace_read32(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[Rtx] = addrspace_read32(&ctx->cpu->addr_space, target + 4);
@@ -752,14 +752,14 @@ static void emulation_i32_ldrexh_T1(void *vctx, uint8_t Rt, uint8_t Rn) {
 }
 
 static void emulation_i16_ldrh_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + 2 * imm;
 	ctx->cpu->reg[Rt] = addrspace_read16(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_ldrh_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	ctx->cpu->reg[Rt] = addrspace_read16(&ctx->cpu->addr_space, target);
 	ctx->cpu->reg[REG_PC] += 4;
@@ -820,7 +820,7 @@ static void emulation_i32_ldrt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t im
 }
 
 static void emulation_i16_lsl_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	// TODO: effizienter
 	bool carry = ((uint64_t)ctx->cpu->reg[Rm] << imm) & (uint64_t)0x100000000;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm] << imm;	
@@ -829,7 +829,7 @@ static void emulation_i16_lsl_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i32_lsl_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], TYPE_LSL, imm);
 	ctx->cpu->reg[Rd] = bsOut.value;
 	if (S) {
@@ -839,7 +839,7 @@ static void emulation_i32_lsl_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i16_lsl_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rdn], TYPE_LSL, ctx->cpu->reg[Rm]);
 	ctx->cpu->reg[Rdn] = bsOut.value;
 	setLslCondCode(ctx, false, ctx->cpu->reg[Rdn], bsOut.carry);
@@ -848,7 +848,7 @@ static void emulation_i16_lsl_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 
 static void emulation_i32_lsl_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, bool S) {
 	// TODO: Rn/Rm vertauscht?
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], TYPE_LSL, ctx->cpu->reg[Rn]);
 	ctx->cpu->reg[Rd] = bsOut.value;
 	if (S) {
@@ -858,7 +858,7 @@ static void emulation_i32_lsl_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_lsr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	bool carry = ctx->cpu->reg[Rm] & (1 << (imm - 1));
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm] >> imm;
 	setLslCondCode(ctx, false, ctx->cpu->reg[Rd], carry);
@@ -866,7 +866,7 @@ static void emulation_i16_lsr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i32_lsr_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	bool carry = ctx->cpu->reg[Rm] & (1 << (imm - 1));
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm] >> imm;
 	if (S) {
@@ -876,7 +876,7 @@ static void emulation_i32_lsr_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i16_lsr_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	bool carry = ctx->cpu->reg[Rm] ? ctx->cpu->reg[Rdn] & (1 << (ctx->cpu->reg[Rm] - 1)) : false;
 	ctx->cpu->reg[Rdn] >>= ctx->cpu->reg[Rm];
 	setLslCondCode(ctx, true, ctx->cpu->reg[Rdn], carry);
@@ -884,7 +884,7 @@ static void emulation_i16_lsr_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 }
 
 static void emulation_i32_lsr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	bool carry = ctx->cpu->reg[Rn] & (1 << (ctx->cpu->reg[Rm] - 1));
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] >> ctx->cpu->reg[Rm];
 	if (S) {
@@ -912,7 +912,7 @@ static void emulation_i32_mls_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm,
 }
 
 static void emulation_i16_mov_imm_T1(void *vctx, uint8_t Rd, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (conditionForExecutionSatisfied(ctx)) {
 		ctx->cpu->reg[Rd] = imm;
 		setMovCondCode(ctx, false, imm);
@@ -921,7 +921,7 @@ static void emulation_i16_mov_imm_T1(void *vctx, uint8_t Rd, uint8_t imm) {
 }
 
 static void emulation_i32_mov_imm_T2(void *vctx, uint8_t Rd, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = imm;
 	if (S) {
 		setMovCondCode(ctx, true, imm);
@@ -930,19 +930,19 @@ static void emulation_i32_mov_imm_T2(void *vctx, uint8_t Rd, int32_t imm, bool S
 }
 
 static void emulation_i32_mov_imm_T3(void *vctx, uint8_t Rd, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = imm;
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i16_mov_reg_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm];
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_mov_reg_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm];
 	ctx->cpu->reg[REG_PC] += 2;
 }
@@ -951,7 +951,7 @@ static void emulation_i32_mov_reg_T3(void *vctx, uint8_t Rd, uint8_t Rm, bool S)
 }
 
 static void emulation_i32_movt_T1(void *vctx, uint8_t Rd, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] &= 0xffff;
 	ctx->cpu->reg[Rd] |= (imm << 16);
 	ctx->cpu->reg[REG_PC] += 4;
@@ -982,7 +982,7 @@ static void emulation_i32_mul_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm)
 }
 
 static void emulation_i32_mvn_imm_T1(void *vctx, uint8_t Rd, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ~imm;
 	if (S) {
 		setMovCondCode(ctx, true, imm);
@@ -991,14 +991,14 @@ static void emulation_i32_mvn_imm_T1(void *vctx, uint8_t Rd, int32_t imm, bool S
 }
 
 static void emulation_i16_mvn_reg_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ~ctx->cpu->reg[Rm];
 	setMovCondCode(ctx, true, ctx->cpu->reg[Rd]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_mvn_reg_T2(void *vctx, uint8_t Rd, uint8_t Rm, int32_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 	ctx->cpu->reg[Rd] = ~bsOut.value;
 	if (S) {
@@ -1008,12 +1008,12 @@ static void emulation_i32_mvn_reg_T2(void *vctx, uint8_t Rd, uint8_t Rm, int32_t
 }
 
 static void emulation_i16_nop_T1(void *vctx) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_nop_T2(void *vctx) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
@@ -1024,7 +1024,7 @@ static void emulation_i32_orn_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i32_orr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] | imm;
 	if (S) {
 		setMovCondCode(ctx, true, ctx->cpu->reg[Rd]);
@@ -1033,14 +1033,14 @@ static void emulation_i32_orr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i16_orr_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rdn] |= ctx->cpu->reg[Rm];
 	setMovCondCode(ctx, false, ctx->cpu->reg[Rdn]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_orr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 	if (Rn != 0x0f) {
 		ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] | bsOut.value;
@@ -1058,7 +1058,7 @@ static void emulation_i32_pkhbt_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t R
 }
 
 static void emulation_i16_pop_T1(void *vctx, uint8_t register_list, bool P) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint16_t regList = register_list;
 	if (P) {
 		regList |= (1 << REG_PC);
@@ -1070,7 +1070,7 @@ static void emulation_i16_pop_T1(void *vctx, uint8_t register_list, bool P) {
 }
 
 static void emulation_i32_pop_T2(void *vctx, uint16_t register_list, bool P, bool M) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (P) {
 		register_list |= (1 << REG_PC);
 	}
@@ -1084,7 +1084,7 @@ static void emulation_i32_pop_T2(void *vctx, uint16_t register_list, bool P, boo
 }
 
 static void emulation_i32_pop_T3(void *vctx, uint8_t Rt) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	loadRegisters(ctx, REG_SP, (1 << Rt), true);
 	if (Rt != REG_PC) {
 		ctx->cpu->reg[REG_PC] += 4;
@@ -1092,7 +1092,7 @@ static void emulation_i32_pop_T3(void *vctx, uint8_t Rt) {
 }
 
 static void emulation_i16_push_T1(void *vctx, uint8_t register_list, bool M) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint16_t regList = register_list;
 	if (M) {
 		regList |= (1 << REG_LR);
@@ -1102,7 +1102,7 @@ static void emulation_i16_push_T1(void *vctx, uint8_t register_list, bool M) {
 }
 
 static void emulation_i32_push_T2(void *vctx, uint16_t register_list, bool M) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (M) {
 		register_list |= (1 << REG_LR);
 	}
@@ -1135,7 +1135,7 @@ static void emulation_i32_revsh_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
 }
 
 static void emulation_i32_ror_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], TYPE_ROR, imm);
 	ctx->cpu->reg[Rd] = bsOut.value;
 	if (S) {
@@ -1157,7 +1157,7 @@ static void emulation_i16_rsb_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn) {
 }
 
 static void emulation_i32_rsb_imm_T2(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (S) {
 		setSubCondCode(ctx, true, imm, ctx->cpu->reg[Rn]);
 	}
@@ -1166,7 +1166,7 @@ static void emulation_i32_rsb_imm_T2(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i32_rsb_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 	if (S) {
 		setSubCondCode(ctx, true, bsOut.value, ctx->cpu->reg[Rn]);
@@ -1185,7 +1185,7 @@ static void emulation_i32_sbc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i32_sdiv_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	// TODO: Condcodes?
 	ctx->cpu->reg[Rd] = (int32_t)ctx->cpu->reg[Rn] / (int32_t)ctx->cpu->reg[Rm];
 	ctx->cpu->reg[REG_PC] += 4;
@@ -1207,13 +1207,13 @@ static void emulation_i32_stc_T1(void *vctx, uint8_t Rn, uint8_t imm, uint8_t co
 }
 
 static void emulation_i16_stm_T1(void *vctx, uint8_t Rn, uint8_t register_list) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	storeRegisters(ctx, Rn, register_list, true, true);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_stm_T2(void *vctx, uint8_t Rn, uint16_t register_list, bool M, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (M) {
 		register_list |= 1 << REG_LR;
 	}
@@ -1222,7 +1222,7 @@ static void emulation_i32_stm_T2(void *vctx, uint8_t Rn, uint16_t register_list,
 }
 
 static void emulation_i32_stmdb_T1(void *vctx, uint8_t Rn, uint16_t register_list, bool M, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (M) {
 		register_list |= (1 << REG_LR);
 	}
@@ -1231,28 +1231,28 @@ static void emulation_i32_stmdb_T1(void *vctx, uint8_t Rn, uint16_t register_lis
 }
 
 static void emulation_i16_str_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (4 * imm);
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_str_imm_T2(void *vctx, uint8_t Rt, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[REG_SP] + (4 * imm);
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_str_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i32_str_imm_T4(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (P ? 1 : 0) * (U ? 1 : -1) * imm;
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	if (W) {
@@ -1262,35 +1262,35 @@ static void emulation_i32_str_imm_T4(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_str_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm];
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_str_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (ctx->cpu->reg[Rm] << imm);
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i16_strb_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	addrspace_write8(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xff);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_strb_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	addrspace_write8(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xff);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i32_strb_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (P ? 1 : 0) * (U ? 1 : -1) * imm;
 	addrspace_write8(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xff);
 	if (W) {
@@ -1300,7 +1300,7 @@ static void emulation_i32_strb_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 }
 
 static void emulation_i16_strb_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm];
 	addrspace_write8(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xff);
 	ctx->cpu->reg[REG_PC] += 2;
@@ -1308,14 +1308,14 @@ static void emulation_i16_strb_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 
 static void emulation_i32_strb_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
 	// TODO: ??? imm unbenutzt?
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + ctx->cpu->reg[Rm] + imm;
 	addrspace_write8(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xff);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i32_strd_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rtx, uint8_t imm, bool P, bool U, bool W) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + (P ? 1 : 0) * (U ? 1 : -1) * (4 * imm);
 	addrspace_write32(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt]);
 	addrspace_write32(&ctx->cpu->addr_space, target + 4, ctx->cpu->reg[Rtx]);
@@ -1326,14 +1326,14 @@ static void emulation_i32_strd_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 }
 
 static void emulation_i16_strh_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + 2 * imm;
 	addrspace_write16(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xffff);
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_strh_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->cpu->reg[Rn] + imm;
 	addrspace_write16(&ctx->cpu->addr_space, target, ctx->cpu->reg[Rt] & 0xffff);
 	ctx->cpu->reg[REG_PC] += 4;
@@ -1355,7 +1355,7 @@ static void emulation_i32_strt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t im
 }
 
 static void emulation_i16_sub_SPimm_T1(void *vctx, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_SP] -= imm * 4;
 	ctx->cpu->reg[REG_PC] += 2;
 }
@@ -1370,21 +1370,21 @@ static void emulation_i32_sub_SPreg_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8
 }
 
 static void emulation_i16_sub_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, false, ctx->cpu->reg[Rn], imm);
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] - imm;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i16_sub_imm_T2(void *vctx, uint8_t Rdn, uint8_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, false, ctx->cpu->reg[Rdn], imm);
 	ctx->cpu->reg[Rdn] -= imm;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_sub_imm_T3(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (S) {
 		setSubCondCode(ctx, true, ctx->cpu->reg[Rn], imm);
 	}
@@ -1396,14 +1396,14 @@ static void emulation_i32_sub_imm_T4(void *vctx, uint8_t Rd, uint8_t Rn, uint16_
 }
 
 static void emulation_i16_sub_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setSubCondCode(ctx, false, ctx->cpu->reg[Rn], ctx->cpu->reg[Rm]);
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rn] - ctx->cpu->reg[Rm];
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_sub_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	struct barrel_shifterOutput bsOut = barrel_shift(ctx->cpu->reg[Rm], type, imm);
 	if (S) {
 		setSubCondCode(ctx, true, ctx->cpu->reg[Rn], bsOut.value);
@@ -1419,7 +1419,7 @@ static void emulation_i32_sxtb16_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t 
 }
 
 static void emulation_i16_sxtb_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = (int8_t)(ctx->cpu->reg[Rm] & 0xff);
 	ctx->cpu->reg[REG_PC] += 2;
 }
@@ -1434,7 +1434,7 @@ static void emulation_i32_sxth_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t ro
 }
 
 static void emulation_i32_tbb_T1(void *vctx, uint8_t Rn, uint8_t Rm, bool H) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[REG_PC] += 4;
 	if (H) {
 		// TODO negative offsets?
@@ -1445,13 +1445,13 @@ static void emulation_i32_tbb_T1(void *vctx, uint8_t Rn, uint8_t Rm, bool H) {
 }
 
 static void emulation_i32_tst_imm_T1(void *vctx, uint8_t Rn, int32_t imm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setMovCondCode(ctx, true, ctx->cpu->reg[Rn] & imm);
 	ctx->cpu->reg[REG_PC] += 4;
 }
 
 static void emulation_i16_tst_reg_T1(void *vctx, uint8_t Rn, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	setMovCondCode(ctx, true, ctx->cpu->reg[Rn] & ctx->cpu->reg[Rm]);
 	ctx->cpu->reg[REG_PC] += 2;
 }
@@ -1460,7 +1460,7 @@ static void emulation_i32_tst_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t
 }
 
 static void emulation_i32_ubfx_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm, uint8_t width) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = (ctx->cpu->reg[Rn] >> imm) & ((1 << width) - 1);
 	ctx->cpu->reg[REG_PC] += 4;
 }
@@ -1478,7 +1478,7 @@ static void emulation_i32_umlal_T1(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t R
 }
 
 static void emulation_i32_umull_T1(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t RdLo, uint8_t RdHi) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint64_t result = (uint64_t)ctx->cpu->reg[Rn] * ctx->cpu->reg[Rm];
 	ctx->cpu->reg[RdLo] = (result >> 0) & 0xffffffff;
 	ctx->cpu->reg[RdHi] = (result >> 32) & 0xffffffff;
@@ -1490,13 +1490,13 @@ static void emulation_i32_uxtb16_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t 
 }
 
 static void emulation_i16_uxtb_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm] & 0xff;
 	ctx->cpu->reg[REG_PC] += 2;
 }
 
 static void emulation_i32_uxtb_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t rotate) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (rotate == 0) {
 		ctx->cpu->reg[Rd] = (ctx->cpu->reg[Rm] & 0xff) << (8 * rotate);
 		ctx->cpu->reg[REG_PC] += 4;
@@ -1505,7 +1505,7 @@ static void emulation_i32_uxtb_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t ro
 }
 
 static void emulation_i16_uxth_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
-	struct emu_ctx_t *ctx = (struct emu_ctx_t*)vctx;
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->cpu->reg[Rd] = ctx->cpu->reg[Rm] & 0xffff;
 	ctx->cpu->reg[REG_PC] += 2;
 }
