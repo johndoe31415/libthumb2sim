@@ -106,7 +106,7 @@ enum it_state_t {
 struct cm3_cpu_state_t {
 	uint32_t reg[16];
 	uint32_t psr;
-	uint32_t clockcycle;
+	uint32_t insn_ctr;
 	uint8_t it_cond;
 	uint8_t it_state;
 };

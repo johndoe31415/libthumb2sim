@@ -112,8 +112,6 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 		.countNextInstruction = true,
 		.shiftInstructionITState = true,
 	};
-//	bool instructionDebug = (ctx->cpu->clockcycle + 1 == 2363);
-//	bool instructionDebug = true;
 	uint32_t insnWord = addrspace_read_insn_word(&emu_ctx->addr_space, emu_ctx->cpu.reg[REG_PC]);
 
 #if 0
@@ -136,7 +134,7 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 		if (instructionDebug) {
 			fprintf(stderr, "\n");
 		}
-		fprintf(stderr, "< %5d %8x: %-30s [sp=%x] ", 1 + ctx->cpu->clockcycle, ctx->cpu->reg[REG_PC], disasCtx.disasBuffer, ctx->cpu->reg[REG_SP]);
+		fprintf(stderr, "< %5d %8x: %-30s [sp=%x] ", 1 + ctx->cpu->insn_ctr, ctx->cpu->reg[REG_PC], disasCtx.disasBuffer, ctx->cpu->reg[REG_SP]);
 		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_NEGATIVE) ? 'N' : ' ');
 		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_ZERO) ? 'Z' : ' ');
 		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_CARRY) ? 'C' : ' ');
@@ -159,7 +157,7 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 	}
 
 	if (insn_ctx.countNextInstruction) {
-		emu_ctx->cpu.clockcycle++;
+		emu_ctx->cpu.insn_ctr++;
 	}
 	if (insn_ctx.shiftInstructionITState) {
 		emu_ctx->cpu.it_state >>= 2;
@@ -200,7 +198,7 @@ void cpu_run(struct emu_ctx_t *emu_ctx) {
 void cpu_reset(struct emu_ctx_t *emu_ctx) {
 	memset(emu_ctx->cpu.reg, 0, 16 * sizeof(uint32_t));
 	emu_ctx->cpu.psr = 0x173;
-	emu_ctx->cpu.clockcycle = 0;
+	emu_ctx->cpu.insn_ctr = 0;
 
 	/* Load stack pointer and program counter */
 	emu_ctx->cpu.reg[REG_SP] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 0);

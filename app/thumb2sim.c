@@ -32,7 +32,7 @@ struct user_ctx_t {
 static void bkpt_callback(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number) {
 	struct user_ctx_t *usr = (struct user_ctx_t*)emu_ctx->user;
 	if (bkpt_number != 255) {
-		fprintf(stderr, "Hit breakpoint %d at instruction %u.\n", bkpt_number, emu_ctx->cpu.clockcycle);
+		fprintf(stderr, "Hit breakpoint %d at instruction %u.\n", bkpt_number, emu_ctx->cpu.insn_ctr);
 	}
 	if (bkpt_number == 2) {
 		usr->end_emulation = true;
