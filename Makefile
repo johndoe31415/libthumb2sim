@@ -1,26 +1,21 @@
-.PHONY: all clean
+.PHONY: all clean install disas test gdb app
 
-CFLAGS := -O3 -std=c11 -Iinclude -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wimplicit-fallthrough -Wshadow
+CFLAGS := -O3 -shared -fPIC -std=c11 -Iinclude -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wimplicit-fallthrough -Wshadow
 CFLAGS += -g -D_XOPEN_SOURCE=500
 
-INSTALL_DIR := /usr/local/lib
-VERSION := 0.1
+LDFLAGS :=
 
-SO_CFLAGS := -fPIC -shared 
-SO_LDFLAGS :=
+OBJS := address_space.o cpu_cm3.o decoder.o hexdump.o impl_disassembly.o impl_emulation.o convenience.o
+TARGETS := libthumb2sim.so
 
-APP_CFLAGS := 
-APP_LDFLAGS := -L. -L$(INSTALL_DIR) -lthumb2sim
+all: $(TARGETS) app
 
-SO_OBJS := address_space.o cpu_cm3.o hexdump.o decoder.o impl_disassembly.o impl_emulation.o rdtsc.o
-APP_OBJS := app/thumb2sim.o
-
-ALL_TARGETS := libthumb2sim.so thumb2sim
-
-all: $(ALL_TARGETS)
+app:
+	make -C app
 
 clean:
-	rm -f $(SO_OBJS) $(APP_OBJS) $(ALL_TARGETS)
+	rm -f $(OBJS) $(TARGETS)
+	make -C app clean
 
 install: libthumb2sim.so
 	cp libthumb2sim.so "$(INSTALL_DIR)/libthumb2sim.so.$(VERSION)"
@@ -35,16 +30,13 @@ disas:
 	./objdump -D rom.bin -M force-thumb -b binary -m arm
 
 test: all
-	./simulator simulation_rom.bin -
+	make -C app test
 
-libthumb2sim.so: $(SO_OBJS)
-	$(CC) $(CFLAGS) $(SO_CFLAGS) $(SO_LDFLAGS) -o $@ $^
+gdb: all
+	make -C app gdb
 
-thumb2sim: $(APP_OBJS)
-	$(CC) $(CFLAGS) $(SO_CFLAGS) $(SO_LDFLAGS) -o $@ $^
-
-.c.o: $(SO_OBJS)
-	$(CC) $(CFLAGS) $(SO_CFLAGS) -c -o $@ $<
+libthumb2sim.so: $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<

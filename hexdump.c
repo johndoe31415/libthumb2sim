@@ -33,18 +33,16 @@ static char hexdump_char(char chararcter) {
 	}
 }
 
-void hexdump_data(const unsigned char *data, uint16_t length) {
-	uint16_t i;
+void hexdump_data(const unsigned char *data, unsigned int length) {
 	fprintf(stderr, "%d bytes (0x%x) follow:\r\n", length, length);
-	for (i = 0; i < length; i++) {
+	for (unsigned int i = 0; i < length; i++) {
 		if ((i % 16) == 0) {
 			fprintf(stderr, "%4x   ", i);
 		}
 		fprintf(stderr, "%02x ", data[i]);
 		if (((i + 1) % 16) == 0) {
-			uint16_t j;
 			fprintf(stderr, "   ");
-			for (j = i - 15; j <= i; j++) {
+			for (unsigned int j = i - 15; j <= i; j++) {
 				fprintf(stderr, "%c", hexdump_char(data[j]));
 			}
 			fprintf(stderr, "\r\n");
@@ -55,8 +53,7 @@ void hexdump_data(const unsigned char *data, uint16_t length) {
 		}
 	}
 	if (length % 16) {
-		uint16_t j;
-		for (j = 0; j < 16 - (length % 16); j++) {
+		for (unsigned int j = 0; j < 16 - (length % 16); j++) {
 			fprintf(stderr, "   ");
 		}
 		if ((length % 16) < 4) {
@@ -67,15 +64,15 @@ void hexdump_data(const unsigned char *data, uint16_t length) {
 			fprintf(stderr, " ");
 		}
 		fprintf(stderr, "   ");
-		for (j = length - (length % 16); j < length; j++) {
+		for (unsigned int j = length - (length % 16); j < length; j++) {
 			fprintf(stderr, "%c", hexdump_char(data[j]));
 		}
 		fprintf(stderr, "\r\n");
 	}
 }
 
-void hexdump_nameddata(const char *name, const unsigned char *data, uint16_t length) {
-	fprintf(stderr, "%s ", name);
+void hexdump_nameddata(const char *name, const unsigned char *data, unsigned int length) {
+	fprintf(stderr, "\"%s\" ", name);
 	hexdump_data(data, length);
 	fprintf(stderr, "\n");
 }
@@ -86,6 +83,7 @@ int main(int argc, char **argv) {
 	for (i = 0; i < 34; i++) {
 		hexdump_data((unsigned char*)"Hallo du da. Wie geht es dir", i);
 	}
+	hexdump_nameddata("Test", (unsigned char*)"Hallo", 6);
 	return 0;
 }
 #endif

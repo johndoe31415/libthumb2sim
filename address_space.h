@@ -36,7 +36,7 @@ void addrspace_write16(struct addrspace_t *address_space, uint32_t address, uint
 uint16_t addrspace_read16(struct addrspace_t *address_space, uint32_t address);
 uint32_t addrspace_read32(struct addrspace_t *address_space, uint32_t address);
 void addrspace_write32(struct addrspace_t *address_space, uint32_t address, uint32_t value);
-void addrspace_add_region(struct addrspace_t *address_space, uint32_t start_addr, uint32_t length, uint8_t *data, bool read_only);
+void addrspace_add_region(struct addrspace_t *address_space, const char *name, uint32_t start_addr, uint32_t length, void *data, bool read_only, bool shadow_mapping);
 void addrspace_init(struct addrspace_t *address_space);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 

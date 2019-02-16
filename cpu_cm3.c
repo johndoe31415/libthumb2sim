@@ -33,11 +33,25 @@
 #include "decoder.h"
 #include "impl_emulation.h"
 #include "impl_disassembly.h"
-#include "rdtsc.h"
 
-#define STATE_WAITING			0
-#define STATE_SIMULATING		1
-#define STATE_FINISHED			2
+static const char *register_name[] = {
+	[0] = "r0",
+	[1] = "r1",
+	[2] = "r2",
+	[3] = "r3",
+	[4] = "r4",
+	[5] = "r5",
+	[6] = "r6",
+	[7] = "r7",
+	[8] = "r8",
+	[9] = "r9",
+	[10] = "r10",
+	[11] = "r11",
+	[12] = "r12",
+	[REG_SP] = "sp",
+	[REG_LR] = "lr",
+	[REG_PC] = "pc",
+};
 
 #if 0
 static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, ...) {
@@ -47,45 +61,33 @@ static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, 
 	vsnprintf(ctx->disasBuffer + l, 128 - l, aMsg, ap);
 	va_end(ap);
 }
+#endif
 
-void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
+
+
+void cpu_print_state(const struct emu_ctx_t *emu_ctx) {
 	for (int i = 0; i < 16; i++) {
-		fprintf(stderr, "r%-2d = %8x    ", i, cpu_state->reg[i]);
+		fprintf(stderr, "%-3s = %8x    ", register_name[i], emu_ctx->cpu.reg[i]);
 		if ((i % 4) == 3) {
 			fprintf(stderr, "\n");
 		}
 	}
-	fprintf(stderr, "PSR = %8x    >", cpu_state->psr);
-	fprintf(stderr, "%c", (cpu_state->psr & FLAG_NEGATIVE) ? 'N' : ' ');
-	fprintf(stderr, "%c", (cpu_state->psr & FLAG_ZERO) ? 'Z' : ' ');
-	fprintf(stderr, "%c", (cpu_state->psr & FLAG_CARRY) ? 'C' : ' ');
-	fprintf(stderr, "%c", (cpu_state->psr & FLAG_OVERFLOW) ? 'V' : ' ');
-	fprintf(stderr, "%c", (cpu_state->psr & FLAG_SATURATION) ? 'Q' : ' ');
+	fprintf(stderr, "PSR = %8x    >", emu_ctx->cpu.psr);
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_NEGATIVE) ? 'N' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_ZERO) ? 'Z' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_CARRY) ? 'C' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_OVERFLOW) ? 'V' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_SATURATION) ? 'Q' : ' ');
 	fprintf(stderr, "<\n");
 	fprintf(stderr, "\n");
 }
-#endif
 
-#if 0
-static void traceCPUStateFull(const struct insn_emu_ctx_t *insn_emu_ctx, uint32_t previous_pc) {
-	struct emu_ctx_t *lctx = (struct emu_ctx_t*)emu_ctx->localContext;
-	if (lctx->traceFile) {
-		fprintf(lctx->traceFile, "%d ", emu_ctx->cpu->clockcycle);
-		fprintf(lctx->traceFile, "%x ", previous_pc);
-		for (int i = 0; i < 16; i++) {
-			fprintf(lctx->traceFile, "r%d=%-8x ", i, emu_ctx->cpu->reg[i]);
-		}
-		fprintf(lctx->traceFile, "PSR=%-8x\n", emu_ctx->cpu->psr);
-	}
-}
-#endif
-
-void cpu_dump_memory(struct emu_ctx_t *emu_ctx, uint32_t address, uint16_t length) {
+void cpu_print_memory(struct emu_ctx_t *emu_ctx, uint32_t address, unsigned int length) {
 	const uint8_t *data = addrspace_memptr(&emu_ctx->addr_space, address);
 	hexdump_data(data, length);
 }
 
-void cpu_dump_memory_file(struct emu_ctx_t *emu_ctx, const char *filename) {
+void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const char *filename) {
 	FILE *f = fopen(filename, "w");
 	if (!f) {
 		perror(filename);
@@ -141,7 +143,7 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_OVERFLOW) ? 'V' : ' ');
 		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_SATURATION) ? 'Q' : ' ');
 		fprintf(stderr, "\n");
-	
+
 		if (instructionDebug) {
 			cpu_dump_state(ctx->cpu);
 		}
@@ -203,4 +205,5 @@ void cpu_reset(struct emu_ctx_t *emu_ctx) {
 	/* Load stack pointer and program counter */
 	emu_ctx->cpu.reg[REG_SP] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 0);
 	emu_ctx->cpu.reg[REG_PC] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 4) & ~1;
+	//fprintf(stderr, "CPU reset, IVT base 0x%x: SP 0x%x, PC 0x%x\n", emu_ctx->ivt_base_address, emu_ctx->cpu.reg[REG_SP], emu_ctx->cpu.reg[REG_PC]);
 }

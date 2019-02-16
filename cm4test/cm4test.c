@@ -1,6 +1,6 @@
 /*
 	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-	Copyright (C) 2014-2019 Johannes Bauer
+	Copyright (C) 2019-2019 Johannes Bauer
 
 	This file is part of libthumb2sim.
 
@@ -21,17 +21,26 @@
 	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-#include "rdtsc.h"
+#include <stdbool.h>
 
-uint64_t rdtsc(void) {
-	uint64_t value;
-	__asm__ __volatile__ (
-		"xor %%rax, %%rax"			"\n\t"
-		"cpuid"						"\n\t"
-		"rdtsc"						"\n\t"
-	: "=A" (value)
-	:
-	: "ebx", "ecx", "edx"
-	);
-	return value;
+void _exit(int status);
+void _exit(int status) {
+	while (true);
+}
+
+void SystemInit(void);
+void SystemInit(void) {
+}
+
+void default_fault_handler(void);
+void default_fault_handler(void) {
+	while (true);
+}
+
+int main(void) {
+	__asm__ __volatile__("bkpt #1");
+	for (volatile int i = 0; i < 12345; i++) {
+	}
+	__asm__ __volatile__("bkpt #2");
+	return 0;
 }

@@ -27,9 +27,9 @@
 #include <thumb2sim.h>
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state);
-void cpu_dump_memory(struct emu_ctx_t *emu_ctx, uint32_t address, uint16_t length);
-void cpu_dump_memory_file(struct emu_ctx_t *emu_ctx, const char *filename);
+void cpu_print_state(const struct emu_ctx_t *emu_ctx);
+void cpu_print_memory(struct emu_ctx_t *emu_ctx, uint32_t address, unsigned int length);
+void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const char *filename);
 void cpu_single_step(struct emu_ctx_t *emu_ctx);
 void cpu_run(struct emu_ctx_t *emu_ctx);
 void cpu_reset(struct emu_ctx_t *emu_ctx);

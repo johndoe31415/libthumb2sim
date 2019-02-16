@@ -1,6 +1,8 @@
 __pycache__
 .*.swp
 *.o
+libthumb2sim.so
+app/thumb2sim
 simulator
 codegen/cpu_stub.c
 codegen/decoder.c

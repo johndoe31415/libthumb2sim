@@ -29,11 +29,17 @@
 
 #define MAX_ADDRESS_SLICES		4
 
+enum emu_dump_t {
+	FOO
+};
+
 struct address_slice_t {
 	uint32_t begin;
 	uint32_t end;
 	uint8_t *data;
-	bool readOnly;
+	bool read_only;
+	bool shadow_mapping;
+	const char *name;
 };
 
 struct addrspace_t {
@@ -107,5 +113,25 @@ struct emu_ctx_t {
 	void *user;
 	//uint32_t registerCopy[16];
 };
+
+struct hardware_params_t {
+	unsigned int rom_size_bytes;
+	unsigned int ram_size_bytes;
+	uint32_t ivt_base_address;
+	uint32_t rom_base_address;
+	uint32_t ram_base_address;
+	const char *rom_image_filename;
+	const char *ram_image_filename;
+};
+
+struct emu_ctx_t* init_cortexm(const struct hardware_params_t *hwparams);
+void free_cortexm(struct emu_ctx_t *emu_ctx);
+
+void cpu_print_state(const struct emu_ctx_t *emu_ctx);
+void cpu_print_memory(struct emu_ctx_t *emu_ctx, uint32_t address, unsigned int length);
+void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const char *filename);
+void cpu_single_step(struct emu_ctx_t *emu_ctx);
+void cpu_run(struct emu_ctx_t *emu_ctx);
+void cpu_reset(struct emu_ctx_t *emu_ctx);
 
 #endif
