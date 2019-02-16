@@ -32,7 +32,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "app_initialization.h"
 #include "address_space.h"
 #include "cpu_cm3.h"
 #include "impl_disassembly.h"

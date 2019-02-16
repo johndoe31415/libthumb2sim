@@ -39,6 +39,7 @@
 #define STATE_SIMULATING		1
 #define STATE_FINISHED			2
 
+#if 0
 static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, ...) {
 	va_list ap;
 	va_start(ap, aMsg);
@@ -63,6 +64,7 @@ void cpu_dump_state(const struct cm3_cpu_state_t *cpu_state) {
 	fprintf(stderr, "<\n");
 	fprintf(stderr, "\n");
 }
+#endif
 
 #if 0
 static void traceCPUStateFull(const struct insn_emu_ctx_t *insn_emu_ctx, uint32_t previous_pc) {
