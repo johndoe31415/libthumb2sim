@@ -641,7 +641,7 @@ static void emulation_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
 	ctx->emu_ctx->cpu.it_state |= IT_THEN;
 
 	ctx->emu_ctx->cpu.reg[REG_PC] += 2;
-	ctx->shiftInstructionITState = false;
+	ctx->shift_insn_it_state = false;
 }
 
 static void emulation_i32_ldc2_imm_T2(void *vctx, uint8_t Rn, uint8_t imm, uint8_t coproc, uint8_t CRd, bool D, bool P, bool U, bool W) {

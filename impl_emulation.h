@@ -28,8 +28,8 @@
 
 struct insn_emu_ctx_t {
 	struct emu_ctx_t *emu_ctx;	
-	bool countNextInstruction;
-	bool shiftInstructionITState;
+	bool count_next_insn;
+	bool shift_insn_it_state;
 };
 
 bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *ctx);

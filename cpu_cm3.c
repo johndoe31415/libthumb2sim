@@ -109,8 +109,8 @@ static uint32_t addrspace_read_insn_word(struct addrspace_t *addr_space, uint32_
 void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 	struct insn_emu_ctx_t insn_ctx = {
 		.emu_ctx = emu_ctx,
-		.countNextInstruction = true,
-		.shiftInstructionITState = true,
+		.count_next_insn = true,
+		.shift_insn_it_state = true,
 	};
 	uint32_t insnWord = addrspace_read_insn_word(&emu_ctx->addr_space, emu_ctx->cpu.reg[REG_PC]);
 
@@ -156,10 +156,10 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 		emu_ctx->cpu.reg[REG_PC] += length;
 	}
 
-	if (insn_ctx.countNextInstruction) {
+	if (insn_ctx.count_next_insn) {
 		emu_ctx->cpu.insn_ctr++;
 	}
-	if (insn_ctx.shiftInstructionITState) {
+	if (insn_ctx.shift_insn_it_state) {
 		emu_ctx->cpu.it_state >>= 2;
 	}
 
@@ -187,7 +187,7 @@ void cpu_run(struct emu_ctx_t *emu_ctx) {
 		cpu_single_step(emu_ctx);
 #if 0
 #if DO_TRACE == 1
-		if (ctx.countNextInstruction) {
+		if (ctx.count_next_insn) {
 			traceCPUStateFull(&ctx, prevLoc);
 		}
 #endif

@@ -30,7 +30,7 @@
 //#define DEBUG_MEMORY_ACCESS
 
 static struct address_slice_t *addrspace_getslice(struct addrspace_t *address_space, uint32_t address) {
-	for (int i = 0; i < address_space->sliceCnt; i++) {
+	for (int i = 0; i < address_space->slice_cnt; i++) {
 		if ((address >= address_space->slices[i].begin) && (address < address_space->slices[i].end)) {
 			return &address_space->slices[i];
 		}
@@ -142,13 +142,13 @@ void addrspace_write32(struct addrspace_t *address_space, uint32_t address, uint
 }
 
 void addrspace_add_region(struct addrspace_t *address_space, const char *name, uint32_t start_addr, uint32_t length, void *data, bool read_only, bool shadow_mapping) {
-	if (address_space->sliceCnt == MAX_ADDRESS_SLICES) {
+	if (address_space->slice_cnt == MAX_ADDRESS_SLICES) {
 		fprintf(stderr, "Cannot add memory: Slices exhausted. Increase MAX_ADDRESS_SLICES at compile time.\n");
 		exit(EXIT_FAILURE);
 	}
 
-	int slice_no = address_space->sliceCnt;
-	address_space->sliceCnt++;
+	int slice_no = address_space->slice_cnt;
+	address_space->slice_cnt++;
 	address_space->slices[slice_no].begin = start_addr;
 	address_space->slices[slice_no].end = start_addr + length;
 	address_space->slices[slice_no].data = data;

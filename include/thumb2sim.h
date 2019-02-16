@@ -43,7 +43,7 @@ struct address_slice_t {
 };
 
 struct addrspace_t {
-	int sliceCnt;
+	int slice_cnt;
 	struct address_slice_t slices[MAX_ADDRESS_SLICES];
 };
 
