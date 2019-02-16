@@ -1,6 +1,6 @@
 /*
 	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-	Copyright (C) 2019-2019 Johannes Bauer
+	Copyright (C) 2014-2019 Johannes Bauer
 
 	This file is part of libthumb2sim.
 
@@ -21,12 +21,21 @@
 	Johannes Bauer <JohannesBauer@gmx.de>
 */
 
-#ifndef __CONVENIENCE_H__
-#define __CONVENIENCE_H__
+#ifndef __THUMB2SIMGUEST_H__
+#define __THUMB2SIMGUEST_H__
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-struct emu_ctx_t* init_cortexm(const struct hardware_params_t *hwparams);
-void free_cortexm(struct emu_ctx_t *emu_ctx);
-/***************  AUTO GENERATED SECTION ENDS   ***************/
+#include <stdint.h>
+
+enum thumb2sim_syscall_t {
+	SYSCALL_GUEST_READ = 0,
+	SYSCALL_GUEST_WRITE = 1,
+	SYSCALL_GUEST_PUTS = 2,
+};
+
+uint32_t thumb2sim_syscall(uint32_t syscall_no, void *data_ptr, uint32_t length);
+
+#define thumb2sim_read(data, max_length) thumb2sim_syscall(SYSCALL_GUEST_READ, (data), (length))
+#define thumb2sim_write(data, length) thumb2sim_syscall(SYSCALL_GUEST_WRITE, (void*)(data), (length))
+#define thumb2sim_puts(msg) thumb2sim_syscall(SYSCALL_GUEST_PUTS, (msg), 0)
 
 #endif

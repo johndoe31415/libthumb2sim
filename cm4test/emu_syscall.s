@@ -1,6 +1,6 @@
-/*
+/**
 	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-	Copyright (C) 2019-2019 Johannes Bauer
+	Copyright (C) 2014-2019 Johannes Bauer
 
 	This file is part of libthumb2sim.
 
@@ -19,14 +19,17 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 	Johannes Bauer <JohannesBauer@gmx.de>
-*/
+**/
 
-#ifndef __CONVENIENCE_H__
-#define __CONVENIENCE_H__
+.syntax unified
+.cpu cortex-m4
+.fpu softvfp
+.thumb
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-struct emu_ctx_t* init_cortexm(const struct hardware_params_t *hwparams);
-void free_cortexm(struct emu_ctx_t *emu_ctx);
-/***************  AUTO GENERATED SECTION ENDS   ***************/
-
-#endif
+.section .text
+.type thumb2sim_syscall, %function
+thumb2sim_syscall:
+	bkpt #255
+	bx lr
+.size thumb2sim_syscall, .-thumb2sim_syscall
+.global thumb2sim_syscall

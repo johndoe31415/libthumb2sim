@@ -31,7 +31,9 @@ struct user_ctx_t {
 
 static void bkpt_callback(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number) {
 	struct user_ctx_t *usr = (struct user_ctx_t*)emu_ctx->user;
-	fprintf(stderr, "Hit breakpoint %d at instruction %u.\n", bkpt_number, emu_ctx->cpu.clockcycle);
+	if (bkpt_number != 255) {
+		fprintf(stderr, "Hit breakpoint %d at instruction %u.\n", bkpt_number, emu_ctx->cpu.clockcycle);
+	}
 	if (bkpt_number == 2) {
 		usr->end_emulation = true;
 	}
@@ -40,6 +42,23 @@ static void bkpt_callback(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number) {
 static bool end_emulation_callback(struct emu_ctx_t *emu_ctx) {
 	struct user_ctx_t *usr = (struct user_ctx_t*)emu_ctx->user;
 	return usr->end_emulation;
+}
+
+static uint32_t syscall_read(void *data, uint32_t max_length) {
+	fprintf(stderr, "Guest read: max of %d bytes, write to %p.\n", max_length, data);
+	return 0;
+}
+
+static void syscall_write(const void *data, uint32_t length) {
+	if (length == 4) {
+		fprintf(stderr, "Guest write: %d bytes, dereferenced uint32_t value: %u\n", length, *((uint32_t*)data));
+	} else {
+		fprintf(stderr, "Guest write: %d bytes, available at %p.\n", length, data);
+	}
+}
+
+static void syscall_puts(const char *msg) {
+	fprintf(stderr, "Guest puts: \"%s\"\n", msg);
 }
 
 int main(int argc, char **argv) {
@@ -65,6 +84,9 @@ int main(int argc, char **argv) {
 	struct emu_ctx_t *emu_ctx = init_cortexm(&cpu_parameters);
 	emu_ctx->bkpt_callback = bkpt_callback;
 	emu_ctx->end_emulation_callback = end_emulation_callback;
+	emu_ctx->emulator_syscall_read = syscall_read;
+	emu_ctx->emulator_syscall_write = syscall_write;
+	emu_ctx->emulator_syscall_puts = syscall_puts;
 	emu_ctx->user = &user;
 
 	cpu_print_state(emu_ctx);

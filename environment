@@ -1,1 +1,2 @@
+export PS1="(t2sim) ${PS1}"
 export LD_LIBRARY_PATH=`readlink -f .`

@@ -9,3 +9,4 @@ codegen/decoder.c
 codegen/decoder.h
 codegen/implementation.c
 codegen/implementation.h
+cm4test/cm4test

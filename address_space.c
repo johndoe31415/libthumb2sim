@@ -38,12 +38,11 @@ static struct address_slice_t *addrspace_getslice(struct addrspace_t *address_sp
 	return NULL;
 }
 
-const uint8_t *addrspace_memptr(const struct addrspace_t *address_space, uint32_t address) {
+uint8_t *addrspace_memptr(struct addrspace_t *address_space, uint32_t address) {
 	struct address_slice_t *slice = addrspace_getslice((struct addrspace_t*)address_space, address);
 	if (slice) {
 		return slice->data + (address - slice->begin);
 	} else {
-
 		return NULL;
 	}
 }

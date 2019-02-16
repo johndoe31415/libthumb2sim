@@ -11,6 +11,59 @@ of my paper, but since it might be useful for others as well I've decided to
 clean it up a notch and distribute it as a library with a clean API. The
 original files are commited as they were at end of 2016 for historic reference.
 
+## Getting started
+There's a Makefile included that should get you going, by default you only need
+the host compiler. A Thumb-2 binary is included in the cm4test/ subdirectory
+already, so for the first steps you don't even need to cross-compile Thumb-2
+code. Simply source the enviroment:
+
+```
+$ . ./environment
+(t2sim) $
+```
+
+You'll see that your PS1 prompt changes to the (t2sim) prefix to indicate that
+you're in the correct environment. This is needed because LD_LIBRARY_PATH needs
+to be set. Then, simply build the library and test application and try it out:
+
+```
+(t2sim) $ make test
+./thumb2sim ../cm4test/cm4test.bin
+Added memory "rom": at 0x8000000 len 0x100000 read_only=true shadow_mapping=false
+Added memory "ram": at 0x20000000 len 0x20000 read_only=false shadow_mapping=false
+r0  =        0    r1  =        0    r2  =        0    r3  =        0
+r4  =        0    r5  =        0    r6  =        0    r7  =        0
+r8  =        0    r9  =        0    r10 =        0    r11 =        0
+r12 =        0    sp  = 20020000    lr  =        0    pc  =  80002a8
+PSR =      173    >     <
+
+Hit breakpoint 1 at instruction 131431.
+Guest puts: "Hello from the Cortex-M"
+Guest write: 4 bytes, dereferenced uint32_t value: 0
+Guest write: 4 bytes, dereferenced uint32_t value: 256
+Guest write: 4 bytes, dereferenced uint32_t value: 512
+Guest write: 4 bytes, dereferenced uint32_t value: 768
+Guest write: 4 bytes, dereferenced uint32_t value: 1024
+Guest write: 4 bytes, dereferenced uint32_t value: 1280
+[...]
+Guest write: 4 bytes, dereferenced uint32_t value: 11520
+Guest write: 4 bytes, dereferenced uint32_t value: 11776
+Guest write: 4 bytes, dereferenced uint32_t value: 12032
+Guest write: 4 bytes, dereferenced uint32_t value: 12288
+Guest puts: "Goodbyte from the Cortex-M"
+Hit breakpoint 2 at instruction 218206.
+r0  =        2    r1  =  80004d8    r2  =        0    r3  =     3039
+r4  = 2001fff4    r5  =        0    r6  =        0    r7  =        0
+r8  =        0    r9  =        0    r10 =        0    r11 =        0
+r12 =        0    sp  = 2001fff0    lr  =  800048f    pc  =  8000490
+PSR = 20000173    >  C  <
+```
+
+You'll see that the example in cm4test/ is executed, which produces a puts()
+emulator syscall at the beginning and the end of the main loop and issues a
+different write() system every 256 loop iterations. This is a simple but
+powerful mechanism to exchange data between host and guest.
+
 ## ISA Code Generator
 In order to automate writing the Thumb-2 ISA decoder, I specified the ISA as a
 machine-readable XML file that closely looks like the specification in the
@@ -30,8 +83,6 @@ Here's a incomplete list of questions/TODOs that I see for this:
     O(log(n)) if the partitioner was working. Look into it, maybe?
   * Even if we don't partition in the decoder, use a lookup table for better
     efficiency.
-  * Implement a host/guest read/write API. Maybe use bkpt #255 for this
-    purpose. Could be cool.
 
 ## License
 libthumb2sim is licensed under the GNU GPL-3. It currently includes a copy of

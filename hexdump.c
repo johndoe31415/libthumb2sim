@@ -33,7 +33,8 @@ static char hexdump_char(char chararcter) {
 	}
 }
 
-void hexdump_data(const unsigned char *data, unsigned int length) {
+void hexdump_data(const void *vdata, unsigned int length) {
+	const uint8_t *data = (const uint8_t*)vdata;
 	fprintf(stderr, "%d bytes (0x%x) follow:\r\n", length, length);
 	for (unsigned int i = 0; i < length; i++) {
 		if ((i % 16) == 0) {
@@ -71,7 +72,7 @@ void hexdump_data(const unsigned char *data, unsigned int length) {
 	}
 }
 
-void hexdump_nameddata(const char *name, const unsigned char *data, unsigned int length) {
+void hexdump_nameddata(const char *name, const void *data, unsigned int length) {
 	fprintf(stderr, "\"%s\" ", name);
 	hexdump_data(data, length);
 	fprintf(stderr, "\n");

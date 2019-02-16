@@ -2,12 +2,12 @@
 
 CC := arm-none-eabi-gcc
 OBJCOPY := arm-none-eabi-objcopy
-CFLAGS := -O3 -std=c11 -Iinclude -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wshadow
+CFLAGS := -O3 -std=c11 -I../include -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wshadow
 CFLAGS += -g -D_XOPEN_SOURCE=500
 
 LDFLAGS := -Tstm32f407.ld
 
-OBJS := cm4test.o ivt.o
+OBJS := cm4test.o ivt.o emu_syscall.o
 TARGETS := cm4test cm4test.bin
 
 all: $(TARGETS)

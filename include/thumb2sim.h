@@ -47,8 +47,24 @@ struct addrspace_t {
 	struct address_slice_t slices[MAX_ADDRESS_SLICES];
 };
 
+#define REG_R0		0
+#define REG_R1		1
+#define REG_R2		2
+#define REG_R3		3
+#define REG_R4		4
+#define REG_R5		5
+#define REG_R6		6
+#define REG_R7		7
+#define REG_R8		8
+#define REG_R9		9
+#define REG_R10		10
+#define REG_R11		11
+#define REG_R12		12
+#define REG_R13		13
 #define REG_SP		13
+#define REG_R14		14
 #define REG_LR		14
+#define REG_R15		15
 #define REG_PC		15
 
 #define FLAG_NEGATIVE					(1 << 31)		// 0x80 00 00 00
@@ -104,14 +120,21 @@ typedef void (*bkpt_callback_t)(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number);
  * abort emulation */
 typedef bool (*end_emulation_callback_t)(struct emu_ctx_t *emu_ctx);
 
+/* Syscalls for communication between guest/host */
+typedef uint32_t (*syscall_read_t)(void *data, uint32_t max_length);
+typedef void (*syscall_write_t)(const void *data, uint32_t length);
+typedef void (*syscall_puts_t)(const char *msg);
+
 struct emu_ctx_t {
 	struct cm3_cpu_state_t cpu;
 	struct addrspace_t addr_space;
 	uint32_t ivt_base_address;
 	bkpt_callback_t bkpt_callback;
 	end_emulation_callback_t end_emulation_callback;
+	syscall_read_t emulator_syscall_read;
+	syscall_write_t emulator_syscall_write;
+	syscall_puts_t emulator_syscall_puts;
 	void *user;
-	//uint32_t registerCopy[16];
 };
 
 struct hardware_params_t {

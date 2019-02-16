@@ -83,7 +83,7 @@ void cpu_print_state(const struct emu_ctx_t *emu_ctx) {
 }
 
 void cpu_print_memory(struct emu_ctx_t *emu_ctx, uint32_t address, unsigned int length) {
-	const uint8_t *data = addrspace_memptr(&emu_ctx->addr_space, address);
+	uint8_t *data = addrspace_memptr(&emu_ctx->addr_space, address);
 	hexdump_data(data, length);
 }
 

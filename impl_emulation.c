@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <thumb2simguest.h>
 #include "decoder.h"
 #include "impl_emulation.h"
 #include "cpu_cm3.h"
@@ -53,7 +54,7 @@ struct barrel_shifterOutput {
 
 static struct barrel_shifterOutput barrel_shift(uint32_t aInValue, uint8_t aType, uint8_t aImm) {
 	struct barrel_shifterOutput outValue;
-	outValue.carry = false;	
+	outValue.carry = false;
 	if (aType == TYPE_LSL) {
 		outValue.carry = aInValue & 0x80000000;
 		outValue.value = aInValue << aImm;
@@ -136,7 +137,7 @@ static bool condSatisfied(const struct insn_emu_ctx_t *insn_emu_ctx, uint8_t aCo
 
 bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *insn_emu_ctx) {
 	uint8_t currentItState = (insn_emu_ctx->emu_ctx->cpu.it_state & 0x03);
-	bool doExecute = (currentItState == IT_NONE) 
+	bool doExecute = (currentItState == IT_NONE)
 					|| ((currentItState == IT_THEN) && (condSatisfied(insn_emu_ctx, insn_emu_ctx->emu_ctx->cpu.it_cond)))
 					|| ((currentItState == IT_ELSE) && (condSatisfied(insn_emu_ctx, insn_emu_ctx->emu_ctx->cpu.it_cond ^ 1)));
 //	fprintf(stderr, "doExecute %d currentItState %x  ", doExecute, currentItState);
@@ -317,7 +318,7 @@ static void emulation_i32_and_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if ((Rd == REG_PC) && S) {
 		setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rn] & imm);
-	} else {		
+	} else {
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] & imm;
 		if (S) {
 			setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd]);
@@ -335,7 +336,7 @@ static void emulation_i16_and_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 
 static void emulation_i32_and_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	if (Rd != REG_PC) {	
+	if (Rd != REG_PC) {
 		struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] & bsOut.value;
 		if (S) {
@@ -364,7 +365,7 @@ static void emulation_i32_asr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 
 static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	
+
 	if (condSatisfied(ctx, cond)) {
 		ctx->emu_ctx->cpu.reg[REG_PC] = relBranchTarget(ctx->emu_ctx->cpu.reg[REG_PC], imm, 8);
 	} else {
@@ -379,7 +380,7 @@ static void emulation_i16_b_T2(void *vctx, uint16_t imm) {
 
 static void emulation_i32_b_T3(void *vctx, int32_t imm, uint8_t cond) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	
+
 	if (condSatisfied(ctx, cond)) {
 		ctx->emu_ctx->cpu.reg[REG_PC] = ctx->emu_ctx->cpu.reg[REG_PC] + 2 * imm + 4;
 	} else {
@@ -412,7 +413,7 @@ static void emulation_i16_bic_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 
 static void emulation_i32_bic_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	if (Rd != REG_PC) {	
+	if (Rd != REG_PC) {
 		struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] & ~bsOut.value;
 		if (S) {
@@ -426,6 +427,33 @@ static void emulation_i16_bkpt_T1(void *vctx, uint8_t imm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (ctx->emu_ctx->bkpt_callback) {
 		ctx->emu_ctx->bkpt_callback(ctx->emu_ctx, imm);
+	}
+	if (imm == 255) {
+		/* Possible syscall callback */
+		/* API:
+		 *     r0: syscall_no
+		 *     r1: data_ptr
+		 *     r2: length
+		 */
+		uint32_t syscall_no = ctx->emu_ctx->cpu.reg[REG_R0];
+		uint32_t data_ptr = ctx->emu_ctx->cpu.reg[REG_R1];
+		uint32_t length = ctx->emu_ctx->cpu.reg[REG_R2];
+		if ((syscall_no == SYSCALL_GUEST_READ) && ctx->emu_ctx->emulator_syscall_read) {
+			/* Guest wants to read data */
+			void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
+			length = ctx->emu_ctx->emulator_syscall_read(data, length);
+
+			/* Return actual read length in r0, as of EABI calling convention */
+			ctx->emu_ctx->cpu.reg[REG_R0] = length;
+		} else if ((syscall_no == SYSCALL_GUEST_WRITE) && ctx->emu_ctx->emulator_syscall_write) {
+			/* Guest wants to write data */
+			const void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
+			ctx->emu_ctx->emulator_syscall_write(data, length);
+		} else if ((syscall_no == SYSCALL_GUEST_PUTS) && ctx->emu_ctx->emulator_syscall_puts) {
+			/* Similar to write, but for convenience zero-terminated */
+			const void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
+			ctx->emu_ctx->emulator_syscall_puts(data);
+		}
 	}
 	ctx->emu_ctx->cpu.reg[REG_PC] += 2;
 }
@@ -446,7 +474,7 @@ static void emulation_i16_bx_T1(void *vctx, uint8_t Rm) {
 
 static void emulation_i16_cbnz_T1(void *vctx, uint8_t Rn, uint8_t imm, bool op) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	
+
 	if ((ctx->emu_ctx->cpu.reg[Rn] == 0) ^ op) {
 		/* Branch */
 		ctx->emu_ctx->cpu.reg[REG_PC] = relBranchTarget(ctx->emu_ctx->cpu.reg[REG_PC], imm, 7);
@@ -548,7 +576,7 @@ static void emulation_i16_eor_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 static void emulation_i32_eor_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 
-	if (Rd != REG_PC) {	
+	if (Rd != REG_PC) {
 		struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] ^ bsOut.value;
 		if (S) {
@@ -564,7 +592,7 @@ static void emulation_i32_isb_T1(void *vctx, uint8_t option) {
 
 static void emulation_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	
+
 	int len = 3;
 	for (int i = 0; i < 3; i++) {
 		if (mask & (1 << i)) {
@@ -582,7 +610,7 @@ static void emulation_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
 	}
 	ctx->emu_ctx->cpu.it_state <<= 2;
 	ctx->emu_ctx->cpu.it_state |= IT_THEN;
-	
+
 	ctx->emu_ctx->cpu.reg[REG_PC] += 2;
 	ctx->shiftInstructionITState = false;
 }
@@ -823,7 +851,7 @@ static void emulation_i16_lsl_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	// TODO: effizienter
 	bool carry = ((uint64_t)ctx->emu_ctx->cpu.reg[Rm] << imm) & (uint64_t)0x100000000;
-	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rm] << imm;	
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rm] << imm;
 	setLslCondCode(ctx, false, ctx->emu_ctx->cpu.reg[Rd], carry);
 	ctx->emu_ctx->cpu.reg[REG_PC] += 2;
 }
@@ -1218,7 +1246,7 @@ static void emulation_i32_stm_T2(void *vctx, uint8_t Rn, uint16_t register_list,
 		register_list |= 1 << REG_LR;
 	}
 	storeRegisters(ctx, Rn, register_list, true, W);
-	ctx->emu_ctx->cpu.reg[REG_PC] += 4;	
+	ctx->emu_ctx->cpu.reg[REG_PC] += 4;
 }
 
 static void emulation_i32_stmdb_T1(void *vctx, uint8_t Rn, uint16_t register_list, bool M, bool W) {

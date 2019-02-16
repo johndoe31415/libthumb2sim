@@ -25,8 +25,8 @@
 #define __HEXDUMP_H__
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-void hexdump_data(const unsigned char *data, unsigned int length);
-void hexdump_nameddata(const char *name, const unsigned char *data, unsigned int length);
+void hexdump_data(const void *vdata, unsigned int length);
+void hexdump_nameddata(const char *name, const void *data, unsigned int length);
 /***************  AUTO GENERATED SECTION ENDS   ***************/
 
 #endif

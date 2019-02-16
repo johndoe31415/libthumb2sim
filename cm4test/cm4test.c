@@ -22,6 +22,7 @@
 */
 
 #include <stdbool.h>
+#include <thumb2simguest.h>
 
 void _exit(int status);
 void _exit(int status) {
@@ -39,8 +40,13 @@ void default_fault_handler(void) {
 
 int main(void) {
 	__asm__ __volatile__("bkpt #1");
-	for (volatile int i = 0; i < 12345; i++) {
+	thumb2sim_puts("Hello from the Cortex-M");
+	for (uint32_t i = 0; i < 12345; i++) {
+		if ((i & 255) == 0) {
+			thumb2sim_write(&i, 4);
+		}
 	}
+	thumb2sim_puts("Goodbyte from the Cortex-M");
 	__asm__ __volatile__("bkpt #2");
 	return 0;
 }
