@@ -91,13 +91,19 @@ struct cm3_cpu_state_t {
 
 struct emu_ctx_t;
 
+/* Called when a breakpoint is emulated */
 typedef void (*bkpt_callback_t)(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number);
+
+/* Called when running the CPU so the user can customize conditions at which to
+ * abort emulation */
+typedef bool (*end_emulation_callback_t)(struct emu_ctx_t *emu_ctx);
 
 struct emu_ctx_t {
 	struct cm3_cpu_state_t cpu;
 	struct addrspace_t addr_space;
 	uint32_t ivt_base_address;
 	bkpt_callback_t bkpt_callback;
+	end_emulation_callback_t end_emulation_callback;
 	void *user;
 	//uint32_t registerCopy[16];
 };

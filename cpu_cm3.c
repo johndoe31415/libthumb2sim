@@ -102,7 +102,7 @@ static uint32_t addrspace_read_insn_word(struct addrspace_t *addr_space, uint32_
 	return (addrspace_read16(addr_space, pc) << 16) | addrspace_read16(addr_space, pc + 2);
 }
 
-static void executeNextInstruction(struct emu_ctx_t *emu_ctx) {
+void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 	struct insn_emu_ctx_t insn_ctx = {
 		.emu_ctx = emu_ctx,
 		.countNextInstruction = true,
@@ -174,11 +174,15 @@ static void executeNextInstruction(struct emu_ctx_t *emu_ctx) {
 
 void cpu_run(struct emu_ctx_t *emu_ctx) {
 	while (true) {
+		bool end_emulation = emu_ctx->end_emulation_callback && (emu_ctx->end_emulation_callback(emu_ctx));
+		if (end_emulation) {
+			break;
+		}
 //		uint32_t prevLoc = emu_ctx->cpu.reg[REG_PC];
 
 	//	memcpy(localContext.registerCopy, cpu_state->reg, sizeof(uint32_t) * 16);
 	//	localContext.disassemblyBuffer[0] = 0;
-		executeNextInstruction(emu_ctx);
+		cpu_single_step(emu_ctx);
 #if 0
 #if DO_TRACE == 1
 		if (ctx.countNextInstruction) {
