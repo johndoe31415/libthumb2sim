@@ -28,9 +28,8 @@ to be set. Then, simply build the library and test application and try it out:
 
 ```
 (t2sim) $ make test
+[...]
 ./thumb2sim ../cm4test/cm4test.bin
-Added memory "rom": at 0x8000000 len 0x100000 read_only=true shadow_mapping=false
-Added memory "ram": at 0x20000000 len 0x20000 read_only=false shadow_mapping=false
 r0  =        0    r1  =        0    r2  =        0    r3  =        0
 r4  =        0    r5  =        0    r6  =        0    r7  =        0
 r8  =        0    r9  =        0    r10 =        0    r11 =        0
@@ -44,25 +43,29 @@ Guest write: 4 bytes, dereferenced uint32_t value: 256
 Guest write: 4 bytes, dereferenced uint32_t value: 512
 Guest write: 4 bytes, dereferenced uint32_t value: 768
 Guest write: 4 bytes, dereferenced uint32_t value: 1024
-Guest write: 4 bytes, dereferenced uint32_t value: 1280
 [...]
-Guest write: 4 bytes, dereferenced uint32_t value: 11520
 Guest write: 4 bytes, dereferenced uint32_t value: 11776
 Guest write: 4 bytes, dereferenced uint32_t value: 12032
 Guest write: 4 bytes, dereferenced uint32_t value: 12288
+Guest read: max of 8 bytes, write to 0x55979e610368.
+Guest write: 4 bytes, dereferenced uint32_t value: 12345678
 Guest puts: "Goodbyte from the Cortex-M"
-Hit breakpoint 2 at instruction 218206.
-r0  =        2    r1  =  80004d8    r2  =        0    r3  =     3039
-r4  = 2001fff4    r5  =        0    r6  =        0    r7  =        0
+Hit breakpoint 2 at instruction 205880.
+r0  =        2    r1  =  80004f8    r2  =        0    r3  =   bc614e
+r4  =     3038    r5  = 2001ffe8    r6  =        0    r7  =        0
 r8  =        0    r9  =        0    r10 =        0    r11 =        0
-r12 =        0    sp  = 2001fff0    lr  =  800048f    pc  =  8000490
-PSR = 20000173    >  C  <
+r12 =        0    sp  = 2001ffe0    lr  =  80004af    pc  =  80004b0
+PSR =      173    >     <
 ```
 
 You'll see that the example in cm4test/ is executed, which produces a puts()
 emulator syscall at the beginning and the end of the main loop and issues a
-different write() system every 256 loop iterations. This is a simple but
-powerful mechanism to exchange data between host and guest.
+different write() system every 256 loop iterations. At the end, the guest
+requests two integers from the host. In the given example implementation, 75844
+and 12257489 are chosen. The guest then computes (12345 + x + y) and writes the
+32-bit result back to the guest. As you can see, it works correctly, since
+75844 + 12257489 + 12345 = 12345678.  This is a simple but powerful mechanism
+to exchange data between host and guest in both directions.
 
 ## ISA Code Generator
 In order to automate writing the Thumb-2 ISA decoder, I specified the ISA as a

@@ -40,12 +40,27 @@ void default_fault_handler(void) {
 
 int main(void) {
 	__asm__ __volatile__("bkpt #1");
+
+	/* Example of how to print strings in the emulator, for easy debugging */
 	thumb2sim_puts("Hello from the Cortex-M");
+
+	/* Example of how to write data to the emulator */
 	for (uint32_t i = 0; i < 12345; i++) {
 		if ((i & 255) == 0) {
 			thumb2sim_write(&i, 4);
 		}
 	}
+
+	/* Now we read integer values from the emulator, add them together with
+	 * 12345 and send the 32-bit result back */
+	struct {
+		uint32_t value_a;
+		uint32_t value_b;
+	} integer_read;
+	thumb2sim_read(&integer_read, sizeof(integer_read));
+	uint32_t result = integer_read.value_a + integer_read.value_b + 12345;
+	thumb2sim_write(&result, 4);
+
 	thumb2sim_puts("Goodbyte from the Cortex-M");
 	__asm__ __volatile__("bkpt #2");
 	return 0;

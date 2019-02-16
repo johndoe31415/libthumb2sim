@@ -46,6 +46,12 @@ static bool end_emulation_callback(struct emu_ctx_t *emu_ctx) {
 
 static uint32_t syscall_read(void *data, uint32_t max_length) {
 	fprintf(stderr, "Guest read: max of %d bytes, write to %p.\n", max_length, data);
+	if (max_length == 8) {
+		/* 12345 + 75844 + 12257489 = 12345678 */
+		uint32_t *int_data = (uint32_t*)data;
+		int_data[0] = 75844;
+		int_data[1] = 12257489;
+	}
 	return 0;
 }
 
