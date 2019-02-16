@@ -218,9 +218,11 @@ static void emulation_i32_adc_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i16_adc_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_adc_reg_T1\n");
 }
 
 static void emulation_i32_adc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_adc_reg_T2\n");
 }
 
 static void emulation_i16_add_SPi_T1(void *vctx, uint8_t Rd, uint8_t imm) {
@@ -245,15 +247,19 @@ static void emulation_i32_add_SPi_T3(void *vctx, uint8_t Rd, int32_t imm, bool S
 }
 
 static void emulation_i32_add_SPi_T4(void *vctx, uint8_t Rd, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_add_SPi_T4\n");
 }
 
 static void emulation_i16_add_SPr_T1(void *vctx, uint8_t Rdm) {
+	fprintf(stderr, "Instruction not implemented: i16_add_SPr_T1\n");
 }
 
 static void emulation_i16_add_SPr_T2(void *vctx, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_add_SPr_T2\n");
 }
 
 static void emulation_i32_add_SPr_T3(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_add_SPr_T3\n");
 }
 
 static void emulation_i16_add_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm) {
@@ -280,6 +286,7 @@ static void emulation_i32_add_imm_T3(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i32_add_imm_T4(void *vctx, uint8_t Rd, uint8_t Rn, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_add_imm_T4\n");
 }
 
 static void emulation_i16_add_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
@@ -306,12 +313,15 @@ static void emulation_i32_add_reg_T3(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_adr_T1(void *vctx, uint8_t Rd, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i16_adr_T1\n");
 }
 
 static void emulation_i32_adr_T2(void *vctx, uint8_t Rd, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_adr_T2\n");
 }
 
 static void emulation_i32_adr_T3(void *vctx, uint8_t Rd, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_adr_T3\n");
 }
 
 static void emulation_i32_and_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -355,12 +365,15 @@ static void emulation_i16_asr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i32_asr_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_asr_imm_T2\n");
 }
 
 static void emulation_i16_asr_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_asr_reg_T1\n");
 }
 
 static void emulation_i32_asr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_asr_reg_T2\n");
 }
 
 static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
@@ -394,9 +407,11 @@ static void emulation_i32_b_T4(void *vctx, int32_t imm) {
 }
 
 static void emulation_i32_bfc_T1(void *vctx, uint8_t Rd, uint8_t imm, uint8_t msb) {
+	fprintf(stderr, "Instruction not implemented: i32_bfc_T1\n");
 }
 
 static void emulation_i32_bfi_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm, uint8_t msb) {
+	fprintf(stderr, "Instruction not implemented: i32_bfi_T1\n");
 }
 
 static void emulation_i32_bic_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -409,6 +424,7 @@ static void emulation_i32_bic_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i16_bic_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_bic_reg_T1\n");
 }
 
 static void emulation_i32_bic_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
@@ -465,6 +481,7 @@ static void emulation_i32_bl_T1(void *vctx, int32_t imm) {
 }
 
 static void emulation_i16_blx_reg_T1(void *vctx, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_blx_reg_T1\n");
 }
 
 static void emulation_i16_bx_T1(void *vctx, uint8_t Rm) {
@@ -485,12 +502,15 @@ static void emulation_i16_cbnz_T1(void *vctx, uint8_t Rn, uint8_t imm, bool op) 
 }
 
 static void emulation_i32_cdp2_T2(void *vctx, uint8_t coproc, uint8_t CRd, uint8_t CRn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {
+	fprintf(stderr, "Instruction not implemented: i32_cdp2_T2\n");
 }
 
 static void emulation_i32_cdp_T1(void *vctx, uint8_t coproc, uint8_t CRd, uint8_t CRn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {
+	fprintf(stderr, "Instruction not implemented: i32_cdp_T1\n");
 }
 
 static void emulation_i32_clrex_T1(void *vctx) {
+	fprintf(stderr, "Instruction not implemented: i32_clrex_T1\n");
 }
 
 static void emulation_i32_clz_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t Rmx) {
@@ -510,12 +530,15 @@ static void emulation_i32_clz_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t Rmx
 }
 
 static void emulation_i32_cmn_imm_T1(void *vctx, uint8_t Rn, int32_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_cmn_imm_T1\n");
 }
 
 static void emulation_i16_cmn_reg_T1(void *vctx, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_cmn_reg_T1\n");
 }
 
 static void emulation_i32_cmn_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm, int32_t imm, uint8_t type) {
+	fprintf(stderr, "Instruction not implemented: i32_cmn_reg_T2\n");
 }
 
 static void emulation_i16_cmp_imm_T1(void *vctx, uint8_t Rn, uint8_t imm) {
@@ -543,18 +566,23 @@ static void emulation_i16_cmp_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm) {
 }
 
 static void emulation_i32_cmp_reg_T3(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type) {
+	fprintf(stderr, "Instruction not implemented: i32_cmp_reg_T3\n");
 }
 
 static void emulation_i16_cps_T1(void *vctx, bool imm, bool F, bool I) {
+	fprintf(stderr, "Instruction not implemented: i16_cps_T1\n");
 }
 
 static void emulation_i32_dbg_T1(void *vctx, uint8_t option) {
+	fprintf(stderr, "Instruction not implemented: i32_dbg_T1\n");
 }
 
 static void emulation_i32_dmb_T1(void *vctx, uint8_t option) {
+	fprintf(stderr, "Instruction not implemented: i32_dmb_T1\n");
 }
 
 static void emulation_i32_dsb_T1(void *vctx, uint8_t option) {
+	fprintf(stderr, "Instruction not implemented: i32_dsb_T1\n");
 }
 
 static void emulation_i32_eor_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -588,6 +616,7 @@ static void emulation_i32_eor_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i32_isb_T1(void *vctx, uint8_t option) {
+	fprintf(stderr, "Instruction not implemented: i32_isb_T1\n");
 }
 
 static void emulation_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
@@ -616,15 +645,19 @@ static void emulation_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
 }
 
 static void emulation_i32_ldc2_imm_T2(void *vctx, uint8_t Rn, uint8_t imm, uint8_t coproc, uint8_t CRd, bool D, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldc2_imm_T2\n");
 }
 
 static void emulation_i32_ldc2_lit_T2(void *vctx, uint8_t imm, uint8_t coproc, uint8_t CRd, bool D, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldc2_lit_T2\n");
 }
 
 static void emulation_i32_ldc_imm_T1(void *vctx, uint8_t Rn, uint8_t imm, uint8_t coproc, uint8_t CRd, bool D, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldc_imm_T1\n");
 }
 
 static void emulation_i32_ldc_lit_T1(void *vctx, uint8_t imm, uint8_t coproc, uint8_t CRd, bool D, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldc_lit_T1\n");
 }
 
 static void emulation_i16_ldm_T1(void *vctx, uint8_t Rn, uint8_t register_list) {
@@ -646,6 +679,7 @@ static void emulation_i32_ldm_T2(void *vctx, uint8_t Rn, uint16_t register_list,
 }
 
 static void emulation_i32_ldmdb_T1(void *vctx, uint8_t Rn, uint16_t register_list, bool P, bool M, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldmdb_T1\n");
 }
 
 static void emulation_i16_ldr_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
@@ -732,6 +766,7 @@ static void emulation_i32_ldrb_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 }
 
 static void emulation_i32_ldrb_lit_T1(void *vctx, uint8_t Rt, uint16_t imm, bool U) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrb_lit_T1\n");
 }
 
 static void emulation_i16_ldrb_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
@@ -754,6 +789,7 @@ static void emulation_i32_ldrb_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 }
 
 static void emulation_i32_ldrbt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrbt_T1\n");
 }
 
 static void emulation_i32_ldrd_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rtx, uint8_t imm, bool P, bool U, bool W) {
@@ -768,15 +804,19 @@ static void emulation_i32_ldrd_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 }
 
 static void emulation_i32_ldrd_lit_T1(void *vctx, uint8_t Rt, uint8_t Rtx, uint8_t imm, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrd_lit_T1\n");
 }
 
 static void emulation_i32_ldrex_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrex_T1\n");
 }
 
 static void emulation_i32_ldrexb_T1(void *vctx, uint8_t Rt, uint8_t Rn) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrexb_T1\n");
 }
 
 static void emulation_i32_ldrexh_T1(void *vctx, uint8_t Rt, uint8_t Rn) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrexh_T1\n");
 }
 
 static void emulation_i16_ldrh_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
@@ -794,57 +834,75 @@ static void emulation_i32_ldrh_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint16
 }
 
 static void emulation_i32_ldrh_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrh_imm_T3\n");
 }
 
 static void emulation_i32_ldrh_lit_T1(void *vctx, uint8_t Rt, uint16_t imm, bool U) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrh_lit_T1\n");
 }
 
 static void emulation_i16_ldrh_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_ldrh_reg_T1\n");
 }
 
 static void emulation_i32_ldrh_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrh_reg_T2\n");
 }
 
 static void emulation_i32_ldrht_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrht_T1\n");
 }
 
 static void emulation_i32_ldrsb_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsb_imm_T1\n");
 }
 
 static void emulation_i32_ldrsb_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsb_imm_T2\n");
 }
 
 static void emulation_i32_ldrsb_lit_T1(void *vctx, uint8_t Rt, uint16_t imm, bool U) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsb_lit_T1\n");
 }
 
 static void emulation_i16_ldrsb_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_ldrsb_reg_T1\n");
 }
 
 static void emulation_i32_ldrsb_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsb_reg_T2\n");
 }
 
 static void emulation_i32_ldrsbt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsbt_T1\n");
 }
 
 static void emulation_i32_ldrsh_imm_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsh_imm_T1\n");
 }
 
 static void emulation_i32_ldrsh_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsh_imm_T2\n");
 }
 
 static void emulation_i32_ldrsh_lit_T1(void *vctx, uint8_t Rt, uint16_t imm, bool U) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsh_lit_T1\n");
 }
 
 static void emulation_i16_ldrsh_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_ldrsh_reg_T1\n");
 }
 
 static void emulation_i32_ldrsh_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsh_reg_T2\n");
 }
 
 static void emulation_i32_ldrsh_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrsh_T1\n");
 }
 
 static void emulation_i32_ldrt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_ldrt_T1\n");
 }
 
 static void emulation_i16_lsl_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm) {
@@ -922,21 +980,27 @@ static void emulation_i32_lsr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i32_mcr2_T2(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t CRn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {
+	fprintf(stderr, "Instruction not implemented: i32_mcr2_T2\n");
 }
 
 static void emulation_i32_mcr_T1(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t CRn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {
+	fprintf(stderr, "Instruction not implemented: i32_mcr_T1\n");
 }
 
 static void emulation_i32_mcrr2_T2(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t CRm, uint8_t opcA, uint8_t RtB) {
+	fprintf(stderr, "Instruction not implemented: i32_mcrr2_T2\n");
 }
 
 static void emulation_i32_mcrr_T1(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t CRm, uint8_t opcA, uint8_t RtB) {
+	fprintf(stderr, "Instruction not implemented: i32_mcrr_T1\n");
 }
 
 static void emulation_i32_mla_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t Ra) {
+	fprintf(stderr, "Instruction not implemented: i32_mla_T1\n");
 }
 
 static void emulation_i32_mls_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t Ra) {
+	fprintf(stderr, "Instruction not implemented: i32_mls_T1\n");
 }
 
 static void emulation_i16_mov_imm_T1(void *vctx, uint8_t Rd, uint8_t imm) {
@@ -976,6 +1040,7 @@ static void emulation_i16_mov_reg_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
 }
 
 static void emulation_i32_mov_reg_T3(void *vctx, uint8_t Rd, uint8_t Rm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_mov_reg_T3\n");
 }
 
 static void emulation_i32_movt_T1(void *vctx, uint8_t Rd, uint16_t imm) {
@@ -986,27 +1051,35 @@ static void emulation_i32_movt_T1(void *vctx, uint8_t Rd, uint16_t imm) {
 }
 
 static void emulation_i32_mrc2_T2(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t Crn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {
+	fprintf(stderr, "Instruction not implemented: i32_mrc2_T2\n");
 }
 
 static void emulation_i32_mrc_T1(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t Crn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {
+	fprintf(stderr, "Instruction not implemented: i32_mrc_T1\n");
 }
 
 static void emulation_i32_mrrc2_T2(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t CRm, uint8_t opcA, uint8_t RtB) {
+	fprintf(stderr, "Instruction not implemented: i32_mrrc2_T2\n");
 }
 
 static void emulation_i32_mrrc_T1(void *vctx, uint8_t Rt, uint8_t coproc, uint8_t CRm, uint8_t opcA, uint8_t RtB) {
+	fprintf(stderr, "Instruction not implemented: i32_mrrc_T1\n");
 }
 
 static void emulation_i32_mrs_T1(void *vctx, uint8_t Rd, uint8_t SYSm) {
+	fprintf(stderr, "Instruction not implemented: i32_mrs_T1\n");
 }
 
 static void emulation_i32_msr_T1(void *vctx, uint8_t Rn, uint8_t mask, uint8_t SYSm) {
+	fprintf(stderr, "Instruction not implemented: i32_msr_T1\n");
 }
 
 static void emulation_i16_mul_T1(void *vctx, uint8_t Rdm, uint8_t Rn) {
+	fprintf(stderr, "Instruction not implemented: i16_mul_T1\n");
 }
 
 static void emulation_i32_mul_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i32_mul_T2\n");
 }
 
 static void emulation_i32_mvn_imm_T1(void *vctx, uint8_t Rd, int32_t imm, bool S) {
@@ -1046,9 +1119,11 @@ static void emulation_i32_nop_T2(void *vctx) {
 }
 
 static void emulation_i32_orn_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint16_t imm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_orn_imm_T1\n");
 }
 
 static void emulation_i32_orn_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_orn_reg_T1\n");
 }
 
 static void emulation_i32_orr_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -1083,6 +1158,7 @@ static void emulation_i32_orr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i32_pkhbt_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, bool tb, bool S, bool T) {
+	fprintf(stderr, "Instruction not implemented: i32_pkhbt_T1\n");
 }
 
 static void emulation_i16_pop_T1(void *vctx, uint8_t register_list, bool P) {
@@ -1139,27 +1215,35 @@ static void emulation_i32_push_T2(void *vctx, uint16_t register_list, bool M) {
 }
 
 static void emulation_i32_push_T3(void *vctx, uint8_t Rt) {
+	fprintf(stderr, "Instruction not implemented: i32_push_T3\n");
 }
 
 static void emulation_i32_rbit_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i32_rbit_T1\n");
 }
 
 static void emulation_i16_rev16_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_rev16_T1\n");
 }
 
 static void emulation_i32_rev16_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i32_rev16_T2\n");
 }
 
 static void emulation_i16_rev_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_rev_T1\n");
 }
 
 static void emulation_i32_rev_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t Rmx) {
+	fprintf(stderr, "Instruction not implemented: i32_rev_T2\n");
 }
 
 static void emulation_i16_revsh_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_revsh_T1\n");
 }
 
 static void emulation_i32_revsh_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i32_revsh_T2\n");
 }
 
 static void emulation_i32_ror_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
@@ -1173,15 +1257,19 @@ static void emulation_i32_ror_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 }
 
 static void emulation_i16_ror_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_ror_reg_T1\n");
 }
 
 static void emulation_i32_ror_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_ror_reg_T2\n");
 }
 
 static void emulation_i32_rrx_T1(void *vctx, uint8_t Rd, uint8_t Rm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_rrx_T1\n");
 }
 
 static void emulation_i16_rsb_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn) {
+	fprintf(stderr, "Instruction not implemented: i16_rsb_imm_T1\n");
 }
 
 static void emulation_i32_rsb_imm_T2(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -1204,12 +1292,15 @@ static void emulation_i32_rsb_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i32_sbc_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_sbc_imm_T1\n");
 }
 
 static void emulation_i16_sbc_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_sbc_reg_T1\n");
 }
 
 static void emulation_i32_sbc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_sbc_reg_T2\n");
 }
 
 static void emulation_i32_sdiv_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
@@ -1220,18 +1311,23 @@ static void emulation_i32_sdiv_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm
 }
 
 static void emulation_i16_sev_T1(void *vctx) {
+	fprintf(stderr, "Instruction not implemented: i16_sev_T1\n");
 }
 
 static void emulation_i32_sev_T2(void *vctx) {
+	fprintf(stderr, "Instruction not implemented: i32_sev_T2\n");
 }
 
 static void emulation_i32_smull_T1(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t RdLo, uint8_t RdHi) {
+	fprintf(stderr, "Instruction not implemented: i32_smull_T1\n");
 }
 
 static void emulation_i32_stc2_T2(void *vctx, uint8_t Rn, uint8_t imm, uint8_t coproc, uint8_t CRd, bool P, bool N, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_stc2_T2\n");
 }
 
 static void emulation_i32_stc_T1(void *vctx, uint8_t Rn, uint8_t imm, uint8_t coproc, uint8_t CRd, bool P, bool N, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_stc_T1\n");
 }
 
 static void emulation_i16_stm_T1(void *vctx, uint8_t Rn, uint8_t register_list) {
@@ -1368,18 +1464,23 @@ static void emulation_i32_strh_imm_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint16
 }
 
 static void emulation_i32_strh_imm_T3(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm, bool P, bool U, bool W) {
+	fprintf(stderr, "Instruction not implemented: i32_strh_imm_T3\n");
 }
 
 static void emulation_i16_strh_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_strh_reg_T1\n");
 }
 
 static void emulation_i32_strh_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_strh_reg_T2\n");
 }
 
 static void emulation_i32_strht_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_strht_T1\n");
 }
 
 static void emulation_i32_strt_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_strt_T1\n");
 }
 
 static void emulation_i16_sub_SPimm_T1(void *vctx, uint8_t imm) {
@@ -1389,12 +1490,15 @@ static void emulation_i16_sub_SPimm_T1(void *vctx, uint8_t imm) {
 }
 
 static void emulation_i32_sub_SPimm_T2(void *vctx, uint8_t Rd, uint16_t imm, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_sub_SPimm_T2\n");
 }
 
 static void emulation_i32_sub_SPimm_T3(void *vctx, uint8_t Rd, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_sub_SPimm_T3\n");
 }
 
 static void emulation_i32_sub_SPreg_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
+	fprintf(stderr, "Instruction not implemented: i32_sub_SPreg_T1\n");
 }
 
 static void emulation_i16_sub_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm) {
@@ -1421,6 +1525,7 @@ static void emulation_i32_sub_imm_T3(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i32_sub_imm_T4(void *vctx, uint8_t Rd, uint8_t Rn, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_sub_imm_T4\n");
 }
 
 static void emulation_i16_sub_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
@@ -1441,9 +1546,11 @@ static void emulation_i32_sub_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 }
 
 static void emulation_i16_svc_T1(void *vctx, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i16_svc_T1\n");
 }
 
 static void emulation_i32_sxtb16_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t rotate) {
+	fprintf(stderr, "Instruction not implemented: i32_sxtb16_T1\n");
 }
 
 static void emulation_i16_sxtb_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
@@ -1453,12 +1560,15 @@ static void emulation_i16_sxtb_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
 }
 
 static void emulation_i32_sxtb_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t rotate) {
+	fprintf(stderr, "Instruction not implemented: i32_sxtb_T2\n");
 }
 
 static void emulation_i16_sxth_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i16_sxth_T1\n");
 }
 
 static void emulation_i32_sxth_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t rotate) {
+	fprintf(stderr, "Instruction not implemented: i32_sxth_T2\n");
 }
 
 static void emulation_i32_tbb_T1(void *vctx, uint8_t Rn, uint8_t Rm, bool H) {
@@ -1485,6 +1595,7 @@ static void emulation_i16_tst_reg_T1(void *vctx, uint8_t Rn, uint8_t Rm) {
 }
 
 static void emulation_i32_tst_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type) {
+	fprintf(stderr, "Instruction not implemented: i32_tst_reg_T2\n");
 }
 
 static void emulation_i32_ubfx_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm, uint8_t width) {
@@ -1494,15 +1605,19 @@ static void emulation_i32_ubfx_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t im
 }
 
 static void emulation_i16_udf_T1(void *vctx, uint8_t imm) {
+	fprintf(stderr, "Instruction not implemented: i16_udf_T1\n");
 }
 
 static void emulation_i32_udf_T2(void *vctx, uint16_t imm) {
+	fprintf(stderr, "Instruction not implemented: i32_udf_T2\n");
 }
 
 static void emulation_i32_udiv_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
+	fprintf(stderr, "Instruction not implemented: i32_udiv_T1\n");
 }
 
 static void emulation_i32_umlal_T1(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t RdLo, uint8_t RdHi) {
+	fprintf(stderr, "Instruction not implemented: i32_umlal_T1\n");
 }
 
 static void emulation_i32_umull_T1(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t RdLo, uint8_t RdHi) {
@@ -1515,6 +1630,7 @@ static void emulation_i32_umull_T1(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t R
 }
 
 static void emulation_i32_uxtb16_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t rotate) {
+	fprintf(stderr, "Instruction not implemented: i32_uxtb16_T1\n");
 }
 
 static void emulation_i16_uxtb_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
@@ -1539,12 +1655,15 @@ static void emulation_i16_uxth_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
 }
 
 static void emulation_i32_uxth_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t rotate) {
+	fprintf(stderr, "Instruction not implemented: i32_uxth_T2\n");
 }
 
 static void emulation_i16_yield_T1(void *vctx) {
+	fprintf(stderr, "Instruction not implemented: i16_yield_T1\n");
 }
 
 static void emulation_i32_yield_T2(void *vctx) {
+	fprintf(stderr, "Instruction not implemented: i32_yield_T2\n");
 }
 
 const struct decoding_handler_t decodeOnlyCallbacks;
