@@ -55,7 +55,7 @@ static bool load_file(const char *img_name, const char *filename, void *memory, 
 	}
 
 	if (statbuf.st_size > max_length) {
-		fprintf(stderr, "%s image / file %s: file size is %lu bytes, but memory region only %lu bytes. Truncated memory.\n", img_name, filename);
+		fprintf(stderr, "%s image / file %s: file size is %lu bytes, but memory region only %u bytes. Truncated memory.\n", img_name, filename, statbuf.st_size, max_length);
 		success = false;
 	}
 
