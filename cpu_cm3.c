@@ -89,7 +89,7 @@ void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const c
 		const struct address_slice_t *slice = &emu_ctx->addr_space.slices[i];
 		if (!slice->read_only && !slice->shadow_mapping) {
 			char full_filename[256];
-			snprintf(full_filename, sizeof(full_filename), "%s/%s.bin", filename, slice->name);
+			snprintf(full_filename, sizeof(full_filename), "%s/slice_%s.bin", filename, slice->name);
 
 			FILE *f = fopen(full_filename, "wb");
 			if (f) {
@@ -108,10 +108,20 @@ void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const c
 	FILE *f = fopen(full_filename, "wb");
 	if (f) {
 		fprintf(f, "{\n");
-		fprintf(f, "	\"regs\":\n");
+		fprintf(f, "	\"regs\": {\n");
 		for (int i = 0; i < 16; i++) {
 			fprintf(f, "		\"r%d\": %u%s\n", i, emu_ctx->cpu.reg[i], i == 15 ? "" : ",");
 		}
+		fprintf(f, "	},\n");
+		fprintf(f, "	\"psr\": {\n");
+		fprintf(f, "		\"value\": %u,\n", emu_ctx->cpu.psr);
+		fprintf(f, "		\"flags\": \"");
+		fprintf(f, "%s", (emu_ctx->cpu.psr & FLAG_NEGATIVE) ? "N" : "n");
+		fprintf(f, "%s", (emu_ctx->cpu.psr & FLAG_ZERO) ? "Z" : "z");
+		fprintf(f, "%s", (emu_ctx->cpu.psr & FLAG_CARRY) ? "C" : "c");
+		fprintf(f, "%s", (emu_ctx->cpu.psr & FLAG_OVERFLOW) ? "V" : "v");
+		fprintf(f, "%s", (emu_ctx->cpu.psr & FLAG_SATURATION) ? "Q" : "q");
+		fprintf(f, "\"\n");
 		fprintf(f, "	}\n");
 		fprintf(f, "}\n");
 		fclose(f);

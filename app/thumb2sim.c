@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
 
 	cpu_run(emu_ctx);
 	cpu_print_state(emu_ctx);
-	//cpu_dump_file(emu_ctx, MULTI_FILE_RW_MEMORY, "/tmp");
+//	cpu_dump_file(emu_ctx, MULTI_FILE_RW_MEMORY, "/tmp");
 
 	free_cortexm(emu_ctx);
 	return 0;
