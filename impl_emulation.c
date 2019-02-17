@@ -443,20 +443,20 @@ static void emulation_i16_bkpt_T1(void *vctx, uint8_t imm) {
 		if ((syscall_no == SYSCALL_GUEST_READ) && ctx->emu_ctx->emulator_syscall_read) {
 			/* Guest wants to read data */
 			void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
-			length = ctx->emu_ctx->emulator_syscall_read(data, length);
+			length = ctx->emu_ctx->emulator_syscall_read(ctx->emu_ctx, data, length);
 
 			/* Return actual read length in r0, as of EABI calling convention */
 			ctx->emu_ctx->cpu.reg[REG_R0] = length;
 		} else if ((syscall_no == SYSCALL_GUEST_WRITE) && ctx->emu_ctx->emulator_syscall_write) {
 			/* Guest wants to write data */
 			const void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
-			ctx->emu_ctx->emulator_syscall_write(data, length);
+			ctx->emu_ctx->emulator_syscall_write(ctx->emu_ctx, data, length);
 		} else if ((syscall_no == SYSCALL_GUEST_PUTS) && ctx->emu_ctx->emulator_syscall_puts) {
 			/* Similar to write, but for convenience zero-terminated */
 			const void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
-			ctx->emu_ctx->emulator_syscall_puts(data);
+			ctx->emu_ctx->emulator_syscall_puts(ctx->emu_ctx, data);
 		} else if ((syscall_no == SYSCALL_GUEST_EXIT) && ctx->emu_ctx->emulator_syscall_exit) {
-			ctx->emu_ctx->emulator_syscall_exit(length);
+			ctx->emu_ctx->emulator_syscall_exit(ctx->emu_ctx, length);
 		}
 	}
 }

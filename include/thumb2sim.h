@@ -121,10 +121,10 @@ typedef void (*bkpt_callback_t)(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number);
 typedef bool (*end_emulation_callback_t)(struct emu_ctx_t *emu_ctx);
 
 /* Syscalls for communication between guest/host */
-typedef uint32_t (*syscall_read_t)(void *data, uint32_t max_length);
-typedef void (*syscall_write_t)(const void *data, uint32_t length);
-typedef void (*syscall_puts_t)(const char *msg);
-typedef void (*syscall_exit_t)(uint32_t status);
+typedef uint32_t (*syscall_read_t)(struct emu_ctx_t *emu_ctx, void *data, uint32_t max_length);
+typedef void (*syscall_write_t)(struct emu_ctx_t *emu_ctx, const void *data, uint32_t length);
+typedef void (*syscall_puts_t)(struct emu_ctx_t *emu_ctx, const char *msg);
+typedef void (*syscall_exit_t)(struct emu_ctx_t *emu_ctx, uint32_t status);
 
 struct emu_ctx_t {
 	struct cm3_cpu_state_t cpu;

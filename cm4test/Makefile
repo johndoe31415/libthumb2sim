@@ -16,17 +16,17 @@ clean:
 	rm -f $(OBJS) $(TARGETS)
 	rm -f simple_test md5_test
 
-simple_test: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ simple_test.c $^ $(LDFLAGS)
+simple_test: $(OBJS) simple_test.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 simple_test.bin: simple_test
 	$(OBJCOPY) -O binary $< $@
 
+md5_test: $(OBJS) md5_test.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 md5_test.bin: md5_test
 	$(OBJCOPY) -O binary $< $@
-
-md5_test: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ md5_test.c $^ $(LDFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<

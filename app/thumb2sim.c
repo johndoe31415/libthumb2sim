@@ -47,7 +47,7 @@ static bool end_emulation_callback(struct emu_ctx_t *emu_ctx) {
 	return usr->end_emulation;
 }
 
-static uint32_t syscall_read(void *data, uint32_t max_length) {
+static uint32_t syscall_read(struct emu_ctx_t *emu_ctx, void *data, uint32_t max_length) {
 	fprintf(stderr, "Guest read: max of %d bytes, write to %p.\n", max_length, data);
 	if (max_length == 8) {
 		/* 12345 + 75844 + 12257489 = 12345678 */
@@ -58,7 +58,7 @@ static uint32_t syscall_read(void *data, uint32_t max_length) {
 	return 0;
 }
 
-static void syscall_write(const void *data, uint32_t length) {
+static void syscall_write(struct emu_ctx_t *emu_ctx, const void *data, uint32_t length) {
 	if (length == 4) {
 		fprintf(stderr, "Guest write: %d bytes, dereferenced uint32_t value: %u\n", length, *((uint32_t*)data));
 	} else {
@@ -70,11 +70,11 @@ static void syscall_write(const void *data, uint32_t length) {
 	}
 }
 
-static void syscall_puts(const char *msg) {
+static void syscall_puts(struct emu_ctx_t *emu_ctx, const char *msg) {
 	fprintf(stderr, "Guest puts: \"%s\"\n", msg);
 }
 
-static void syscall_exit(uint32_t status) {
+static void syscall_exit(struct emu_ctx_t *emu_ctx, uint32_t status) {
 	fprintf(stderr, "Emulation exit with status: %d\n", status);
 	exit(status);
 }
