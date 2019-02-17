@@ -24,33 +24,30 @@ class GDBHelper(object):
 		return self.get_register_by_name("r%d" % (regno))
 
 	def get_registers(self):
-		return { i: self.get_register(i) for i in range(16) }
+		return { "r%d" % (i): self.get_register(i) for i in range(16) }
 
-	def get_flags(self):
+	def get_psr(self):
 		psr = self.get_register_by_name("cpsr")
-		flag_str = ""
-		flag_str += "nN"[bool(psr & (1 << 31))]		# Negative
-		flag_str += "zZ"[bool(psr & (1 << 30))]		# Zero
-		flag_str += "cC"[bool(psr & (1 << 29))]		# Carry/borrow
-		flag_str += "vV"[bool(psr & (1 << 28))]		# Overflow
-		flag_str += "qQ"[bool(psr & (1 << 27))]		# DSP overflow
+		flags = ""
+		flags += "nN"[bool(psr & (1 << 31))]		# Negative
+		flags += "zZ"[bool(psr & (1 << 30))]		# Zero
+		flags += "cC"[bool(psr & (1 << 29))]		# Carry/borrow
+		flags += "vV"[bool(psr & (1 << 28))]		# Overflow
+		flags += "qQ"[bool(psr & (1 << 27))]		# DSP overflow
 		return {
-			"psr":		psr,
-			"flag_str":	flag_str,
+			"value":	psr,
+			"flags":	flags,
 		}
 
 	def get_memory(self, address, length):
 		data = gdb.selected_inferior().read_memory(address, length)
-		print(type(data))
-		print(dir(data))
-		print(bytes(data))
-		print(b"foobar")
+		data = bytes(data)
 		return data
 
 	def get_cpu_state(self):
 		return {
 			"regs":		self.get_registers(),
-			"flags":	self.get_flags(),
+			"psr":		self.get_psr(),
 		}
 
 	def step(self):
