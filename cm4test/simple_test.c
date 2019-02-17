@@ -49,5 +49,7 @@ int main(void) {
 
 	thumb2sim_puts("Goodbyte from the Cortex-M");
 	__asm__ __volatile__("bkpt #2");
+
+	thumb2sim_exit(0);
 	return 0;
 }

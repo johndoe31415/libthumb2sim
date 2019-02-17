@@ -34,7 +34,8 @@ int main(void) {
 
 	uint8_t digest[16];
 	MD5_Final(digest, &ctx);
-
 	thumb2sim_write(digest, 16);
+
+	thumb2sim_exit(0);
 	return 0;
 }

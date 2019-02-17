@@ -24,18 +24,21 @@
 #ifndef __THUMB2SIMGUEST_H__
 #define __THUMB2SIMGUEST_H__
 
+#include <stdio.h>
 #include <stdint.h>
 
 enum thumb2sim_syscall_t {
 	SYSCALL_GUEST_READ = 0,
 	SYSCALL_GUEST_WRITE = 1,
 	SYSCALL_GUEST_PUTS = 2,
+	SYSCALL_GUEST_EXIT = 3,
 };
 
 uint32_t thumb2sim_syscall(uint32_t syscall_no, void *data_ptr, uint32_t length);
 
-#define thumb2sim_read(data, max_length) thumb2sim_syscall(SYSCALL_GUEST_READ, (data), (max_length))
-#define thumb2sim_write(data, length) thumb2sim_syscall(SYSCALL_GUEST_WRITE, (void*)(data), (length))
-#define thumb2sim_puts(msg) thumb2sim_syscall(SYSCALL_GUEST_PUTS, (msg), 0)
+#define thumb2sim_read(data, max_length)	thumb2sim_syscall(SYSCALL_GUEST_READ, (data), (max_length))
+#define thumb2sim_write(data, length)		thumb2sim_syscall(SYSCALL_GUEST_WRITE, (void*)(data), (length))
+#define thumb2sim_puts(msg)					thumb2sim_syscall(SYSCALL_GUEST_PUTS, (msg), 0)
+#define thumb2sim_exit(retcode)				thumb2sim_syscall(SYSCALL_GUEST_EXIT, NULL, (retcode))
 
 #endif

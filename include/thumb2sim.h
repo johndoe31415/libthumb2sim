@@ -124,6 +124,7 @@ typedef bool (*end_emulation_callback_t)(struct emu_ctx_t *emu_ctx);
 typedef uint32_t (*syscall_read_t)(void *data, uint32_t max_length);
 typedef void (*syscall_write_t)(const void *data, uint32_t length);
 typedef void (*syscall_puts_t)(const char *msg);
+typedef void (*syscall_exit_t)(uint32_t status);
 
 struct emu_ctx_t {
 	struct cm3_cpu_state_t cpu;
@@ -134,6 +135,7 @@ struct emu_ctx_t {
 	syscall_read_t emulator_syscall_read;
 	syscall_write_t emulator_syscall_write;
 	syscall_puts_t emulator_syscall_puts;
+	syscall_exit_t emulator_syscall_exit;
 	bool print_disassembly;
 	bool debug_instruction_decoding;
 	void *user;

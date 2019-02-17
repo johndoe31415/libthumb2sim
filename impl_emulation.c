@@ -455,6 +455,8 @@ static void emulation_i16_bkpt_T1(void *vctx, uint8_t imm) {
 			/* Similar to write, but for convenience zero-terminated */
 			const void *data = addrspace_memptr(&ctx->emu_ctx->addr_space, data_ptr);
 			ctx->emu_ctx->emulator_syscall_puts(data);
+		} else if ((syscall_no == SYSCALL_GUEST_EXIT) && ctx->emu_ctx->emulator_syscall_exit) {
+			ctx->emu_ctx->emulator_syscall_exit(length);
 		}
 	}
 }

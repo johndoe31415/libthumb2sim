@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <thumb2sim.h>
 
+/* Using this allows to to end emulation prematurely */
 struct user_ctx_t {
 	bool end_emulation;
 };
@@ -34,7 +35,9 @@ static void bkpt_callback(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number) {
 	if (bkpt_number != 255) {
 		fprintf(stderr, "Hit breakpoint %d at instruction %u.\n", bkpt_number, emu_ctx->cpu.insn_ctr);
 	}
-	if (bkpt_number == 2) {
+	if  (emu_ctx->cpu.insn_ctr >= 1000000) {
+		/* Abort after a million instructions */
+		fprintf(stderr, "We're tired. Quitting emulation.\n");
 		usr->end_emulation = true;
 	}
 }
@@ -59,12 +62,21 @@ static void syscall_write(const void *data, uint32_t length) {
 	if (length == 4) {
 		fprintf(stderr, "Guest write: %d bytes, dereferenced uint32_t value: %u\n", length, *((uint32_t*)data));
 	} else {
-		fprintf(stderr, "Guest write: %d bytes, available at %p.\n", length, data);
+		fprintf(stderr, "Guest write: %d bytes: ", length);
+		for (uint32_t i = 0; i < length; i++) {
+			fprintf(stderr, "%02x ", ((const uint8_t*)data)[i]);
+		}
+		fprintf(stderr, "\n");
 	}
 }
 
 static void syscall_puts(const char *msg) {
 	fprintf(stderr, "Guest puts: \"%s\"\n", msg);
+}
+
+static void syscall_exit(uint32_t status) {
+	fprintf(stderr, "Emulation exit with status: %d\n", status);
+	exit(status);
 }
 
 int main(int argc, char **argv) {
@@ -93,6 +105,7 @@ int main(int argc, char **argv) {
 	emu_ctx->emulator_syscall_read = syscall_read;
 	emu_ctx->emulator_syscall_write = syscall_write;
 	emu_ctx->emulator_syscall_puts = syscall_puts;
+	emu_ctx->emulator_syscall_exit = syscall_exit;
 	emu_ctx->user = &user;
 
 	cpu_print_state(emu_ctx);

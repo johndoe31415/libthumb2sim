@@ -22,9 +22,11 @@
 */
 
 #include <stdbool.h>
+#include <thumb2simguest.h>
 #include "boilerplate.h"
 
 void _exit(int status) {
+	thumb2sim_exit(status);
 	while (true);
 }
 
