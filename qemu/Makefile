@@ -19,7 +19,7 @@ qemu: qemu_test.bin
 	qemu-system-arm -S -machine lm3s6965evb -display none -monitor stdio -gdb tcp::1234 -kernel qemu_test.bin
 
 gdb:
-	arm-none-eabi-gdb -ex 'target remote :1234' qemu_test
+	arm-none-eabi-gdb -q -ex 'target remote :1234' -ex 'source example.py' qemu_test
 
 qemu_test: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
