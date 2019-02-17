@@ -344,7 +344,7 @@ static void emulation_i32_and_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 			setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd]);
 		}
 	} else {
-		fprintf(stderr, "Instruction undefined behavior: i32_and_reg_T2 on PC\n");
+		EMU_ERROR("instruction undefined behavior, acting on PC");
 	}
 }
 
@@ -1253,7 +1253,7 @@ static void emulation_i32_sbc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 
 static void emulation_i32_sdiv_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	// TODO: Condcodes?
+	EMU_ERROR("condition codes not implemented");
 	ctx->emu_ctx->cpu.reg[Rd] = (int32_t)ctx->emu_ctx->cpu.reg[Rn] / (int32_t)ctx->emu_ctx->cpu.reg[Rm];
 }
 
@@ -1365,7 +1365,6 @@ static void emulation_i16_strb_reg_T1(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 }
 
 static void emulation_i32_strb_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_t Rm, uint8_t imm) {
-	// TODO: ??? imm unbenutzt?
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	uint32_t target = ctx->emu_ctx->cpu.reg[Rn] + ctx->emu_ctx->cpu.reg[Rm] + imm;
 	addrspace_write8(&ctx->emu_ctx->addr_space, target, ctx->emu_ctx->cpu.reg[Rt] & 0xff);
@@ -1503,11 +1502,10 @@ static void emulation_i32_tbb_T1(void *vctx, uint8_t Rn, uint8_t Rm, bool H) {
 	ctx->advance_pc = false;
 	ctx->emu_ctx->cpu.reg[REG_PC] += 4;
 	if (H) {
-		// TODO negative offsets?
+		EMU_WARNING("negative offsets not implemented, unsure if we handle it correctly");
 		ctx->emu_ctx->cpu.reg[REG_PC] += 2 * addrspace_read16(&ctx->emu_ctx->addr_space, ctx->emu_ctx->cpu.reg[Rn] + (2 * ctx->emu_ctx->cpu.reg[Rm]));
 	} else {
-		// TODO implement me
-		fprintf(stderr, "Instruction only partially implemented: i32_tbb_T1\n");
+		EMU_ERROR("instruction only partially implemented, !H case");
 	}
 }
 
@@ -1568,7 +1566,7 @@ static void emulation_i32_uxtb_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t ro
 	if (rotate == 0) {
 		ctx->emu_ctx->cpu.reg[Rd] = (ctx->emu_ctx->cpu.reg[Rm] & 0xff) << (8 * rotate);
 	} else {
-		fprintf(stderr, "Instruction only partially implemented: i32_uxtb_T2\n");
+		EMU_ERROR("instruction partially implemented, rotate != 0 case");
 	}
 }
 
