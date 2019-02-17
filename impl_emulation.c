@@ -402,7 +402,17 @@ static void emulation_i32_bfc_T1(void *vctx, uint8_t Rd, uint8_t imm, uint8_t ms
 }
 
 static void emulation_i32_bfi_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm, uint8_t msb) {
-	EMU_ERROR("instruction not implemented");
+	EMU_ERROR("instruction not fully implemented (condition codes unset), not properly tested");
+
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	const uint32_t src_mask = (1 << msb) - 1;
+	const uint32_t dest_mask = src_mask << imm;
+
+	/* First clear out all bits in destination register */
+	ctx->emu_ctx->cpu.reg[Rd] &= ~dest_mask;
+
+	/* Then copy over the bits from the source */
+	ctx->emu_ctx->cpu.reg[Rd] |= (ctx->emu_ctx->cpu.reg[Rn] & src_mask) << imm;
 }
 
 static void emulation_i32_bic_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -1441,7 +1451,11 @@ static void emulation_i32_sub_imm_T3(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 }
 
 static void emulation_i32_sub_imm_T4(void *vctx, uint8_t Rd, uint8_t Rn, uint16_t imm) {
-	EMU_ERROR("instruction not implemented");
+	EMU_WARNING("not properly tested (pure guesswork)");
+
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	setSubCondCode(ctx, false, ctx->emu_ctx->cpu.reg[Rn], imm);
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] - imm;
 }
 
 static void emulation_i16_sub_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
