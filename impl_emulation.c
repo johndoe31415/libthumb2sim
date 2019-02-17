@@ -1666,8 +1666,6 @@ static void emulation_i32_yield_T2(void *vctx) {
 	fprintf(stderr, "Instruction not implemented: i32_yield_T2\n");
 }
 
-const struct decoding_handler_t decodeOnlyCallbacks;
-
 const struct decoding_handler_t emulationCallbacks = {
 	.i32_adc_imm_T1 = emulation_i32_adc_imm_T1,
 	.i16_adc_reg_T1 = emulation_i16_adc_reg_T1,

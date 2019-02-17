@@ -75,7 +75,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf1400000) {
 		// adc_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_adc_imm_T1) {
+		if (handler && handler->i32_adc_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -93,7 +93,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x41400000) {
 		// adc_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_adc_reg_T1) {
+		if (handler && handler->i16_adc_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -107,7 +107,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xeb400000) {
 		// adc_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_adc_reg_T2) {
+		if (handler && handler->i32_adc_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -129,7 +129,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0xa8000000) {
 		// add_SPi_T1
 		decoded_insn_length = 2;
-		if (handler->i16_add_SPi_T1) {
+		if (handler && handler->i16_add_SPi_T1) {
 			uint8_t Rd = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -143,7 +143,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff800000) == 0xb0000000) {
 		// add_SPi_T2
 		decoded_insn_length = 2;
-		if (handler->i16_add_SPi_T2) {
+		if (handler && handler->i16_add_SPi_T2) {
 			uint8_t imm = ((opcode & 0x7f0000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 add_SPi_T2 ", opcode);
@@ -155,7 +155,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x1c000000) {
 		// add_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_add_imm_T1) {
+		if (handler && handler->i16_add_imm_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x1c00000) >> 22);
@@ -171,7 +171,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x30000000) {
 		// add_imm_T2
 		decoded_insn_length = 2;
-		if (handler->i16_add_imm_T2) {
+		if (handler && handler->i16_add_imm_T2) {
 			uint8_t Rdn = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -185,7 +185,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x18000000) {
 		// add_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_add_reg_T1) {
+		if (handler && handler->i16_add_reg_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -201,7 +201,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0xa0000000) {
 		// adr_T1
 		decoded_insn_length = 2;
-		if (handler->i16_adr_T1) {
+		if (handler && handler->i16_adr_T1) {
 			uint8_t Rd = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -215,7 +215,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x40000000) {
 		// and_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_and_reg_T1) {
+		if (handler && handler->i16_and_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -229,7 +229,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x10000000) {
 		// asr_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_asr_imm_T1) {
+		if (handler && handler->i16_asr_imm_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -245,7 +245,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x41000000) {
 		// asr_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_asr_reg_T1) {
+		if (handler && handler->i16_asr_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -259,7 +259,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe0f0f0) == 0xfa40f000) {
 		// asr_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_asr_reg_T2) {
+		if (handler && handler->i32_asr_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -277,7 +277,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0xe0000000) {
 		// b_T2
 		decoded_insn_length = 2;
-		if (handler->i16_b_T2) {
+		if (handler && handler->i16_b_T2) {
 			uint16_t imm = ((opcode & 0x7ff0000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 b_T2 ", opcode);
@@ -289,7 +289,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf0200000) {
 		// bic_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_bic_imm_T1) {
+		if (handler && handler->i32_bic_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -307,7 +307,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x43800000) {
 		// bic_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_bic_reg_T1) {
+		if (handler && handler->i16_bic_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -321,7 +321,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00000) == 0xea200000) {
 		// bic_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_bic_reg_T2) {
+		if (handler && handler->i32_bic_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -343,7 +343,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0xbe000000) {
 		// bkpt_T1
 		decoded_insn_length = 2;
-		if (handler->i16_bkpt_T1) {
+		if (handler && handler->i16_bkpt_T1) {
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 bkpt_T1 ", opcode);
@@ -355,7 +355,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff800000) == 0x47800000) {
 		// blx_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_blx_reg_T1) {
+		if (handler && handler->i16_blx_reg_T1) {
 			uint8_t Rm = ((opcode & 0x780000) >> 19);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 blx_reg_T1 ", opcode);
@@ -367,7 +367,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff800000) == 0x47000000) {
 		// bx_T1
 		decoded_insn_length = 2;
-		if (handler->i16_bx_T1) {
+		if (handler && handler->i16_bx_T1) {
 			uint8_t Rm = ((opcode & 0x780000) >> 19);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 bx_T1 ", opcode);
@@ -379,7 +379,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf5000000) == 0xb1000000) {
 		// cbnz_T1
 		decoded_insn_length = 2;
-		if (handler->i16_cbnz_T1) {
+		if (handler && handler->i16_cbnz_T1) {
 			uint8_t Rn = ((opcode & 0x70000) >> 16);
 			uint8_t imm = ((opcode & 0x2000000) >> 20) | ((opcode & 0xf80000) >> 19);
 			bool op = ((opcode & 0x8000000) >> 27);
@@ -395,7 +395,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfab0f080) {
 		// clz_T1
 		decoded_insn_length = 4;
-		if (handler->i32_clz_T1) {
+		if (handler && handler->i32_clz_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t Rmx = ((opcode & 0xf0000) >> 16);
@@ -411,7 +411,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x42c00000) {
 		// cmn_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_cmn_reg_T1) {
+		if (handler && handler->i16_cmn_reg_T1) {
 			uint8_t Rn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -425,7 +425,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x28000000) {
 		// cmp_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_cmp_imm_T1) {
+		if (handler && handler->i16_cmp_imm_T1) {
 			uint8_t Rn = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -439,7 +439,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x42800000) {
 		// cmp_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_cmp_reg_T1) {
+		if (handler && handler->i16_cmp_reg_T1) {
 			uint8_t Rn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -453,7 +453,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0x45000000) {
 		// cmp_reg_T2
 		decoded_insn_length = 2;
-		if (handler->i16_cmp_reg_T2) {
+		if (handler && handler->i16_cmp_reg_T2) {
 			uint8_t Rn = ((opcode & 0x800000) >> 20) | ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x780000) >> 19);
 			if (insn_debugging_info) {
@@ -467,7 +467,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00000) == 0xb6600000) {
 		// cps_T1
 		decoded_insn_length = 2;
-		if (handler->i16_cps_T1) {
+		if (handler && handler->i16_cps_T1) {
 			bool imm = ((opcode & 0x100000) >> 20);
 			bool F = ((opcode & 0x10000) >> 16);
 			bool I = ((opcode & 0x20000) >> 17);
@@ -483,7 +483,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x40400000) {
 		// eor_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_eor_reg_T1) {
+		if (handler && handler->i16_eor_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -497,7 +497,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0xc8000000) {
 		// ldm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldm_T1) {
+		if (handler && handler->i16_ldm_T1) {
 			uint8_t Rn = ((opcode & 0x7000000) >> 24);
 			uint8_t register_list = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -511,7 +511,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffd02000) == 0xe9100000) {
 		// ldmdb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldmdb_T1) {
+		if (handler && handler->i32_ldmdb_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t register_list = (opcode & 0x1fff);
 			bool P = ((opcode & 0x8000) >> 15);
@@ -531,7 +531,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x68000000) {
 		// ldr_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldr_imm_T1) {
+		if (handler && handler->i16_ldr_imm_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -547,7 +547,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x98000000) {
 		// ldr_imm_T2
 		decoded_insn_length = 2;
-		if (handler->i16_ldr_imm_T2) {
+		if (handler && handler->i16_ldr_imm_T2) {
 			uint8_t Rt = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -561,7 +561,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x48000000) {
 		// ldr_lit_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldr_lit_T1) {
+		if (handler && handler->i16_ldr_lit_T1) {
 			uint8_t Rt = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -575,7 +575,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x58000000) {
 		// ldr_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldr_reg_T1) {
+		if (handler && handler->i16_ldr_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -591,7 +591,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x78000000) {
 		// ldrb_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldrb_imm_T1) {
+		if (handler && handler->i16_ldrb_imm_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -607,7 +607,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x5c000000) {
 		// ldrb_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldrb_reg_T1) {
+		if (handler && handler->i16_ldrb_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -623,7 +623,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x88000000) {
 		// ldrh_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldrh_imm_T1) {
+		if (handler && handler->i16_ldrh_imm_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -639,7 +639,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x5a000000) {
 		// ldrh_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldrh_reg_T1) {
+		if (handler && handler->i16_ldrh_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -655,7 +655,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x56000000) {
 		// ldrsb_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldrsb_reg_T1) {
+		if (handler && handler->i16_ldrsb_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -671,7 +671,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x5e000000) {
 		// ldrsh_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ldrsh_reg_T1) {
+		if (handler && handler->i16_ldrsh_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -687,7 +687,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x40800000) {
 		// lsl_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_lsl_reg_T1) {
+		if (handler && handler->i16_lsl_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -701,7 +701,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe0f0f0) == 0xfa00f000) {
 		// lsl_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_lsl_reg_T2) {
+		if (handler && handler->i32_lsl_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -719,7 +719,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x8000000) {
 		// lsr_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_lsr_imm_T1) {
+		if (handler && handler->i16_lsr_imm_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -735,7 +735,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x40c00000) {
 		// lsr_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_lsr_reg_T1) {
+		if (handler && handler->i16_lsr_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -749,7 +749,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe0f0f0) == 0xfa20f000) {
 		// lsr_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_lsr_reg_T2) {
+		if (handler && handler->i32_lsr_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -767,7 +767,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff100010) == 0xfe000010) {
 		// mcr2_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mcr2_T2) {
+		if (handler && handler->i32_mcr2_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRn = ((opcode & 0xf0000) >> 16);
@@ -789,7 +789,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfb000010) {
 		// mls_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mls_T1) {
+		if (handler && handler->i32_mls_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -807,7 +807,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x20000000) {
 		// mov_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_mov_imm_T1) {
+		if (handler && handler->i16_mov_imm_T1) {
 			uint8_t Rd = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -821,7 +821,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0x46000000) {
 		// mov_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_mov_reg_T1) {
+		if (handler && handler->i16_mov_reg_T1) {
 			uint8_t Rd = ((opcode & 0x800000) >> 20) | ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x780000) >> 19);
 			if (insn_debugging_info) {
@@ -835,7 +835,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf2c00000) {
 		// movt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_movt_T1) {
+		if (handler && handler->i32_movt_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0xf7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -849,7 +849,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff100010) == 0xfe100010) {
 		// mrc2_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mrc2_T2) {
+		if (handler && handler->i32_mrc2_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t Crn = ((opcode & 0xf0000) >> 16);
@@ -871,7 +871,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x43400000) {
 		// mul_T1
 		decoded_insn_length = 2;
-		if (handler->i16_mul_T1) {
+		if (handler && handler->i16_mul_T1) {
 			uint8_t Rdm = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -885,7 +885,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x43c00000) {
 		// mvn_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_mvn_reg_T1) {
+		if (handler && handler->i16_mvn_reg_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -899,7 +899,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x43000000) {
 		// orr_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_orr_reg_T1) {
+		if (handler && handler->i16_orr_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -913,7 +913,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00000) == 0xeac00000) {
 		// pkhbt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_pkhbt_T1) {
+		if (handler && handler->i32_pkhbt_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -937,7 +937,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0xbc000000) {
 		// pop_T1
 		decoded_insn_length = 2;
-		if (handler->i16_pop_T1) {
+		if (handler && handler->i16_pop_T1) {
 			uint8_t register_list = ((opcode & 0xff0000) >> 16);
 			bool P = ((opcode & 0x1000000) >> 24);
 			if (insn_debugging_info) {
@@ -951,7 +951,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0xb4000000) {
 		// push_T1
 		decoded_insn_length = 2;
-		if (handler->i16_push_T1) {
+		if (handler && handler->i16_push_T1) {
 			uint8_t register_list = ((opcode & 0xff0000) >> 16);
 			bool M = ((opcode & 0x1000000) >> 24);
 			if (insn_debugging_info) {
@@ -965,7 +965,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f010) {
 		// qadd16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qadd16_T1) {
+		if (handler && handler->i32_qadd16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -981,7 +981,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f010) {
 		// qadd8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qadd8_T1) {
+		if (handler && handler->i32_qadd8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -997,7 +997,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f080) {
 		// qadd_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qadd_T1) {
+		if (handler && handler->i32_qadd_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1013,7 +1013,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f090) {
 		// qdadd_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qdadd_T1) {
+		if (handler && handler->i32_qdadd_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1029,7 +1029,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f0b0) {
 		// qdsub_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qdsub_T1) {
+		if (handler && handler->i32_qdsub_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1045,7 +1045,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfad0f010) {
 		// qsub16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qsub16_T1) {
+		if (handler && handler->i32_qsub16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1061,7 +1061,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfac0f010) {
 		// qsub8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qsub8_T1) {
+		if (handler && handler->i32_qsub8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1077,7 +1077,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f0a0) {
 		// qsub_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qsub_T1) {
+		if (handler && handler->i32_qsub_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1093,7 +1093,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f0a0) {
 		// rbit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_rbit_T1) {
+		if (handler && handler->i32_rbit_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = ((opcode & 0xf0000) >> 12) | (opcode & 0xf);
 			if (insn_debugging_info) {
@@ -1107,7 +1107,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xba400000) {
 		// rev16_T1
 		decoded_insn_length = 2;
-		if (handler->i16_rev16_T1) {
+		if (handler && handler->i16_rev16_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -1121,7 +1121,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f090) {
 		// rev16_T2
 		decoded_insn_length = 4;
-		if (handler->i32_rev16_T2) {
+		if (handler && handler->i32_rev16_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = ((opcode & 0xf0000) >> 12) | (opcode & 0xf);
 			if (insn_debugging_info) {
@@ -1135,7 +1135,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xba000000) {
 		// rev_T1
 		decoded_insn_length = 2;
-		if (handler->i16_rev_T1) {
+		if (handler && handler->i16_rev_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -1149,7 +1149,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f080) {
 		// rev_T2
 		decoded_insn_length = 4;
-		if (handler->i32_rev_T2) {
+		if (handler && handler->i32_rev_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t Rmx = ((opcode & 0xf0000) >> 16);
@@ -1165,7 +1165,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xbac00000) {
 		// revsh_T1
 		decoded_insn_length = 2;
-		if (handler->i16_revsh_T1) {
+		if (handler && handler->i16_revsh_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -1179,7 +1179,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f0b0) {
 		// revsh_T2
 		decoded_insn_length = 4;
-		if (handler->i32_revsh_T2) {
+		if (handler && handler->i32_revsh_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = ((opcode & 0xf0000) >> 12) | (opcode & 0xf);
 			if (insn_debugging_info) {
@@ -1193,7 +1193,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x41c00000) {
 		// ror_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_ror_reg_T1) {
+		if (handler && handler->i16_ror_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -1207,7 +1207,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe0f0f0) == 0xfa60f000) {
 		// ror_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ror_reg_T2) {
+		if (handler && handler->i32_ror_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1225,7 +1225,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x42400000) {
 		// rsb_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_rsb_imm_T1) {
+		if (handler && handler->i16_rsb_imm_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -1239,7 +1239,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf1c00000) {
 		// rsb_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_rsb_imm_T2) {
+		if (handler && handler->i32_rsb_imm_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -1257,7 +1257,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00000) == 0xebc00000) {
 		// rsb_reg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_rsb_reg_T1) {
+		if (handler && handler->i32_rsb_reg_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1279,7 +1279,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f000) {
 		// sadd16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sadd16_T1) {
+		if (handler && handler->i32_sadd16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1295,7 +1295,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f000) {
 		// sadd8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sadd8_T1) {
+		if (handler && handler->i32_sadd8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1311,7 +1311,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfaa0f000) {
 		// sasx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sasx_T1) {
+		if (handler && handler->i32_sasx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1327,7 +1327,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf1600000) {
 		// sbc_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sbc_imm_T1) {
+		if (handler && handler->i32_sbc_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -1345,7 +1345,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x41800000) {
 		// sbc_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sbc_reg_T1) {
+		if (handler && handler->i16_sbc_reg_T1) {
 			uint8_t Rdn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -1359,7 +1359,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00000) == 0xeb600000) {
 		// sbc_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_sbc_reg_T2) {
+		if (handler && handler->i32_sbc_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1381,7 +1381,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf3400000) {
 		// sbfx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sbfx_T1) {
+		if (handler && handler->i32_sbfx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -1399,7 +1399,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfb9000f0) {
 		// sdiv_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sdiv_T1) {
+		if (handler && handler->i32_sdiv_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1415,7 +1415,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfaa0f080) {
 		// sel_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sel_T1) {
+		if (handler && handler->i32_sel_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1431,7 +1431,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f020) {
 		// shadd16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_shadd16_T1) {
+		if (handler && handler->i32_shadd16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1447,7 +1447,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f020) {
 		// shadd8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_shadd8_T1) {
+		if (handler && handler->i32_shadd8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1463,7 +1463,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfaa0f020) {
 		// shasx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_shasx_T1) {
+		if (handler && handler->i32_shasx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1479,7 +1479,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f020) {
 		// shsax_T1
 		decoded_insn_length = 4;
-		if (handler->i32_shsax_T1) {
+		if (handler && handler->i32_shsax_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1495,7 +1495,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfad0f020) {
 		// shsub16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_shsub16_T1) {
+		if (handler && handler->i32_shsub16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1511,7 +1511,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfac0f020) {
 		// shsub8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_shsub8_T1) {
+		if (handler && handler->i32_shsub8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1527,7 +1527,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfbc00000) {
 		// smlal_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlal_T1) {
+		if (handler && handler->i32_smlal_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -1545,7 +1545,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000c0) == 0xfbc00080) {
 		// smlalbb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlalbb_T1) {
+		if (handler && handler->i32_smlalbb_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -1567,7 +1567,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfbc000c0) {
 		// smlald_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlald_T1) {
+		if (handler && handler->i32_smlald_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -1587,7 +1587,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfbd000c0) {
 		// smlsld_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlsld_T1) {
+		if (handler && handler->i32_smlsld_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -1607,7 +1607,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfb600000) {
 		// smmls_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smmls_T1) {
+		if (handler && handler->i32_smmls_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1627,7 +1627,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfb800000) {
 		// smull_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smull_T1) {
+		if (handler && handler->i32_smull_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -1645,7 +1645,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f000) {
 		// ssax_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ssax_T1) {
+		if (handler && handler->i32_ssax_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1661,7 +1661,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfad0f000) {
 		// ssub16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ssub16_T1) {
+		if (handler && handler->i32_ssub16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1677,7 +1677,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfac0f000) {
 		// ssub8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ssub8_T1) {
+		if (handler && handler->i32_ssub8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1693,7 +1693,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0xc0000000) {
 		// stm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_stm_T1) {
+		if (handler && handler->i16_stm_T1) {
 			uint8_t Rn = ((opcode & 0x7000000) >> 24);
 			uint8_t register_list = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -1707,7 +1707,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffd0a000) == 0xe8800000) {
 		// stm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_stm_T2) {
+		if (handler && handler->i32_stm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t register_list = (opcode & 0x1fff);
 			bool M = ((opcode & 0x4000) >> 14);
@@ -1725,7 +1725,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x60000000) {
 		// str_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_str_imm_T1) {
+		if (handler && handler->i16_str_imm_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -1741,7 +1741,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x90000000) {
 		// str_imm_T2
 		decoded_insn_length = 2;
-		if (handler->i16_str_imm_T2) {
+		if (handler && handler->i16_str_imm_T2) {
 			uint8_t Rt = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -1755,7 +1755,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf8c00000) {
 		// str_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_str_imm_T3) {
+		if (handler && handler->i32_str_imm_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -1771,7 +1771,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x50000000) {
 		// str_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_str_reg_T1) {
+		if (handler && handler->i16_str_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -1787,7 +1787,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf8400000) {
 		// str_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_str_reg_T2) {
+		if (handler && handler->i32_str_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1805,7 +1805,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x70000000) {
 		// strb_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_strb_imm_T1) {
+		if (handler && handler->i16_strb_imm_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -1821,7 +1821,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf8800000) {
 		// strb_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_strb_imm_T2) {
+		if (handler && handler->i32_strb_imm_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -1837,7 +1837,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x54000000) {
 		// strb_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_strb_reg_T1) {
+		if (handler && handler->i16_strb_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -1853,7 +1853,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf8000000) {
 		// strb_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_strb_reg_T2) {
+		if (handler && handler->i32_strb_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1871,7 +1871,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x80000000) {
 		// strh_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_strh_imm_T1) {
+		if (handler && handler->i16_strh_imm_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -1887,7 +1887,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf8a00000) {
 		// strh_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_strh_imm_T2) {
+		if (handler && handler->i32_strh_imm_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -1903,7 +1903,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x52000000) {
 		// strh_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_strh_reg_T1) {
+		if (handler && handler->i16_strh_reg_T1) {
 			uint8_t Rt = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -1919,7 +1919,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf8200000) {
 		// strh_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_strh_reg_T2) {
+		if (handler && handler->i32_strh_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -1937,7 +1937,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff800000) == 0xb0800000) {
 		// sub_SPimm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sub_SPimm_T1) {
+		if (handler && handler->i16_sub_SPimm_T1) {
 			uint8_t imm = ((opcode & 0x7f0000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 sub_SPimm_T1 ", opcode);
@@ -1949,7 +1949,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x1e000000) {
 		// sub_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sub_imm_T1) {
+		if (handler && handler->i16_sub_imm_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x1c00000) >> 22);
@@ -1965,7 +1965,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x38000000) {
 		// sub_imm_T2
 		decoded_insn_length = 2;
-		if (handler->i16_sub_imm_T2) {
+		if (handler && handler->i16_sub_imm_T2) {
 			uint8_t Rdn = ((opcode & 0x7000000) >> 24);
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
@@ -1979,7 +1979,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe000000) == 0x1a000000) {
 		// sub_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sub_reg_T1) {
+		if (handler && handler->i16_sub_reg_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rn = ((opcode & 0x380000) >> 19);
 			uint8_t Rm = ((opcode & 0x1c00000) >> 22);
@@ -1995,7 +1995,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xb2400000) {
 		// sxtb_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sxtb_T1) {
+		if (handler && handler->i16_sxtb_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -2009,7 +2009,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xb2000000) {
 		// sxth_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sxth_T1) {
+		if (handler && handler->i16_sxth_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -2023,7 +2023,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x42000000) {
 		// tst_reg_T1
 		decoded_insn_length = 2;
-		if (handler->i16_tst_reg_T1) {
+		if (handler && handler->i16_tst_reg_T1) {
 			uint8_t Rn = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -2037,7 +2037,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f040) {
 		// uadd16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uadd16_T1) {
+		if (handler && handler->i32_uadd16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2053,7 +2053,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f040) {
 		// uadd8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uadd8_T1) {
+		if (handler && handler->i32_uadd8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2069,7 +2069,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfaa0f040) {
 		// uasx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uasx_T1) {
+		if (handler && handler->i32_uasx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2085,7 +2085,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf3c00000) {
 		// ubfx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ubfx_T1) {
+		if (handler && handler->i32_ubfx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -2103,7 +2103,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfbb000f0) {
 		// udiv_T1
 		decoded_insn_length = 4;
-		if (handler->i32_udiv_T1) {
+		if (handler && handler->i32_udiv_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2119,7 +2119,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f060) {
 		// uhadd16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uhadd16_T1) {
+		if (handler && handler->i32_uhadd16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2135,7 +2135,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f060) {
 		// uhadd8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uhadd8_T1) {
+		if (handler && handler->i32_uhadd8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2151,7 +2151,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfaa0f060) {
 		// uhasx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uhasx_T1) {
+		if (handler && handler->i32_uhasx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2167,7 +2167,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f060) {
 		// uhsax_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uhsax_T1) {
+		if (handler && handler->i32_uhsax_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2183,7 +2183,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfad0f060) {
 		// uhsub16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uhsub16_T1) {
+		if (handler && handler->i32_uhsub16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2199,7 +2199,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfac0f060) {
 		// uhsub8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uhsub8_T1) {
+		if (handler && handler->i32_uhsub8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2215,7 +2215,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfbe00060) {
 		// umaal_T1
 		decoded_insn_length = 4;
-		if (handler->i32_umaal_T1) {
+		if (handler && handler->i32_umaal_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -2233,7 +2233,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfbe00000) {
 		// umlal_T1
 		decoded_insn_length = 4;
-		if (handler->i32_umlal_T1) {
+		if (handler && handler->i32_umlal_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -2251,7 +2251,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfba00000) {
 		// umull_T1
 		decoded_insn_length = 4;
-		if (handler->i32_umull_T1) {
+		if (handler && handler->i32_umull_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t RdLo = ((opcode & 0xf000) >> 12);
@@ -2269,7 +2269,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa90f050) {
 		// uqadd16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uqadd16_T1) {
+		if (handler && handler->i32_uqadd16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2285,7 +2285,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfa80f050) {
 		// uqadd8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uqadd8_T1) {
+		if (handler && handler->i32_uqadd8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2301,7 +2301,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfaa0f050) {
 		// uqasx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uqasx_T1) {
+		if (handler && handler->i32_uqasx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2317,7 +2317,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f050) {
 		// uqsax_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uqsax_T1) {
+		if (handler && handler->i32_uqsax_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2333,7 +2333,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfad0f050) {
 		// uqsub16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uqsub16_T1) {
+		if (handler && handler->i32_uqsub16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2349,7 +2349,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfac0f050) {
 		// uqsub8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uqsub8_T1) {
+		if (handler && handler->i32_uqsub8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2365,7 +2365,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f040) {
 		// usax_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usax_T1) {
+		if (handler && handler->i32_usax_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2381,7 +2381,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfad0f040) {
 		// usub16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usub16_T1) {
+		if (handler && handler->i32_usub16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2397,7 +2397,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfac0f040) {
 		// usub8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usub8_T1) {
+		if (handler && handler->i32_usub8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2413,7 +2413,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xb2c00000) {
 		// uxtb_T1
 		decoded_insn_length = 2;
-		if (handler->i16_uxtb_T1) {
+		if (handler && handler->i16_uxtb_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -2427,7 +2427,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0xb2800000) {
 		// uxth_T1
 		decoded_insn_length = 2;
-		if (handler->i16_uxth_T1) {
+		if (handler && handler->i16_uxth_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -2441,7 +2441,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbff8000) == 0xf20d0000) {
 		// add_SPi_T4
 		decoded_insn_length = 4;
-		if (handler->i32_add_SPi_T4) {
+		if (handler && handler->i32_add_SPi_T4) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -2455,7 +2455,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff870000) == 0x44850000) {
 		// add_SPr_T2
 		decoded_insn_length = 2;
-		if (handler->i16_add_SPr_T2) {
+		if (handler && handler->i16_add_SPr_T2) {
 			uint8_t Rm = ((opcode & 0x780000) >> 19);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 add_SPr_T2 ", opcode);
@@ -2467,7 +2467,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbff8000) == 0xf2af0000) {
 		// adr_T2
 		decoded_insn_length = 4;
-		if (handler->i32_adr_T2) {
+		if (handler && handler->i32_adr_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -2481,7 +2481,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbff8000) == 0xf20f0000) {
 		// adr_T3
 		decoded_insn_length = 4;
-		if (handler->i32_adr_T3) {
+		if (handler && handler->i32_adr_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -2495,7 +2495,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbff8000) == 0xf36f0000) {
 		// bfc_T1
 		decoded_insn_length = 4;
-		if (handler->i32_bfc_T1) {
+		if (handler && handler->i32_bfc_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
 			uint8_t msb = (opcode & 0x1f);
@@ -2511,7 +2511,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08f00) == 0xf1100f00) {
 		// cmn_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_cmn_imm_T1) {
+		if (handler && handler->i32_cmn_imm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
 			if (insn_debugging_info) {
@@ -2525,7 +2525,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xeb100f00) {
 		// cmn_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_cmn_reg_T2) {
+		if (handler && handler->i32_cmn_reg_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			int32_t imm = thumb_expand_imm(((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6));
@@ -2543,7 +2543,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff08f00) == 0xebb00f00) {
 		// cmp_reg_T3
 		decoded_insn_length = 4;
-		if (handler->i32_cmp_reg_T3) {
+		if (handler && handler->i32_cmp_reg_T3) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -2561,7 +2561,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fff) == 0xe8d00f4f) {
 		// ldrexb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrexb_T1) {
+		if (handler && handler->i32_ldrexb_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			if (insn_debugging_info) {
@@ -2575,7 +2575,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fff) == 0xe8d00f5f) {
 		// ldrexh_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrexh_T1) {
+		if (handler && handler->i32_ldrexh_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			if (insn_debugging_info) {
@@ -2589,7 +2589,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf8300000) {
 		// ldrh_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrh_reg_T2) {
+		if (handler && handler->i32_ldrh_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2607,7 +2607,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf9300e00) {
 		// ldrsh_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsh_T1) {
+		if (handler && handler->i32_ldrsh_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -2623,7 +2623,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf9300000) {
 		// ldrsh_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsh_reg_T2) {
+		if (handler && handler->i32_ldrsh_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2641,7 +2641,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xfc400000) {
 		// mcrr2_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mcrr2_T2) {
+		if (handler && handler->i32_mcrr2_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRm = (opcode & 0xf);
@@ -2661,7 +2661,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbef8000) == 0xf04f0000) {
 		// mov_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mov_imm_T2) {
+		if (handler && handler->i32_mov_imm_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
 			bool S = ((opcode & 0x100000) >> 20);
@@ -2677,7 +2677,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffc00000) == 0x0) {
 		// mov_reg_T2
 		decoded_insn_length = 2;
-		if (handler->i16_mov_reg_T2) {
+		if (handler && handler->i16_mov_reg_T2) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			if (insn_debugging_info) {
@@ -2691,7 +2691,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffeff0f0) == 0xf24f0000) {
 		// mov_reg_T3
 		decoded_insn_length = 4;
-		if (handler->i32_mov_reg_T3) {
+		if (handler && handler->i32_mov_reg_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			bool S = ((opcode & 0x100000) >> 20);
@@ -2707,7 +2707,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xfc500000) {
 		// mrrc2_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mrrc2_T2) {
+		if (handler && handler->i32_mrrc2_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRm = (opcode & 0xf);
@@ -2727,7 +2727,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfb00f000) {
 		// mul_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mul_T2) {
+		if (handler && handler->i32_mul_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2743,7 +2743,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbef8000) == 0xf06f0000) {
 		// mvn_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mvn_imm_T1) {
+		if (handler && handler->i32_mvn_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
 			bool S = ((opcode & 0x100000) >> 20);
@@ -2759,7 +2759,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef8000) == 0xea6f0000) {
 		// mvn_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_mvn_reg_T2) {
+		if (handler && handler->i32_mvn_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			int32_t imm = thumb_expand_imm(((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6));
@@ -2779,7 +2779,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0000) == 0xbf000000) {
 		// nop_T1
 		decoded_insn_length = 2;
-		if (handler->i16_nop_T1) {
+		if (handler && handler->i16_nop_T1) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 nop_T1 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -2789,7 +2789,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffffffff) == 0xf3af8000) {
 		// nop_T2
 		decoded_insn_length = 4;
-		if (handler->i32_nop_T2) {
+		if (handler && handler->i32_nop_T2) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 nop_T2 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -2799,7 +2799,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7ff000) == 0xf91ff000) {
 		// pld_immlit_T3
 		decoded_insn_length = 4;
-		if (handler->i32_pld_immlit_T3) {
+		if (handler && handler->i32_pld_immlit_T3) {
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
 			if (insn_debugging_info) {
@@ -2813,7 +2813,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7ff000) == 0xf81ff000) {
 		// pld_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_pld_lit_T1) {
+		if (handler && handler->i32_pld_lit_T1) {
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
 			if (insn_debugging_info) {
@@ -2827,7 +2827,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff2000) == 0xe8bd0000) {
 		// pop_T2
 		decoded_insn_length = 4;
-		if (handler->i32_pop_T2) {
+		if (handler && handler->i32_pop_T2) {
 			uint16_t register_list = (opcode & 0x1fff);
 			bool P = ((opcode & 0x8000) >> 15);
 			bool M = ((opcode & 0x4000) >> 14);
@@ -2843,7 +2843,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0fff) == 0xf85d0b04) {
 		// pop_T3
 		decoded_insn_length = 4;
-		if (handler->i32_pop_T3) {
+		if (handler && handler->i32_pop_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 pop_T3 ", opcode);
@@ -2855,7 +2855,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffffa000) == 0xe92d0000) {
 		// push_T2
 		decoded_insn_length = 4;
-		if (handler->i32_push_T2) {
+		if (handler && handler->i32_push_T2) {
 			uint16_t register_list = (opcode & 0x1fff);
 			bool M = ((opcode & 0x4000) >> 14);
 			if (insn_debugging_info) {
@@ -2869,7 +2869,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0fff) == 0xf84d0d04) {
 		// push_T3
 		decoded_insn_length = 4;
-		if (handler->i32_push_T3) {
+		if (handler && handler->i32_push_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 push_T3 ", opcode);
@@ -2881,7 +2881,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f010) {
 		// qasx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qasx_T1) {
+		if (handler && handler->i32_qasx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2897,7 +2897,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfae0f010) {
 		// qsax_T1
 		decoded_insn_length = 4;
-		if (handler->i32_qsax_T1) {
+		if (handler && handler->i32_qsax_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2913,7 +2913,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef70f0) == 0xea4f0030) {
 		// rrx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_rrx_T1) {
+		if (handler && handler->i32_rrx_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			bool S = ((opcode & 0x100000) >> 20);
@@ -2929,7 +2929,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0000) == 0xbf400000) {
 		// sev_T1
 		decoded_insn_length = 2;
-		if (handler->i16_sev_T1) {
+		if (handler && handler->i16_sev_T1) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 sev_T1 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -2939,7 +2939,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0e0) == 0xfb50f000) {
 		// smmul_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smmul_T1) {
+		if (handler && handler->i32_smmul_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2957,7 +2957,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0e0) == 0xfb20f000) {
 		// smuad_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smuad_T1) {
+		if (handler && handler->i32_smuad_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2975,7 +2975,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0c0) == 0xfb10f000) {
 		// smulbb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smulbb_T1) {
+		if (handler && handler->i32_smulbb_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -2995,7 +2995,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0e0) == 0xfb30f000) {
 		// smulwb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smulwb_T1) {
+		if (handler && handler->i32_smulwb_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -3013,7 +3013,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0e0) == 0xfb40f000) {
 		// smusd_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smusd_T1) {
+		if (handler && handler->i32_smusd_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -3031,7 +3031,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf0f0c0) == 0xf3200000) {
 		// ssat16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ssat16_T1) {
+		if (handler && handler->i32_ssat16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t satimm = (opcode & 0xf);
@@ -3047,7 +3047,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf8000e00) {
 		// strb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strb_T1) {
+		if (handler && handler->i32_strb_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -3063,7 +3063,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xe8c00040) {
 		// strexb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strexb_T1) {
+		if (handler && handler->i32_strexb_T1) {
 			uint8_t Rd = (opcode & 0xf);
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
@@ -3079,7 +3079,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xe8c00050) {
 		// strexh_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strexh_T1) {
+		if (handler && handler->i32_strexh_T1) {
 			uint8_t Rd = (opcode & 0xf);
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
@@ -3095,7 +3095,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf8200e00) {
 		// strht_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strht_T1) {
+		if (handler && handler->i32_strht_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -3111,7 +3111,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbff8000) == 0xf2ad0000) {
 		// sub_SPimm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_sub_SPimm_T3) {
+		if (handler && handler->i32_sub_SPimm_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -3125,7 +3125,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0xdf000000) {
 		// svc_T1
 		decoded_insn_length = 2;
-		if (handler->i16_svc_T1) {
+		if (handler && handler->i16_svc_T1) {
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 svc_T1 ", opcode);
@@ -3137,7 +3137,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfffff0c0) == 0xfa2ff080) {
 		// sxtb16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sxtb16_T1) {
+		if (handler && handler->i32_sxtb16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t rotate = ((opcode & 0x30) >> 4);
@@ -3153,7 +3153,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfffff0c0) == 0xfa4ff080) {
 		// sxtb_T2
 		decoded_insn_length = 4;
-		if (handler->i32_sxtb_T2) {
+		if (handler && handler->i32_sxtb_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t rotate = ((opcode & 0x30) >> 4);
@@ -3169,7 +3169,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfffff0c0) == 0xfa0ff080) {
 		// sxth_T2
 		decoded_insn_length = 4;
-		if (handler->i32_sxth_T2) {
+		if (handler && handler->i32_sxth_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t rotate = ((opcode & 0x30) >> 4);
@@ -3185,7 +3185,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08f00) == 0xf0900f00) {
 		// teq_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_teq_imm_T1) {
+		if (handler && handler->i32_teq_imm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -3199,7 +3199,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xea900f00) {
 		// teq_reg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_teq_reg_T1) {
+		if (handler && handler->i32_teq_reg_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3217,7 +3217,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08f00) == 0xf0100f00) {
 		// tst_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_tst_imm_T1) {
+		if (handler && handler->i32_tst_imm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
 			if (insn_debugging_info) {
@@ -3231,7 +3231,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff08f00) == 0xea100f00) {
 		// tst_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_tst_reg_T2) {
+		if (handler && handler->i32_tst_reg_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3249,7 +3249,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0xde000000) {
 		// udf_T1
 		decoded_insn_length = 2;
-		if (handler->i16_udf_T1) {
+		if (handler && handler->i16_udf_T1) {
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 udf_T1 ", opcode);
@@ -3261,7 +3261,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f0f0) == 0xfb70f000) {
 		// usad8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usad8_T1) {
+		if (handler && handler->i32_usad8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -3277,7 +3277,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf0f0c0) == 0xf3a00000) {
 		// usat16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usat16_T1) {
+		if (handler && handler->i32_usat16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t satimm = (opcode & 0xf);
@@ -3293,7 +3293,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfffff0c0) == 0xfa3ff080) {
 		// uxtb16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uxtb16_T1) {
+		if (handler && handler->i32_uxtb16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t rotate = ((opcode & 0x30) >> 4);
@@ -3309,7 +3309,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfffff0c0) == 0xfa5ff080) {
 		// uxtb_T2
 		decoded_insn_length = 4;
-		if (handler->i32_uxtb_T2) {
+		if (handler && handler->i32_uxtb_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t rotate = ((opcode & 0x30) >> 4);
@@ -3325,7 +3325,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfffff0c0) == 0xfa1ff080) {
 		// uxth_T2
 		decoded_insn_length = 4;
-		if (handler->i32_uxth_T2) {
+		if (handler && handler->i32_uxth_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t rotate = ((opcode & 0x30) >> 4);
@@ -3341,7 +3341,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0ed0) == 0xeeb00ac0) {
 		// vabs_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vabs_T1) {
+		if (handler && handler->i32_vabs_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -3361,7 +3361,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0ed0) == 0xeeb70ac0) {
 		// vcvt_dpsp_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vcvt_dpsp_T1) {
+		if (handler && handler->i32_vcvt_dpsp_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -3381,7 +3381,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00fd0) == 0xec400a10) {
 		// vmov_2arm2sp_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_2arm2sp_T1) {
+		if (handler && handler->i32_vmov_2arm2sp_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rtx = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -3401,7 +3401,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00fd0) == 0xec400b10) {
 		// vmov_2armdw_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_2armdw_T1) {
+		if (handler && handler->i32_vmov_2armdw_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rtx = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -3421,7 +3421,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffd00f70) == 0xee000b10) {
 		// vmov_armscl_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_armscl_T1) {
+		if (handler && handler->i32_vmov_armscl_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Vd = ((opcode & 0xf0000) >> 16);
 			bool H = ((opcode & 0x200000) >> 21);
@@ -3439,7 +3439,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0ed0) == 0xeeb00a40) {
 		// vmov_reg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_reg_T1) {
+		if (handler && handler->i32_vmov_reg_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -3459,7 +3459,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffd00f70) == 0xee100b10) {
 		// vmov_sclarm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_sclarm_T1) {
+		if (handler && handler->i32_vmov_sclarm_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Vd = ((opcode & 0xf0000) >> 16);
 			bool H = ((opcode & 0x200000) >> 21);
@@ -3477,7 +3477,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0ed0) == 0xeeb10a40) {
 		// vneg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vneg_T1) {
+		if (handler && handler->i32_vneg_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -3497,7 +3497,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbc0ed0) == 0xfeb80a40) {
 		// vrinta_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vrinta_T1) {
+		if (handler && handler->i32_vrinta_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			uint8_t RM = ((opcode & 0x30000) >> 16);
@@ -3519,7 +3519,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0ed0) == 0xeeb70a40) {
 		// vrintx_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vrintx_T1) {
+		if (handler && handler->i32_vrintx_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -3539,7 +3539,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0ed0) == 0xeeb10ac0) {
 		// vsqrt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vsqrt_T1) {
+		if (handler && handler->i32_vsqrt_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -3559,7 +3559,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0000) == 0xbf200000) {
 		// wfe_T1
 		decoded_insn_length = 2;
-		if (handler->i16_wfe_T1) {
+		if (handler && handler->i16_wfe_T1) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 wfe_T1 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -3569,7 +3569,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0000) == 0xbf300000) {
 		// wfi_T1
 		decoded_insn_length = 2;
-		if (handler->i16_wfi_T1) {
+		if (handler && handler->i16_wfi_T1) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 wfi_T1 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -3579,7 +3579,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffff0000) == 0xbf100000) {
 		// yield_T1
 		decoded_insn_length = 2;
-		if (handler->i16_yield_T1) {
+		if (handler && handler->i16_yield_T1) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 yield_T1 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -3589,7 +3589,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbef8000) == 0xf10d0000) {
 		// add_SPi_T3
 		decoded_insn_length = 4;
-		if (handler->i32_add_SPi_T3) {
+		if (handler && handler->i32_add_SPi_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
 			bool S = ((opcode & 0x100000) >> 20);
@@ -3605,7 +3605,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff780000) == 0x44680000) {
 		// add_SPr_T1
 		decoded_insn_length = 2;
-		if (handler->i16_add_SPr_T1) {
+		if (handler && handler->i16_add_SPr_T1) {
 			uint8_t Rdm = ((opcode & 0x800000) >> 20) | ((opcode & 0x70000) >> 16);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 16 add_SPr_T1 ", opcode);
@@ -3617,7 +3617,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef8000) == 0xeb0d0000) {
 		// add_SPr_T3
 		decoded_insn_length = 4;
-		if (handler->i32_add_SPr_T3) {
+		if (handler && handler->i32_add_SPr_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3637,7 +3637,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf2000000) {
 		// add_imm_T4
 		decoded_insn_length = 4;
-		if (handler->i32_add_imm_T4) {
+		if (handler && handler->i32_add_imm_T4) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
@@ -3653,7 +3653,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf0000000) {
 		// and_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_and_imm_T1) {
+		if (handler && handler->i32_and_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -3671,7 +3671,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xea000000) {
 		// and_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_and_reg_T2) {
+		if (handler && handler->i32_and_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -3693,7 +3693,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef8030) == 0xea4f0020) {
 		// asr_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_asr_imm_T2) {
+		if (handler && handler->i32_asr_imm_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3711,7 +3711,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf0000000) == 0xd0000000) {
 		// b_T1
 		decoded_insn_length = 2;
-		if (handler->i16_b_T1) {
+		if (handler && handler->i16_b_T1) {
 			uint8_t imm = ((opcode & 0xff0000) >> 16);
 			uint8_t cond = ((opcode & 0xf000000) >> 24);
 			if (insn_debugging_info) {
@@ -3725,7 +3725,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf3600000) {
 		// bfi_T1
 		decoded_insn_length = 4;
-		if (handler->i32_bfi_T1) {
+		if (handler && handler->i32_bfi_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3743,7 +3743,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf0800000) {
 		// eor_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_eor_imm_T1) {
+		if (handler && handler->i32_eor_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -3761,7 +3761,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xea800000) {
 		// eor_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_eor_reg_T2) {
+		if (handler && handler->i32_eor_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -3783,7 +3783,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0xbf000000) {
 		// it_T1
 		decoded_insn_length = 2;
-		if (handler->i16_it_T1) {
+		if (handler && handler->i16_it_T1) {
 			uint8_t firstcond = ((opcode & 0xf00000) >> 20);
 			uint8_t mask = ((opcode & 0xf0000) >> 16);
 			if (insn_debugging_info) {
@@ -3797,7 +3797,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe1f0000) == 0xfc1f0000) {
 		// ldc2_lit_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldc2_lit_T2) {
+		if (handler && handler->i32_ldc2_lit_T2) {
 			uint8_t imm = (opcode & 0xff);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRd = ((opcode & 0xf000) >> 12);
@@ -3821,7 +3821,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffd02000) == 0xe8900000) {
 		// ldm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldm_T2) {
+		if (handler && handler->i32_ldm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t register_list = (opcode & 0x1fff);
 			bool P = ((opcode & 0x8000) >> 15);
@@ -3841,7 +3841,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7f0000) == 0xf85f0000) {
 		// ldr_lit_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldr_lit_T2) {
+		if (handler && handler->i32_ldr_lit_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
@@ -3857,7 +3857,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xe8500f00) {
 		// ldrex_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrex_T1) {
+		if (handler && handler->i32_ldrex_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -3873,7 +3873,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf8300e00) {
 		// ldrht_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrht_T1) {
+		if (handler && handler->i32_ldrht_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -3889,7 +3889,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7f0000) == 0xf91f0000) {
 		// ldrsb_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsb_lit_T1) {
+		if (handler && handler->i32_ldrsb_lit_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
@@ -3905,7 +3905,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf9300800) {
 		// ldrsh_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsh_imm_T2) {
+		if (handler && handler->i32_ldrsh_imm_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -3927,7 +3927,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf8000000) == 0x0) {
 		// lsl_imm_T1
 		decoded_insn_length = 2;
-		if (handler->i16_lsl_imm_T1) {
+		if (handler && handler->i16_lsl_imm_T1) {
 			uint8_t Rd = ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x380000) >> 19);
 			uint8_t imm = ((opcode & 0x7c00000) >> 22);
@@ -3943,7 +3943,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef8030) == 0xea4f0000) {
 		// lsl_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_lsl_imm_T2) {
+		if (handler && handler->i32_lsl_imm_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3961,7 +3961,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef8030) == 0xea4f0010) {
 		// lsr_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_lsr_imm_T2) {
+		if (handler && handler->i32_lsr_imm_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -3979,7 +3979,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfb000000) {
 		// mla_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mla_T1) {
+		if (handler && handler->i32_mla_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -3997,7 +3997,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf2400000) {
 		// mov_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_mov_imm_T3) {
+		if (handler && handler->i32_mov_imm_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0xf7000) >> 4) | (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -4011,7 +4011,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf0600000) {
 		// orn_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_orn_imm_T1) {
+		if (handler && handler->i32_orn_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
@@ -4029,7 +4029,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xea600000) {
 		// orn_reg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_orn_reg_T1) {
+		if (handler && handler->i32_orn_reg_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4051,7 +4051,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf0400000) {
 		// orr_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_orr_imm_T1) {
+		if (handler && handler->i32_orr_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -4069,7 +4069,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0ffc0) == 0xf810f000) {
 		// pld_reg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_pld_reg_T1) {
+		if (handler && handler->i32_pld_reg_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x30) >> 4);
@@ -4085,7 +4085,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef0030) == 0xea4f0030) {
 		// ror_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ror_imm_T1) {
+		if (handler && handler->i32_ror_imm_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -4103,7 +4103,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000c0) == 0xfb100000) {
 		// smlabb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlabb_T1) {
+		if (handler && handler->i32_smlabb_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4125,7 +4125,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfb200000) {
 		// smlad_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlad_T1) {
+		if (handler && handler->i32_smlad_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4145,7 +4145,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfb300000) {
 		// smlawb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlawb_T1) {
+		if (handler && handler->i32_smlawb_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4165,7 +4165,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfb400000) {
 		// smlsd_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smlsd_T1) {
+		if (handler && handler->i32_smlsd_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4185,7 +4185,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xfb500000) {
 		// smmla_T1
 		decoded_insn_length = 4;
-		if (handler->i32_smmla_T1) {
+		if (handler && handler->i32_smmla_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4205,7 +4205,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbd08000) == 0xf3000000) {
 		// ssat_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ssat_T1) {
+		if (handler && handler->i32_ssat_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			bool shift = ((opcode & 0x200000) >> 21);
@@ -4225,7 +4225,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100000) == 0xfc000000) {
 		// stc2_T2
 		decoded_insn_length = 4;
-		if (handler->i32_stc2_T2) {
+		if (handler && handler->i32_stc2_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
@@ -4251,7 +4251,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffd0a000) == 0xe9000000) {
 		// stmdb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_stmdb_T1) {
+		if (handler && handler->i32_stmdb_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t register_list = (opcode & 0x1fff);
 			bool M = ((opcode & 0x4000) >> 14);
@@ -4269,7 +4269,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf8000800) {
 		// strb_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_strb_imm_T3) {
+		if (handler && handler->i32_strb_imm_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -4291,7 +4291,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xe8400000) {
 		// strex_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strex_T1) {
+		if (handler && handler->i32_strex_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
@@ -4309,7 +4309,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf8200800) {
 		// strh_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_strh_imm_T3) {
+		if (handler && handler->i32_strh_imm_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -4331,7 +4331,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf8400e00) {
 		// strt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strt_T1) {
+		if (handler && handler->i32_strt_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -4347,7 +4347,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffef8000) == 0xebad0000) {
 		// sub_SPreg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sub_SPreg_T1) {
+		if (handler && handler->i32_sub_SPreg_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rm = (opcode & 0xf);
 			uint8_t imm = ((opcode & 0x7000) >> 10) | ((opcode & 0xc0) >> 6);
@@ -4367,7 +4367,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf08000) == 0xf2a00000) {
 		// sub_imm_T4
 		decoded_insn_length = 4;
-		if (handler->i32_sub_imm_T4) {
+		if (handler && handler->i32_sub_imm_T4) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
@@ -4383,7 +4383,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f080) == 0xfa20f080) {
 		// sxtab16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sxtab16_T1) {
+		if (handler && handler->i32_sxtab16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4401,7 +4401,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f080) == 0xfa40f080) {
 		// sxtab_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sxtab_T1) {
+		if (handler && handler->i32_sxtab_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4419,7 +4419,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f080) == 0xfa00f080) {
 		// sxtah_T1
 		decoded_insn_length = 4;
-		if (handler->i32_sxtah_T1) {
+		if (handler && handler->i32_sxtah_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4437,7 +4437,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f000) == 0xf7f0a000) {
 		// udf_T2
 		decoded_insn_length = 4;
-		if (handler->i32_udf_T2) {
+		if (handler && handler->i32_udf_T2) {
 			uint16_t imm = ((opcode & 0xf0000) >> 4) | (opcode & 0xfff);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 udf_T2 ", opcode);
@@ -4449,7 +4449,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000f0) == 0xfb700000) {
 		// usada8_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usada8_T1) {
+		if (handler && handler->i32_usada8_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4467,7 +4467,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbd08000) == 0xf3800000) {
 		// usat_T1
 		decoded_insn_length = 4;
-		if (handler->i32_usat_T1) {
+		if (handler && handler->i32_usat_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			bool shift = ((opcode & 0x200000) >> 21);
@@ -4487,7 +4487,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f080) == 0xfa30f080) {
 		// uxtab16_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uxtab16_T1) {
+		if (handler && handler->i32_uxtab16_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4505,7 +4505,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f080) == 0xfa50f080) {
 		// uxtab_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uxtab_T1) {
+		if (handler && handler->i32_uxtab_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4523,7 +4523,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f080) == 0xfa10f080) {
 		// uxtah_T1
 		decoded_insn_length = 4;
-		if (handler->i32_uxtah_T1) {
+		if (handler && handler->i32_uxtah_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4541,7 +4541,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0e50) == 0xeeb40a40) {
 		// vcmp_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vcmp_T1) {
+		if (handler && handler->i32_vcmp_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -4563,7 +4563,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0e50) == 0xeeb50a40) {
 		// vcmp_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vcmp_T2) {
+		if (handler && handler->i32_vcmp_T2) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			bool D = ((opcode & 0x400000) >> 22);
 			bool E = ((opcode & 0x80) >> 7);
@@ -4581,7 +4581,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbc0e50) == 0xfebc0a40) {
 		// vcvt_fltint_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vcvt_fltint_T1) {
+		if (handler && handler->i32_vcvt_fltint_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool op = ((opcode & 0x80) >> 7);
@@ -4605,7 +4605,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbc0e50) == 0xfebc0a40) {
 		// vcvta_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vcvta_T1) {
+		if (handler && handler->i32_vcvta_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool op = ((opcode & 0x80) >> 7);
@@ -4629,7 +4629,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f10) == 0xeef00a10) {
 		// vmrs_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmrs_T1) {
+		if (handler && handler->i32_vmrs_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 vmrs_T1 ", opcode);
@@ -4641,7 +4641,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f10) == 0xeee00a10) {
 		// vmsr_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmsr_T1) {
+		if (handler && handler->i32_vmsr_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 vmsr_T1 ", opcode);
@@ -4653,7 +4653,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0f00) == 0xecbd0b00) {
 		// vpop_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vpop_T1) {
+		if (handler && handler->i32_vpop_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -4669,7 +4669,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0f00) == 0xecbd0a00) {
 		// vpop_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vpop_T2) {
+		if (handler && handler->i32_vpop_T2) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -4685,7 +4685,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0f00) == 0xed2d0b00) {
 		// vpush_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vpush_T1) {
+		if (handler && handler->i32_vpush_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -4701,7 +4701,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0f00) == 0xed2d0a00) {
 		// vpush_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vpush_T2) {
+		if (handler && handler->i32_vpush_T2) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -4717,7 +4717,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbf0e50) == 0xeeb60a40) {
 		// vrintz_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vrintz_T1) {
+		if (handler && handler->i32_vrintz_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool op = ((opcode & 0x80) >> 7);
@@ -4739,7 +4739,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf1000000) {
 		// add_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_add_imm_T3) {
+		if (handler && handler->i32_add_imm_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -4757,7 +4757,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000000) == 0x44000000) {
 		// add_reg_T2
 		decoded_insn_length = 2;
-		if (handler->i16_add_reg_T2) {
+		if (handler && handler->i16_add_reg_T2) {
 			uint8_t Rdn = ((opcode & 0x800000) >> 20) | ((opcode & 0x70000) >> 16);
 			uint8_t Rm = ((opcode & 0x780000) >> 19);
 			if (insn_debugging_info) {
@@ -4771,7 +4771,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xeb000000) {
 		// add_reg_T3
 		decoded_insn_length = 4;
-		if (handler->i32_add_reg_T3) {
+		if (handler && handler->i32_add_reg_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4793,7 +4793,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100000) == 0xfc100000) {
 		// ldc2_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldc2_imm_T2) {
+		if (handler && handler->i32_ldc2_imm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
@@ -4819,7 +4819,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf8500000) {
 		// ldr_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldr_reg_T2) {
+		if (handler && handler->i32_ldr_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4837,7 +4837,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7f0000) == 0xf83f0000) {
 		// ldrh_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrh_lit_T1) {
+		if (handler && handler->i32_ldrh_lit_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
@@ -4853,7 +4853,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7f0000) == 0xf93f0000) {
 		// ldrsh_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsh_lit_T1) {
+		if (handler && handler->i32_ldrsh_lit_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
@@ -4869,7 +4869,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xea400000) {
 		// orr_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_orr_reg_T2) {
+		if (handler && handler->i32_orr_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4891,7 +4891,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0ff00) == 0xf810fc00) {
 		// pld_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_pld_imm_T2) {
+		if (handler && handler->i32_pld_imm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -4905,7 +4905,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0ff00) == 0xf910fc00) {
 		// pld_immlit_T2
 		decoded_insn_length = 4;
-		if (handler->i32_pld_immlit_T2) {
+		if (handler && handler->i32_pld_immlit_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -4919,7 +4919,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d7ff) == 0xf3a08004) {
 		// sev_T2
 		decoded_insn_length = 4;
-		if (handler->i32_sev_T2) {
+		if (handler && handler->i32_sev_T2) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 sev_T2 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -4929,7 +4929,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf8400800) {
 		// str_imm_T4
 		decoded_insn_length = 4;
-		if (handler->i32_str_imm_T4) {
+		if (handler && handler->i32_str_imm_T4) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -4951,7 +4951,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe500000) == 0xe8400000) {
 		// strd_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_strd_imm_T1) {
+		if (handler && handler->i32_strd_imm_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rtx = ((opcode & 0xf00) >> 8);
@@ -4975,7 +4975,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe08000) == 0xeba00000) {
 		// sub_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_sub_reg_T2) {
+		if (handler && handler->i32_sub_reg_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -4997,7 +4997,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff000e0) == 0xe8d00000) {
 		// tbb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_tbb_T1) {
+		if (handler && handler->i32_tbb_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
 			bool H = ((opcode & 0x10) >> 4);
@@ -5013,7 +5013,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffbe0e50) == 0xeeb20a40) {
 		// vcvtb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vcvtb_T1) {
+		if (handler && handler->i32_vcvtb_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vm = (opcode & 0xf);
 			bool op = ((opcode & 0x10000) >> 16);
@@ -5037,7 +5037,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff300f00) == 0xed100b00) {
 		// vldr_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vldr_T1) {
+		if (handler && handler->i32_vldr_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5057,7 +5057,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff300f00) == 0xed100a00) {
 		// vldr_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vldr_T2) {
+		if (handler && handler->i32_vldr_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5077,7 +5077,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e10) == 0xfe800a00) {
 		// vmaxnm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmaxnm_T1) {
+		if (handler && handler->i32_vmaxnm_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5103,7 +5103,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe00f10) == 0xee000a10) {
 		// vmov_armsp_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_armsp_T1) {
+		if (handler && handler->i32_vmov_armsp_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			bool op = ((opcode & 0x100000) >> 20);
@@ -5121,7 +5121,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff300f00) == 0xed000b00) {
 		// vstr_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vstr_T1) {
+		if (handler && handler->i32_vstr_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5141,7 +5141,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff300f00) == 0xed000a00) {
 		// vstr_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vstr_T2) {
+		if (handler && handler->i32_vstr_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5161,7 +5161,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d7ff) == 0xf3a08002) {
 		// wfe_T2
 		decoded_insn_length = 4;
-		if (handler->i32_wfe_T2) {
+		if (handler && handler->i32_wfe_T2) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 wfe_T2 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -5171,7 +5171,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d7ff) == 0xf3a08003) {
 		// wfi_T2
 		decoded_insn_length = 4;
-		if (handler->i32_wfi_T2) {
+		if (handler && handler->i32_wfi_T2) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 wfi_T2 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -5181,7 +5181,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d7ff) == 0xf3a08001) {
 		// yield_T2
 		decoded_insn_length = 4;
-		if (handler->i32_yield_T2) {
+		if (handler && handler->i32_yield_T2) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 yield_T2 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -5191,7 +5191,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d7f0) == 0xf3a080f0) {
 		// dbg_T1
 		decoded_insn_length = 4;
-		if (handler->i32_dbg_T1) {
+		if (handler && handler->i32_dbg_T1) {
 			uint8_t option = (opcode & 0xf);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 dbg_T1 ", opcode);
@@ -5203,7 +5203,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe5f0000) == 0xe85f0000) {
 		// ldrd_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrd_lit_T1) {
+		if (handler && handler->i32_ldrd_lit_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rtx = ((opcode & 0xf00) >> 8);
 			uint8_t imm = (opcode & 0xff);
@@ -5225,7 +5225,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf8300800) {
 		// ldrh_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_ldrh_imm_T3) {
+		if (handler && handler->i32_ldrh_imm_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -5247,7 +5247,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf9b00000) {
 		// ldrsh_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsh_imm_T1) {
+		if (handler && handler->i32_ldrsh_imm_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -5263,7 +5263,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf8500e00) {
 		// ldrt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrt_T1) {
+		if (handler && handler->i32_ldrt_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -5279,7 +5279,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff100010) == 0xee000010) {
 		// mcr_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mcr_T1) {
+		if (handler && handler->i32_mcr_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRn = ((opcode & 0xf0000) >> 16);
@@ -5301,7 +5301,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff100010) == 0xee100010) {
 		// mrc_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mrc_T1) {
+		if (handler && handler->i32_mrc_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t Crn = ((opcode & 0xf0000) >> 16);
@@ -5323,7 +5323,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f000) == 0xf890f000) {
 		// pld_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_pld_imm_T1) {
+		if (handler && handler->i32_pld_imm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
 			if (insn_debugging_info) {
@@ -5337,7 +5337,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0f000) == 0xf990f000) {
 		// pld_immlit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_pld_immlit_T1) {
+		if (handler && handler->i32_pld_immlit_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
 			if (insn_debugging_info) {
@@ -5351,7 +5351,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffba0e50) == 0xeeba0a40) {
 		// vcvt_fltfpt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vcvt_fltfpt_T1) {
+		if (handler && handler->i32_vcvt_fltfpt_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = ((opcode & 0x20) >> 5) | ((opcode & 0xf) << 1);
 			bool op = ((opcode & 0x40000) >> 18);
@@ -5375,7 +5375,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100f00) == 0xec100b00) {
 		// vldm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vldm_T1) {
+		if (handler && handler->i32_vldm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5399,7 +5399,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100f00) == 0xec100a00) {
 		// vldm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vldm_T2) {
+		if (handler && handler->i32_vldm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5423,7 +5423,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff800e50) == 0xfe000a00) {
 		// vsel_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vsel_T1) {
+		if (handler && handler->i32_vsel_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5449,7 +5449,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100f00) == 0xec000b00) {
 		// vstm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vstm_T1) {
+		if (handler && handler->i32_vstm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5473,7 +5473,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100f00) == 0xec000a00) {
 		// vstm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vstm_T2) {
+		if (handler && handler->i32_vstm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = (opcode & 0xff);
@@ -5497,7 +5497,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000010) == 0xfe000000) {
 		// cdp2_T2
 		decoded_insn_length = 4;
-		if (handler->i32_cdp2_T2) {
+		if (handler && handler->i32_cdp2_T2) {
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRd = ((opcode & 0xf000) >> 12);
 			uint8_t CRn = ((opcode & 0xf0000) >> 16);
@@ -5519,7 +5519,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d0f0) == 0xf3b08020) {
 		// clrex_T1
 		decoded_insn_length = 4;
-		if (handler->i32_clrex_T1) {
+		if (handler && handler->i32_clrex_T1) {
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 clrex_T1 ", opcode);
 				fprintf(insn_debugging_info, "\t");
@@ -5529,7 +5529,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d0f0) == 0xf3b08050) {
 		// dmb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_dmb_T1) {
+		if (handler && handler->i32_dmb_T1) {
 			uint8_t option = (opcode & 0xf);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 dmb_T1 ", opcode);
@@ -5541,7 +5541,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d0f0) == 0xf3b08040) {
 		// dsb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_dsb_T1) {
+		if (handler && handler->i32_dsb_T1) {
 			uint8_t option = (opcode & 0xf);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 dsb_T1 ", opcode);
@@ -5553,7 +5553,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff0d0f0) == 0xf3b08060) {
 		// isb_T1
 		decoded_insn_length = 4;
-		if (handler->i32_isb_T1) {
+		if (handler && handler->i32_isb_T1) {
 			uint8_t option = (opcode & 0xf);
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 isb_T1 ", opcode);
@@ -5565,7 +5565,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe1f0000) == 0xec1f0000) {
 		// ldc_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldc_lit_T1) {
+		if (handler && handler->i32_ldc_lit_T1) {
 			uint8_t imm = (opcode & 0xff);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRd = ((opcode & 0xf000) >> 12);
@@ -5589,7 +5589,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf8500800) {
 		// ldr_imm_T4
 		decoded_insn_length = 4;
-		if (handler->i32_ldr_imm_T4) {
+		if (handler && handler->i32_ldr_imm_T4) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -5611,7 +5611,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf8100000) {
 		// ldrb_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrb_reg_T2) {
+		if (handler && handler->i32_ldrb_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -5629,7 +5629,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe500000) == 0xe8500000) {
 		// ldrd_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrd_imm_T1) {
+		if (handler && handler->i32_ldrd_imm_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rtx = ((opcode & 0xf00) >> 8);
@@ -5653,7 +5653,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf8b00000) {
 		// ldrh_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrh_imm_T2) {
+		if (handler && handler->i32_ldrh_imm_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -5669,7 +5669,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00fc0) == 0xf9100000) {
 		// ldrsb_reg_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsb_reg_T2) {
+		if (handler && handler->i32_ldrsb_reg_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t Rm = (opcode & 0xf);
@@ -5687,7 +5687,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e50) == 0xee300a00) {
 		// vadd_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vadd_T1) {
+		if (handler && handler->i32_vadd_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5711,7 +5711,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e50) == 0xee800a00) {
 		// vdiv_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vdiv_T1) {
+		if (handler && handler->i32_vdiv_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5735,7 +5735,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e50) == 0xeeb00a00) {
 		// vmov_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmov_imm_T1) {
+		if (handler && handler->i32_vmov_imm_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t imm = ((opcode & 0xf0000) >> 12) | (opcode & 0xf);
 			bool D = ((opcode & 0x400000) >> 22);
@@ -5753,7 +5753,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e50) == 0xee200a00) {
 		// vmul_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmul_T1) {
+		if (handler && handler->i32_vmul_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5777,7 +5777,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e50) == 0xee200a40) {
 		// vnmla_T2
 		decoded_insn_length = 4;
-		if (handler->i32_vnmla_T2) {
+		if (handler && handler->i32_vnmla_T2) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5801,7 +5801,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e50) == 0xee300a40) {
 		// vsub_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vsub_T1) {
+		if (handler && handler->i32_vsub_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5825,7 +5825,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf8d00000) {
 		// ldr_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_ldr_imm_T3) {
+		if (handler && handler->i32_ldr_imm_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -5841,7 +5841,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf8100e00) {
 		// ldrbt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrbt_T1) {
+		if (handler && handler->i32_ldrbt_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -5857,7 +5857,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00f00) == 0xf9100e00) {
 		// ldrsbt_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsbt_T1) {
+		if (handler && handler->i32_ldrsbt_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -5873,7 +5873,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xec400000) {
 		// mcrr_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mcrr_T1) {
+		if (handler && handler->i32_mcrr_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRm = (opcode & 0xf);
@@ -5893,7 +5893,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xec500000) {
 		// mrrc_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mrrc_T1) {
+		if (handler && handler->i32_mrrc_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRm = (opcode & 0xf);
@@ -5913,7 +5913,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe0d000) == 0xf3e08000) {
 		// mrs_T1
 		decoded_insn_length = 4;
-		if (handler->i32_mrs_T1) {
+		if (handler && handler->i32_mrs_T1) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t SYSm = (opcode & 0xff);
 			if (insn_debugging_info) {
@@ -5927,7 +5927,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffe0d000) == 0xf3808000) {
 		// msr_T1
 		decoded_insn_length = 4;
-		if (handler->i32_msr_T1) {
+		if (handler && handler->i32_msr_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t mask = ((opcode & 0xc00) >> 10);
 			uint8_t SYSm = (opcode & 0xff);
@@ -5943,7 +5943,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e10) == 0xeea00a00) {
 		// vfma_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vfma_T1) {
+		if (handler && handler->i32_vfma_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5969,7 +5969,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e10) == 0xee900a00) {
 		// vfnma_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vfnma_T1) {
+		if (handler && handler->i32_vfnma_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -5995,7 +5995,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e10) == 0xee000a00) {
 		// vmla_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vmla_T1) {
+		if (handler && handler->i32_vmla_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -6021,7 +6021,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xffb00e10) == 0xee100a00) {
 		// vnmla_T1
 		decoded_insn_length = 4;
-		if (handler->i32_vnmla_T1) {
+		if (handler && handler->i32_vnmla_T1) {
 			uint8_t Vd = ((opcode & 0xf000) >> 12);
 			uint8_t Vn = ((opcode & 0xf0000) >> 16);
 			uint8_t Vm = (opcode & 0xf);
@@ -6047,7 +6047,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff000010) == 0xee000000) {
 		// cdp_T1
 		decoded_insn_length = 4;
-		if (handler->i32_cdp_T1) {
+		if (handler && handler->i32_cdp_T1) {
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
 			uint8_t CRd = ((opcode & 0xf000) >> 12);
 			uint8_t CRn = ((opcode & 0xf0000) >> 16);
@@ -6069,7 +6069,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100000) == 0xec100000) {
 		// ldc_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldc_imm_T1) {
+		if (handler && handler->i32_ldc_imm_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
@@ -6095,7 +6095,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf8100800) {
 		// ldrb_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_ldrb_imm_T3) {
+		if (handler && handler->i32_ldrb_imm_T3) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -6117,7 +6117,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00800) == 0xf9100800) {
 		// ldrsb_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsb_imm_T2) {
+		if (handler && handler->i32_ldrsb_imm_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
@@ -6139,7 +6139,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfe100000) == 0xec000000) {
 		// stc_T1
 		decoded_insn_length = 4;
-		if (handler->i32_stc_T1) {
+		if (handler && handler->i32_stc_T1) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint8_t imm = (opcode & 0xff);
 			uint8_t coproc = ((opcode & 0xf00) >> 8);
@@ -6165,7 +6165,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbef8000) == 0xf1ad0000) {
 		// sub_SPimm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_sub_SPimm_T2) {
+		if (handler && handler->i32_sub_SPimm_T2) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint16_t imm = ((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff);
 			bool S = ((opcode & 0x100000) >> 20);
@@ -6181,7 +6181,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbf00f00) == 0xf1b00f00) {
 		// cmp_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_cmp_imm_T2) {
+		if (handler && handler->i32_cmp_imm_T2) {
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
 			if (insn_debugging_info) {
@@ -6195,7 +6195,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xff7f0000) == 0xf81f0000) {
 		// ldrb_lit_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrb_lit_T1) {
+		if (handler && handler->i32_ldrb_lit_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint16_t imm = (opcode & 0xfff);
 			bool U = ((opcode & 0x800000) >> 23);
@@ -6211,7 +6211,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf9900000) {
 		// ldrsb_imm_T1
 		decoded_insn_length = 4;
-		if (handler->i32_ldrsb_imm_T1) {
+		if (handler && handler->i32_ldrsb_imm_T1) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -6227,7 +6227,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfff00000) == 0xf8900000) {
 		// ldrb_imm_T2
 		decoded_insn_length = 4;
-		if (handler->i32_ldrb_imm_T2) {
+		if (handler && handler->i32_ldrb_imm_T2) {
 			uint8_t Rt = ((opcode & 0xf000) >> 12);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			uint16_t imm = (opcode & 0xfff);
@@ -6243,7 +6243,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xfbe08000) == 0xf1a00000) {
 		// sub_imm_T3
 		decoded_insn_length = 4;
-		if (handler->i32_sub_imm_T3) {
+		if (handler && handler->i32_sub_imm_T3) {
 			uint8_t Rd = ((opcode & 0xf00) >> 8);
 			uint8_t Rn = ((opcode & 0xf0000) >> 16);
 			int32_t imm = thumb_expand_imm(((opcode & 0x4000000) >> 15) | ((opcode & 0x7000) >> 4) | (opcode & 0xff));
@@ -6261,7 +6261,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf800d000) == 0xf0008000) {
 		// b_T3
 		decoded_insn_length = 4;
-		if (handler->i32_b_T3) {
+		if (handler && handler->i32_b_T3) {
 			int32_t imm = thumb_sign_extend20(((opcode & 0x4000000) >> 7) | ((opcode & 0x3f0000) >> 5) | (opcode & 0x7ff) | ((opcode & 0x2000) << 4) | ((opcode & 0x800) << 7));
 			uint8_t cond = ((opcode & 0x3c00000) >> 22);
 			if (insn_debugging_info) {
@@ -6275,7 +6275,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf800d000) == 0xf0009000) {
 		// b_T4
 		decoded_insn_length = 4;
-		if (handler->i32_b_T4) {
+		if (handler && handler->i32_b_T4) {
 			int32_t imm = thumb_sign_extend24_EOR(((opcode & 0x3ff0000) >> 5) | ((opcode & 0x4000000) >> 3) | (opcode & 0x7ff) | ((opcode & 0x2000) << 9) | ((opcode & 0x800) << 10));
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 b_T4 ", opcode);
@@ -6287,7 +6287,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & 0xf800d000) == 0xf000d000) {
 		// bl_T1
 		decoded_insn_length = 4;
-		if (handler->i32_bl_T1) {
+		if (handler && handler->i32_bl_T1) {
 			int32_t imm = thumb_sign_extend24_EOR(((opcode & 0x3ff0000) >> 5) | ((opcode & 0x4000000) >> 3) | (opcode & 0x7ff) | ((opcode & 0x2000) << 9) | ((opcode & 0x800) << 10));
 			if (insn_debugging_info) {
 				fprintf(insn_debugging_info, "Insn 0x%04x: 32 bl_T1 ", opcode);

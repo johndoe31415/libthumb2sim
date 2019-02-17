@@ -152,7 +152,7 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 		decode_insn(&insn_ctx, insnWord, &emulationCallbacks, NULL);
 	} else {
 		/* Skip instruction, decode to find out how long it is */
-		int length = decode_insn(&insn_ctx, insnWord, &decodeOnlyCallbacks, NULL);
+		int length = decode_insn(&insn_ctx, insnWord, NULL, NULL);
 		emu_ctx->cpu.reg[REG_PC] += length;
 	}
 

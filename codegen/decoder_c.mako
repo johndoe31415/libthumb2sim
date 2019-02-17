@@ -76,7 +76,7 @@ int decode_insn(void *vctx, uint32_t opcode, const struct decoding_handler_t *ha
 	} else if ((opcode & ${"%#x" % (opcode.bitfield.constantmask)}) == ${"%#x" % (opcode.bitfield.constantcmp)}) {
 		// ${opcode.name}
 		decoded_insn_length = ${len(opcode) // 8};
-		if (handler->i${len(opcode)}_${opcode.name}) {
+		if (handler && handler->i${len(opcode)}_${opcode.name}) {
 			%for (varname, variable) in opcode.itervars():
 			${variable.ctype()} ${varname} = ${variable.cexpression("opcode")};
 			%endfor
