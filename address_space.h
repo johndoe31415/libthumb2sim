@@ -29,7 +29,7 @@
 #include <thumb2sim.h>
 
 /*************** AUTO GENERATED SECTION FOLLOWS ***************/
-uint8_t *addrspace_memptr(struct addrspace_t *address_space, uint32_t address);
+uint8_t *addrspace_memptr(struct addrspace_t *address_space, uint32_t address, unsigned int length);
 uint8_t addrspace_read8(struct addrspace_t *address_space, uint32_t address);
 void addrspace_write8(struct addrspace_t *address_space, uint32_t address, uint8_t value);
 void addrspace_write16(struct addrspace_t *address_space, uint32_t address, uint16_t value);
