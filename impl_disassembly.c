@@ -79,7 +79,7 @@ static const char *regString(uint8_t aReg) {
 	}
 }
 
-static uint32_t relBranchTarget(uint32_t aPC, uint32_t aImmediate, uint8_t aImmBits) {
+static uint32_t relative_branch_target(uint32_t aPC, uint32_t aImmediate, uint8_t aImmBits) {
 	if (aImmediate >= (1 << (aImmBits - 1))) {
 		// Negative offset
 		return aPC - (4 + 2 * ((1 << aImmBits) - aImmediate)) + 8;
@@ -410,13 +410,13 @@ static void disassembly_i32_asr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8
 static void disassembly_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
 	struct disas_ctx_t *ctx = (struct disas_ctx_t*)vctx;
 	printOpcode(ctx, "b", OPCODE_NARROW | OPCODE_ISCONDITIONAL(cond));
-	ctx->printDisassembly(vctx, " 0x%x", relBranchTarget(ctx->pc, imm, 8));
+	ctx->printDisassembly(vctx, " 0x%x", relative_branch_target(ctx->pc, imm, 8));
 }
 
 static void disassembly_i16_b_T2(void *vctx, uint16_t imm) {
 	struct disas_ctx_t *ctx = (struct disas_ctx_t*)vctx;
 	printOpcode(ctx, "b", OPCODE_NARROW);
-	ctx->printDisassembly(vctx, " 0x%x", relBranchTarget(ctx->pc, imm, 11));
+	ctx->printDisassembly(vctx, " 0x%x", relative_branch_target(ctx->pc, imm, 11));
 }
 
 static void disassembly_i32_b_T3(void *vctx, int32_t imm, uint8_t cond) {
@@ -482,7 +482,7 @@ static void disassembly_i16_bx_T1(void *vctx, uint8_t Rm) {
 static void disassembly_i16_cbnz_T1(void *vctx, uint8_t Rn, uint8_t imm, bool op) {
 	struct disas_ctx_t *ctx = (struct disas_ctx_t*)vctx;
 	printOpcode(ctx, op ? "cbnz" : "cbz", 0);
-	ctx->printDisassembly(vctx, " %s, 0x%x", regString(Rn), relBranchTarget(ctx->pc, imm, 7));
+	ctx->printDisassembly(vctx, " %s, 0x%x", regString(Rn), relative_branch_target(ctx->pc, imm, 7));
 }
 
 static void disassembly_i32_cdp2_T2(void *vctx, uint8_t coproc, uint8_t CRd, uint8_t CRn, uint8_t CRm, uint8_t opcA, uint8_t opcB) {

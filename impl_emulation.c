@@ -38,7 +38,7 @@
 #define OPCODE_FORCE_CONDITION			(1 << 4)
 #define OPCODE_ISCONDITIONAL(cond)		(OPCODE_FORCE_CONDITION | (((cond) & 0xf) << 8))
 
-static uint32_t relBranchTarget(uint32_t aPC, uint32_t aImmediate, uint8_t aImmBits) {
+static uint32_t relative_branch_target(uint32_t aPC, uint32_t aImmediate, uint8_t aImmBits) {
 	if (aImmediate >= (1 << (aImmBits - 1))) {
 		// Negative offset
 		return aPC - (4 + 2 * ((1 << aImmBits) - aImmediate)) + 8;
@@ -47,25 +47,25 @@ static uint32_t relBranchTarget(uint32_t aPC, uint32_t aImmediate, uint8_t aImmB
 	}
 }
 
-struct barrel_shifterOutput {
+struct barrelshifter_output_t {
 	uint32_t value;
 	bool carry;
 };
 
-static struct barrel_shifterOutput barrel_shift(uint32_t aInValue, uint8_t aType, uint8_t aImm) {
-	struct barrel_shifterOutput outValue;
+static struct barrelshifter_output_t barrel_shift(uint32_t in_value, uint8_t aType, uint8_t aImm) {
+	struct barrelshifter_output_t outValue;
 	outValue.carry = false;
 	if (aType == TYPE_LSL) {
-		outValue.carry = aInValue & 0x80000000;
-		outValue.value = aInValue << aImm;
+		outValue.carry = in_value & 0x80000000;
+		outValue.value = in_value << aImm;
 	} else if (aType == TYPE_LSR) {
-		outValue.carry = aInValue & (1 << (aImm - 1));
-		outValue.value = aInValue >> aImm;
+		outValue.carry = in_value & (1 << (aImm - 1));
+		outValue.value = in_value >> aImm;
 	} else if (aType == TYPE_ROR) {
 		/* ROR */
 		uint32_t loMask = (1 << aImm) - 1;
 		uint32_t hiMask = ~loMask;
-		outValue.value = ((aInValue & loMask) << (32 - aImm)) | ((aInValue & hiMask) >> aImm);
+		outValue.value = ((in_value & loMask) << (32 - aImm)) | ((in_value & hiMask) >> aImm);
 	} else {
 		outValue.value = 0xabcdef;
 	}
@@ -304,7 +304,7 @@ static void emulation_i16_add_reg_T2(void *vctx, uint8_t Rdn, uint8_t Rm) {
 
 static void emulation_i32_add_reg_T3(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 	if (S) {
 		setAddCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rn], bsOut.value);
 	}
@@ -347,7 +347,7 @@ static void emulation_i16_and_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 static void emulation_i32_and_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (Rd != REG_PC) {
-		struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+		struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] & bsOut.value;
 		if (S) {
 			setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd]);
@@ -380,7 +380,7 @@ static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 
 	if (condSatisfied(ctx, cond)) {
-		ctx->emu_ctx->cpu.reg[REG_PC] = relBranchTarget(ctx->emu_ctx->cpu.reg[REG_PC], imm, 8);
+		ctx->emu_ctx->cpu.reg[REG_PC] = relative_branch_target(ctx->emu_ctx->cpu.reg[REG_PC], imm, 8);
 	} else {
 		ctx->emu_ctx->cpu.reg[REG_PC] += 2;
 	}
@@ -388,7 +388,7 @@ static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
 
 static void emulation_i16_b_T2(void *vctx, uint16_t imm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	ctx->emu_ctx->cpu.reg[REG_PC] = relBranchTarget(ctx->emu_ctx->cpu.reg[REG_PC], imm, 11);
+	ctx->emu_ctx->cpu.reg[REG_PC] = relative_branch_target(ctx->emu_ctx->cpu.reg[REG_PC], imm, 11);
 }
 
 static void emulation_i32_b_T3(void *vctx, int32_t imm, uint8_t cond) {
@@ -430,7 +430,7 @@ static void emulation_i16_bic_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 static void emulation_i32_bic_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	if (Rd != REG_PC) {
-		struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+		struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] & ~bsOut.value;
 		if (S) {
 			setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd]);
@@ -494,7 +494,7 @@ static void emulation_i16_cbnz_T1(void *vctx, uint8_t Rn, uint8_t imm, bool op) 
 
 	if ((ctx->emu_ctx->cpu.reg[Rn] == 0) ^ op) {
 		/* Branch */
-		ctx->emu_ctx->cpu.reg[REG_PC] = relBranchTarget(ctx->emu_ctx->cpu.reg[REG_PC], imm, 7);
+		ctx->emu_ctx->cpu.reg[REG_PC] = relative_branch_target(ctx->emu_ctx->cpu.reg[REG_PC], imm, 7);
 	} else {
 		/* Do not branch */
 		ctx->emu_ctx->cpu.reg[REG_PC] += 2;
@@ -605,7 +605,7 @@ static void emulation_i32_eor_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 
 	if (Rd != REG_PC) {
-		struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+		struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] ^ bsOut.value;
 		if (S) {
 			setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd]);
@@ -781,7 +781,7 @@ static void emulation_i32_ldrb_reg_T2(void *vctx, uint8_t Rt, uint8_t Rn, uint8_
 	uint32_t target = ctx->emu_ctx->cpu.reg[Rn] + ctx->emu_ctx->cpu.reg[Rm];
 	uint32_t value = addrspace_read8(&ctx->emu_ctx->addr_space, target);
 	if (imm) {
-		struct barrel_shifterOutput bsOut = barrel_shift(value, TYPE_LSL, imm);
+		struct barrelshifter_output_t bsOut = barrel_shift(value, TYPE_LSL, imm);
 		value = bsOut.value;
 	}
 	ctx->emu_ctx->cpu.reg[Rt] = value;
@@ -916,7 +916,7 @@ static void emulation_i16_lsl_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 
 static void emulation_i32_lsl_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], TYPE_LSL, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], TYPE_LSL, imm);
 	ctx->emu_ctx->cpu.reg[Rd] = bsOut.value;
 	if (S) {
 		setLslCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd], bsOut.carry);
@@ -926,7 +926,7 @@ static void emulation_i32_lsl_imm_T2(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t
 
 static void emulation_i16_lsl_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rdn], TYPE_LSL, ctx->emu_ctx->cpu.reg[Rm]);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rdn], TYPE_LSL, ctx->emu_ctx->cpu.reg[Rm]);
 	ctx->emu_ctx->cpu.reg[Rdn] = bsOut.value;
 	setLslCondCode(ctx, false, ctx->emu_ctx->cpu.reg[Rdn], bsOut.carry);
 	ctx->emu_ctx->cpu.reg[REG_PC] += 2;
@@ -935,7 +935,7 @@ static void emulation_i16_lsl_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 static void emulation_i32_lsl_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, bool S) {
 	// TODO: Rn/Rm vertauscht?
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], TYPE_LSL, ctx->emu_ctx->cpu.reg[Rn]);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], TYPE_LSL, ctx->emu_ctx->cpu.reg[Rn]);
 	ctx->emu_ctx->cpu.reg[Rd] = bsOut.value;
 	if (S) {
 		setLslCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd], bsOut.carry);
@@ -1100,7 +1100,7 @@ static void emulation_i16_mvn_reg_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
 
 static void emulation_i32_mvn_reg_T2(void *vctx, uint8_t Rd, uint8_t Rm, int32_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 	ctx->emu_ctx->cpu.reg[Rd] = ~bsOut.value;
 	if (S) {
 		setMovCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd]);
@@ -1144,7 +1144,7 @@ static void emulation_i16_orr_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 
 static void emulation_i32_orr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 	if (Rn != 0x0f) {
 		ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] | bsOut.value;
 	} else {
@@ -1248,7 +1248,7 @@ static void emulation_i32_revsh_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
 
 static void emulation_i32_ror_imm_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], TYPE_ROR, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], TYPE_ROR, imm);
 	ctx->emu_ctx->cpu.reg[Rd] = bsOut.value;
 	if (S) {
 		setLslCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd], bsOut.carry);
@@ -1283,7 +1283,7 @@ static void emulation_i32_rsb_imm_T2(void *vctx, uint8_t Rd, uint8_t Rn, int32_t
 
 static void emulation_i32_rsb_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 	if (S) {
 		setSubCondCode(ctx, true, bsOut.value, ctx->emu_ctx->cpu.reg[Rn]);
 	}
@@ -1537,7 +1537,7 @@ static void emulation_i16_sub_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 
 static void emulation_i32_sub_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	struct barrel_shifterOutput bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
 	if (S) {
 		setSubCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rn], bsOut.value);
 	}
@@ -1666,7 +1666,7 @@ static void emulation_i32_yield_T2(void *vctx) {
 	fprintf(stderr, "Instruction not implemented: i32_yield_T2\n");
 }
 
-const struct decoding_handler_t emulationCallbacks = {
+const struct decoding_handler_t emulation_callbacks = {
 	.i32_adc_imm_T1 = emulation_i32_adc_imm_T1,
 	.i16_adc_reg_T1 = emulation_i16_adc_reg_T1,
 	.i32_adc_reg_T2 = emulation_i32_adc_reg_T2,

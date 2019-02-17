@@ -34,6 +34,6 @@ struct insn_emu_ctx_t {
 
 bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *ctx);
 extern const struct decoding_handler_t decodeOnlyCallbacks;
-extern const struct decoding_handler_t emulationCallbacks;
+extern const struct decoding_handler_t emulation_callbacks;
 
 #endif

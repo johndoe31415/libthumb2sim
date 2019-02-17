@@ -112,7 +112,7 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 		.count_next_insn = true,
 		.shift_insn_it_state = true,
 	};
-	uint32_t insnWord = addrspace_read_insn_word(&emu_ctx->addr_space, emu_ctx->cpu.reg[REG_PC]);
+	uint32_t insn_word = addrspace_read_insn_word(&emu_ctx->addr_space, emu_ctx->cpu.reg[REG_PC]);
 
 #if 0
 	if (instructionDebug) {
@@ -124,11 +124,11 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 			.disasBuffer = { 0 }
 		};
 		FILE *decodeInfos = instructionDebug ? stderr : NULL;
-		decode_insn(&disasCtx, insnWord, &disassemblyCallbacks, decodeInfos);
+		decode_insn(&disasCtx, insn_word, &disassemblyCallbacks, decodeInfos);
 		if (disasCtx.disasBuffer[0] == 0) {
 			fprintf(stderr, "Warning: Cannot disassemble instruction at 0x%x\n", ctx->cpu->reg[REG_PC]);
 			if (!instructionDebug) {
-				decode_insn(&disasCtx, insnWord, &disassemblyCallbacks, stderr);
+				decode_insn(&disasCtx, insn_word, &disassemblyCallbacks, stderr);
 			}
 		}
 		if (instructionDebug) {
@@ -149,10 +149,10 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 #endif
 
 	if (conditionallyExecuteInstruction(&insn_ctx)) {
-		decode_insn(&insn_ctx, insnWord, &emulationCallbacks, NULL);
+		decode_insn(&insn_ctx, insn_word, &emulation_callbacks, NULL);
 	} else {
 		/* Skip instruction, decode to find out how long it is */
-		int length = decode_insn(&insn_ctx, insnWord, NULL, NULL);
+		int length = decode_insn(&insn_ctx, insn_word, NULL, NULL);
 		emu_ctx->cpu.reg[REG_PC] += length;
 	}
 
