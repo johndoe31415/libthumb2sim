@@ -30,6 +30,7 @@ struct insn_emu_ctx_t {
 	struct emu_ctx_t *emu_ctx;
 	bool count_next_insn;
 	bool shift_insn_it_state;
+	bool advance_pc;
 };
 
 bool emulator_should_exec_next_insn(const struct insn_emu_ctx_t *ctx);

@@ -53,17 +53,13 @@ static const char *register_name[] = {
 	[REG_PC] = "pc",
 };
 
-#if 0
-static void printDisassemblyCallback(struct disas_ctx_t *ctx, const char *aMsg, ...) {
+static void print_disas_callback(struct disas_ctx_t *ctx, const char *msg, ...) {
 	va_list ap;
-	va_start(ap, aMsg);
+	va_start(ap, msg);
 	int l = strlen(ctx->disasBuffer);
-	vsnprintf(ctx->disasBuffer + l, 128 - l, aMsg, ap);
+	vsnprintf(ctx->disasBuffer + l, 128 - l, msg, ap);
 	va_end(ap);
 }
-#endif
-
-
 
 void cpu_print_state(const struct emu_ctx_t *emu_ctx) {
 	for (int i = 0; i < 16; i++) {
@@ -106,54 +102,55 @@ static uint32_t addrspace_read_insn_word(struct addrspace_t *addr_space, uint32_
 	return (addrspace_read16(addr_space, pc) << 16) | addrspace_read16(addr_space, pc + 2);
 }
 
+static void cpu_debug_insn(struct emu_ctx_t *emu_ctx, uint32_t insn_word) {
+	struct disas_ctx_t disasCtx = {
+		.pc = emu_ctx->cpu.reg[REG_PC],
+		.it_state = emu_ctx->cpu.it_state,
+		.it_cond = emu_ctx->cpu.it_cond,
+		.printDisassembly = print_disas_callback,
+		.disasBuffer = { 0 }
+	};
+
+	decode_insn(&disasCtx, insn_word, &disassemblyCallbacks, emu_ctx->debug_instruction_decoding ? stderr : NULL);
+	if (disasCtx.disasBuffer[0] == 0) {
+		fprintf(stderr, "Warning: Cannot disassemble instruction 0x%08x at 0x%x\n", insn_word, emu_ctx->cpu.reg[REG_PC]);
+		if (!emu_ctx->debug_instruction_decoding) {
+			/* Even if we don't decode by default, when we cannot disassemble,
+			 * decode again to print information about decoding */
+			decode_insn(&disasCtx, insn_word, &disassemblyCallbacks, stderr);
+		}
+	}
+	fprintf(stderr, "\n");
+	fprintf(stderr, "< %5d %8x: %-30s [sp=%x] ", 1 + emu_ctx->cpu.insn_ctr, emu_ctx->cpu.reg[REG_PC], disasCtx.disasBuffer, emu_ctx->cpu.reg[REG_SP]);
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_NEGATIVE) ? 'N' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_ZERO) ? 'Z' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_CARRY) ? 'C' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_OVERFLOW) ? 'V' : ' ');
+	fprintf(stderr, "%c", (emu_ctx->cpu.psr & FLAG_SATURATION) ? 'Q' : ' ');
+	fprintf(stderr, "\n");
+}
+
 void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 	struct insn_emu_ctx_t insn_ctx = {
 		.emu_ctx = emu_ctx,
 		.count_next_insn = true,
 		.shift_insn_it_state = true,
+		.advance_pc = true,
 	};
 	uint32_t insn_word = addrspace_read_insn_word(&emu_ctx->addr_space, emu_ctx->cpu.reg[REG_PC]);
 
-#if 0
-	if (instructionDebug) {
-		struct disas_ctx_t disasCtx = {
-			.pc = ctx->cpu->reg[REG_PC],
-			.it_state = ctx->cpu->it_state,
-			.it_cond = ctx->cpu->it_cond,
-			.printDisassembly = printDisassemblyCallback,
-			.disasBuffer = { 0 }
-		};
-		FILE *decodeInfos = instructionDebug ? stderr : NULL;
-		decode_insn(&disasCtx, insn_word, &disassemblyCallbacks, decodeInfos);
-		if (disasCtx.disasBuffer[0] == 0) {
-			fprintf(stderr, "Warning: Cannot disassemble instruction at 0x%x\n", ctx->cpu->reg[REG_PC]);
-			if (!instructionDebug) {
-				decode_insn(&disasCtx, insn_word, &disassemblyCallbacks, stderr);
-			}
-		}
-		if (instructionDebug) {
-			fprintf(stderr, "\n");
-		}
-		fprintf(stderr, "< %5d %8x: %-30s [sp=%x] ", 1 + ctx->cpu->insn_ctr, ctx->cpu->reg[REG_PC], disasCtx.disasBuffer, ctx->cpu->reg[REG_SP]);
-		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_NEGATIVE) ? 'N' : ' ');
-		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_ZERO) ? 'Z' : ' ');
-		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_CARRY) ? 'C' : ' ');
-		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_OVERFLOW) ? 'V' : ' ');
-		fprintf(stderr, "%c", (ctx->cpu->psr & FLAG_SATURATION) ? 'Q' : ' ');
-		fprintf(stderr, "\n");
-
-		if (instructionDebug) {
-			cpu_dump_state(ctx->cpu);
-		}
+	if (emu_ctx->print_disassembly) {
+		cpu_debug_insn(emu_ctx, insn_word);
 	}
-#endif
 
-	if (emulator_should_exec_next_insn(&insn_ctx)) {
-		decode_insn(&insn_ctx, insn_word, &emulation_callbacks, NULL);
-	} else {
-		/* Skip instruction, decode to find out how long it is */
-		int length = decode_insn(&insn_ctx, insn_word, NULL, NULL);
-		emu_ctx->cpu.reg[REG_PC] += length;
+	/* Determine if execution of next instruction is unconditional or
+	 * conditions are satisfied to execute */
+	bool should_execute = emulator_should_exec_next_insn(&insn_ctx);
+
+	int insn_length = decode_insn(&insn_ctx, insn_word, should_execute ? &emulation_callbacks : NULL, NULL);
+	if (insn_ctx.advance_pc) {
+		/* Unless we branch, we just regularly advance the PC */
+		emu_ctx->cpu.reg[REG_PC] += insn_length;
 	}
 
 	if (insn_ctx.count_next_insn) {

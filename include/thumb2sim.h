@@ -134,6 +134,8 @@ struct emu_ctx_t {
 	syscall_read_t emulator_syscall_read;
 	syscall_write_t emulator_syscall_write;
 	syscall_puts_t emulator_syscall_puts;
+	bool print_disassembly;
+	bool debug_instruction_decoding;
 	void *user;
 };
 
