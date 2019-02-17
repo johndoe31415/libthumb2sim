@@ -91,4 +91,6 @@ Here's a incomplete list of questions/TODOs that I see for this:
 libthumb2sim is licensed under the GNU GPL-3. It currently includes a copy of
 the RSA Labs MD5 implementation, which is covered under its own license (see
 file headers). The code generator uses the fantastic Toy Parser Generator
-(tpg), also distributed under its own license.
+(tpg), also distributed under its own license. The MD5 implementation in the
+Cortex-M code is the public domain implementation by Alexander Peslyak (Solar
+Designer).

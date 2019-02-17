@@ -7,19 +7,26 @@ CFLAGS += -g -D_XOPEN_SOURCE=500
 
 LDFLAGS := -Tstm32f407.ld
 
-OBJS := cm4test.o ivt.o emu_syscall.o
-TARGETS := cm4test cm4test.bin
+OBJS := ivt.o emu_syscall.o md5.o boilerplate.o
+TARGETS := simple_test.bin md5_test.bin
 
 all: $(TARGETS)
 
 clean:
 	rm -f $(OBJS) $(TARGETS)
+	rm -f simple_test md5_test
 
-cm4test: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+simple_test: $(OBJS)
+	$(CC) $(CFLAGS) -o $@ simple_test.c $^ $(LDFLAGS)
 
-cm4test.bin: cm4test
+simple_test.bin: simple_test
 	$(OBJCOPY) -O binary $< $@
+
+md5_test.bin: md5_test
+	$(OBJCOPY) -O binary $< $@
+
+md5_test: $(OBJS)
+	$(CC) $(CFLAGS) -o $@ md5_test.c $^ $(LDFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<

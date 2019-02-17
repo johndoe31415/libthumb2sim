@@ -7,6 +7,8 @@ LDFLAGS := -L.. -lthumb2sim
 
 OBJS := thumb2sim.o
 TARGETS := thumb2sim
+TEST_IMG := ../cm4test/simple_test.bin
+#TEST_IMG := ../cm4test/md5_test.bin
 
 all: $(TARGETS)
 
@@ -14,10 +16,10 @@ clean:
 	rm -f $(OBJS) $(TARGETS)
 
 test: all
-	./thumb2sim ../cm4test/cm4test.bin
+	./thumb2sim $(TEST_IMG)
 
 gdb: all
-	gdb --args ./thumb2sim ../cm4test/cm4test.bin
+	gdb --args ./thumb2sim $(TEST_IMG)
 
 thumb2sim: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
