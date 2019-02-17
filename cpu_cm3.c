@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "cpu_cm3.h"
 #include "address_space.h"
@@ -84,18 +85,39 @@ void cpu_print_memory(struct emu_ctx_t *emu_ctx, uint32_t address, unsigned int 
 }
 
 void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const char *filename) {
-	FILE *f = fopen(filename, "w");
-	if (!f) {
-		perror(filename);
-		return;
+	for (unsigned int i = 0; i < emu_ctx->addr_space.slice_cnt; i++) {
+		const struct address_slice_t *slice = &emu_ctx->addr_space.slices[i];
+		if (!slice->read_only && !slice->shadow_mapping) {
+			char full_filename[256];
+			snprintf(full_filename, sizeof(full_filename), "%s/%s.bin", filename, slice->name);
+
+			FILE *f = fopen(full_filename, "wb");
+			if (f) {
+				if (fwrite(slice->data, slice->end - slice->begin, 1, f) != 1) {
+					fprintf(stderr, "%s: short write (%s)\n", full_filename, strerror(errno));
+				}
+				fclose(f);
+			} else {
+				perror(full_filename);
+			}
+		}
 	}
-#if 0
-	const uint8_t *data = addrspace_memptr(&emu_ctx->addr_space, RAM_BASE);
-	if (fwrite(data, RAM_SIZE, 1, f) != 1) {
-		perror("fwrite");
+
+	char full_filename[256];
+	snprintf(full_filename, sizeof(full_filename), "%s/cpu.json", filename);
+	FILE *f = fopen(full_filename, "wb");
+	if (f) {
+		fprintf(f, "{\n");
+		fprintf(f, "	\"regs\":\n");
+		for (int i = 0; i < 16; i++) {
+			fprintf(f, "		\"r%d\": %u%s\n", i, emu_ctx->cpu.reg[i], i == 15 ? "" : ",");
+		}
+		fprintf(f, "	}\n");
+		fprintf(f, "}\n");
+		fclose(f);
+	} else {
+		perror(full_filename);
 	}
-#endif
-	fclose(f);
 }
 
 static uint32_t addrspace_read_insn_word(struct addrspace_t *addr_space, uint32_t pc) {

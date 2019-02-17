@@ -30,7 +30,7 @@
 #define MAX_ADDRESS_SLICES		4
 
 enum emu_dump_t {
-	FOO
+	MULTI_FILE_RW_MEMORY
 };
 
 struct address_slice_t {

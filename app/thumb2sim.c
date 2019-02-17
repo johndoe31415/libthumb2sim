@@ -75,8 +75,9 @@ static void syscall_puts(struct emu_ctx_t *emu_ctx, const char *msg) {
 }
 
 static void syscall_exit(struct emu_ctx_t *emu_ctx, uint32_t status) {
+	struct user_ctx_t *usr = (struct user_ctx_t*)emu_ctx->user;
 	fprintf(stderr, "Emulation exit with status: %d\n", status);
-	exit(status);
+	usr->end_emulation = true;
 }
 
 int main(int argc, char **argv) {
@@ -109,8 +110,11 @@ int main(int argc, char **argv) {
 	emu_ctx->user = &user;
 
 	cpu_print_state(emu_ctx);
+
 	cpu_run(emu_ctx);
 	cpu_print_state(emu_ctx);
+	//cpu_dump_file(emu_ctx, MULTI_FILE_RW_MEMORY, "/tmp");
+
 	free_cortexm(emu_ctx);
 	return 0;
 }
