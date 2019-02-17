@@ -67,6 +67,56 @@ and 12257489 are chosen. The guest then computes (12345 + x + y) and writes the
 75844 + 12257489 + 12345 = 12345678.  This is a simple but powerful mechanism
 to exchange data between host and guest in both directions.
 
+There's also a more sophisticated example included that computes the MD5 over
+the string "foobar". Note however that I had to quickly implement some opcodes
+that older gcc versions never produced, so this is very much ad-hoc and
+untested -- hence the warnings:
+
+```
+(t2sim) $ echo foobar | md5sum
+14758f1afd44c09b7992073ccf00b43d  -
+(t2sim) $ app/thumb2sim cm4test/md5_test.bin
+Added memory "rom": at 0x8000000 len 0x100000 read_only=true shadow_mapping=false
+Added memory "ram": at 0x20000000 len 0x20000 read_only=false shadow_mapping=false
+r0  =        0    r1  =        0    r2  =        0    r3  =        0    
+r4  =        0    r5  =        0    r6  =        0    r7  =        0    
+r8  =        0    r9  =        0    r10 =        0    r11 =        0    
+r12 =        0    sp  = 20020000    lr  =        0    pc  =  800029c    
+PSR =      173    >     <
+
+Guest puts: "Computing MD5 on the Cortex-M"
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation error at emulation_i32_bfi_T1 / impl_emulation.c:405 -- instruction not fully implemented (condition codes unset), not properly tested
+Emulation warning at emulation_i32_sub_imm_T4 / impl_emulation.c:1454 -- not properly tested (pure guesswork)
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_sub_imm_T4 / impl_emulation.c:1454 -- not properly tested (pure guesswork)
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Emulation warning at emulation_i32_orn_reg_T1 / impl_emulation.c:1081 -- not properly tested
+Guest write: 16 bytes: 14 75 8f 1a fd 44 c0 9b 79 92 07 3c cf 00 b4 3d 
+Emulation exit with status: 0
+```
+
+As you can see, it properly computes the MD5SUM!
+
 ## ISA Code Generator
 In order to automate writing the Thumb-2 ISA decoder, I specified the ISA as a
 machine-readable XML file that closely looks like the specification in the
