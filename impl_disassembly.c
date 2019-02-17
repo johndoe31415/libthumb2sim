@@ -555,7 +555,7 @@ static void disassembly_i16_cps_T1(void *vctx, bool imm, bool F, bool I) {
 	printOpcode(ctx, (imm == 0) ? "cpsie" : "cpsid", 0);
 	if (I || F) {
 		ctx->printDisassembly(vctx, " ");
-	}	
+	}
 	if (I) {
 		ctx->printDisassembly(vctx, "i");
 	}
@@ -606,7 +606,7 @@ static void disassembly_i32_isb_T1(void *vctx, uint8_t option) {
 
 static void disassembly_i16_it_T1(void *vctx, uint8_t firstcond, uint8_t mask) {
 	struct disas_ctx_t *ctx = (struct disas_ctx_t*)vctx;
-	
+
 	int len = 3;
 	for (int i = 0; i < 3; i++) {
 		if (mask & (1 << i)) {
@@ -1193,7 +1193,7 @@ static void disassembly_i32_rrx_T1(void *vctx, uint8_t Rd, uint8_t Rm, bool S) {
 static void disassembly_i16_rsb_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn) {
 	struct disas_ctx_t *ctx = (struct disas_ctx_t*)vctx;
 	printOpcode(ctx, "neg", OPCODE_SETFLAGS_IF_UNCOND);
-	print_rr(ctx, Rd, Rn);	
+	print_rr(ctx, Rd, Rn);
 }
 
 static void disassembly_i32_rsb_imm_T2(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
@@ -1266,7 +1266,7 @@ static void disassembly_i32_stm_T2(void *vctx, uint8_t Rn, uint16_t register_lis
 	if (M) {
 		register_list |= 1 << REG_LR;
 	}
-	
+
 	printOpcode(ctx, "stmia", OPCODE_WIDE);
 	ctx->printDisassembly(vctx, " %s%s,", regString(Rn), W ? "!" : "");
 	print_reglist(vctx, register_list);
@@ -1584,7 +1584,6 @@ static void disassembly_i32_yield_T2(void *vctx) {
 	struct disas_ctx_t *ctx = (struct disas_ctx_t*)vctx;
 	printOpcode(ctx, "yield", OPCODE_WIDE);
 }
-
 
 const struct decoding_handler_t disassemblyCallbacks = {
 	.i32_adc_imm_T1 = disassembly_i32_adc_imm_T1,

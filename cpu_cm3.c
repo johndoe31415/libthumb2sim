@@ -148,7 +148,7 @@ void cpu_single_step(struct emu_ctx_t *emu_ctx) {
 	}
 #endif
 
-	if (conditionallyExecuteInstruction(&insn_ctx)) {
+	if (emulator_should_exec_next_insn(&insn_ctx)) {
 		decode_insn(&insn_ctx, insn_word, &emulation_callbacks, NULL);
 	} else {
 		/* Skip instruction, decode to find out how long it is */

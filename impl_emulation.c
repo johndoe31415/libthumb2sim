@@ -114,7 +114,7 @@ static void setCondCode(const struct insn_emu_ctx_t *insn_emu_ctx, uint32_t valu
 	insn_emu_ctx->emu_ctx->cpu.psr |= value;
 }
 
-static bool condSatisfied(const struct insn_emu_ctx_t *insn_emu_ctx, uint8_t aCond) {
+static bool cond_satisfied(const struct insn_emu_ctx_t *insn_emu_ctx, uint8_t aCond) {
 	switch (aCond) {
 		case CONDITION_EQ:	return (insn_emu_ctx->emu_ctx->cpu.psr & FLAG_ZERO) == FLAG_ZERO;
 		case CONDITION_NE:	return (insn_emu_ctx->emu_ctx->cpu.psr & FLAG_ZERO) == 0;
@@ -135,16 +135,15 @@ static bool condSatisfied(const struct insn_emu_ctx_t *insn_emu_ctx, uint8_t aCo
 	return true;
 }
 
-bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *insn_emu_ctx) {
-	uint8_t currentItState = (insn_emu_ctx->emu_ctx->cpu.it_state & 0x03);
-	bool doExecute = (currentItState == IT_NONE)
-					|| ((currentItState == IT_THEN) && (condSatisfied(insn_emu_ctx, insn_emu_ctx->emu_ctx->cpu.it_cond)))
-					|| ((currentItState == IT_ELSE) && (condSatisfied(insn_emu_ctx, insn_emu_ctx->emu_ctx->cpu.it_cond ^ 1)));
-//	fprintf(stderr, "doExecute %d currentItState %x  ", doExecute, currentItState);
-	return doExecute;
+bool emulator_should_exec_next_insn(const struct insn_emu_ctx_t *insn_emu_ctx) {
+	uint8_t current_it_state = (insn_emu_ctx->emu_ctx->cpu.it_state & 0x03);
+	bool execute_insn = (current_it_state == IT_NONE)
+					|| ((current_it_state == IT_THEN) && (cond_satisfied(insn_emu_ctx, insn_emu_ctx->emu_ctx->cpu.it_cond)))
+					|| ((current_it_state == IT_ELSE) && (cond_satisfied(insn_emu_ctx, insn_emu_ctx->emu_ctx->cpu.it_cond ^ 1)));
+	return execute_insn;
 }
 
-static bool executionIsUnconditional(const struct insn_emu_ctx_t *insn_emu_ctx) {
+static bool emulator_execution_unconditionally(const struct insn_emu_ctx_t *insn_emu_ctx) {
 	return (insn_emu_ctx->emu_ctx->cpu.it_state & 0x03) == IT_NONE;
 }
 
@@ -177,27 +176,27 @@ static uint32_t movCondCode(uint32_t aX) {
 }
 
 static void setMovCondCode(const struct insn_emu_ctx_t *insn_emu_ctx, bool always_set, uint32_t value) {
-	if (always_set || executionIsUnconditional(insn_emu_ctx)) {
+	if (always_set || emulator_execution_unconditionally(insn_emu_ctx)) {
 		insn_emu_ctx->emu_ctx->cpu.psr &= ~(FLAG_NEGATIVE | FLAG_ZERO);
 		insn_emu_ctx->emu_ctx->cpu.psr |= movCondCode(value);
 	}
 }
 
 static void setLslCondCode(const struct insn_emu_ctx_t *insn_emu_ctx, bool always_set, uint32_t value, bool aCarry) {
-	if (always_set || executionIsUnconditional(insn_emu_ctx)) {
+	if (always_set || emulator_execution_unconditionally(insn_emu_ctx)) {
 		insn_emu_ctx->emu_ctx->cpu.psr &= ~(FLAG_NEGATIVE | FLAG_ZERO | FLAG_CARRY);
 		insn_emu_ctx->emu_ctx->cpu.psr |= movCondCode(value) | (aCarry ? FLAG_CARRY : 0);
 	}
 }
 
 static void setSubCondCode(const struct insn_emu_ctx_t *insn_emu_ctx, bool always_set, uint32_t valueA, uint32_t valueB) {
-	if (always_set || executionIsUnconditional(insn_emu_ctx)) {
+	if (always_set || emulator_execution_unconditionally(insn_emu_ctx)) {
 		setCondCode(insn_emu_ctx, subCondCode(valueA, valueB));
 	}
 }
 
 static void setAddCondCode(const struct insn_emu_ctx_t *insn_emu_ctx, bool always_set, uint32_t valueA, uint32_t valueB) {
-	if (always_set || executionIsUnconditional(insn_emu_ctx)) {
+	if (always_set || emulator_execution_unconditionally(insn_emu_ctx)) {
 		setCondCode(insn_emu_ctx, addCondCode(valueA, valueB));
 	}
 }
@@ -379,7 +378,7 @@ static void emulation_i32_asr_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 static void emulation_i16_b_T1(void *vctx, uint8_t imm, uint8_t cond) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 
-	if (condSatisfied(ctx, cond)) {
+	if (cond_satisfied(ctx, cond)) {
 		ctx->emu_ctx->cpu.reg[REG_PC] = relative_branch_target(ctx->emu_ctx->cpu.reg[REG_PC], imm, 8);
 	} else {
 		ctx->emu_ctx->cpu.reg[REG_PC] += 2;
@@ -394,7 +393,7 @@ static void emulation_i16_b_T2(void *vctx, uint16_t imm) {
 static void emulation_i32_b_T3(void *vctx, int32_t imm, uint8_t cond) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 
-	if (condSatisfied(ctx, cond)) {
+	if (cond_satisfied(ctx, cond)) {
 		ctx->emu_ctx->cpu.reg[REG_PC] = ctx->emu_ctx->cpu.reg[REG_PC] + 2 * imm + 4;
 	} else {
 		ctx->emu_ctx->cpu.reg[REG_PC] += 4;

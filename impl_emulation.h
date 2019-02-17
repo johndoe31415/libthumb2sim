@@ -27,13 +27,12 @@
 #include <thumb2sim.h>
 
 struct insn_emu_ctx_t {
-	struct emu_ctx_t *emu_ctx;	
+	struct emu_ctx_t *emu_ctx;
 	bool count_next_insn;
 	bool shift_insn_it_state;
 };
 
-bool conditionallyExecuteInstruction(const struct insn_emu_ctx_t *ctx);
-extern const struct decoding_handler_t decodeOnlyCallbacks;
+bool emulator_should_exec_next_insn(const struct insn_emu_ctx_t *ctx);
 extern const struct decoding_handler_t emulation_callbacks;
 
 #endif
