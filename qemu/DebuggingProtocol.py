@@ -29,8 +29,6 @@ import queue
 import collections
 
 class DebuggingProtocolResponse(object):
-	_MAX_MEMREQUEST_CHUNK = 2048
-
 	def __init__(self, success, data, rx_cksum):
 		self._success = success
 		self._data = data
@@ -89,8 +87,8 @@ class RXBuffer(object):
 	def _recv_thread(self, conn):
 		while self._run:
 			try:
-				data = conn.recv(128)
-				print("<=", data)
+				data = conn.recv(8192)
+#				print("<=", data, len(data))
 			except socket.timeout:
 				continue
 			if len(data) == 0:
@@ -103,6 +101,8 @@ class RXBuffer(object):
 		return self._msgs.get(timeout = timeout)
 
 class DebuggingProtocol(object):
+	_MAX_MEMREQUEST_CHUNK = 2048
+
 	def __init__(self, conn, close_conn = True):
 		self._close_conn = close_conn
 		self._conn = conn
@@ -164,21 +164,29 @@ class DebuggingProtocol(object):
 		cksum = self._checksum(command)
 		frame = b"+$" + command + ("#%02x" % (cksum)).encode("ascii")
 		self._conn.send(frame)
-		print("->", command)
+#		print("->", command)
 		reply = self._rxbuf.wait(timeout = 1)
-		print("<-", reply)
+#		print("<-", reply)
 		return reply
 
 	def singlestep(self):
 		self.send_cmd("vCont;s:1;c")
 
+	def _read_memory(self, start_address, length):
+		data = self.send_cmd("m%x,%x" % (start_address, length))
+		return bytes.fromhex(data.text)
+
 	def read_memory(self, start_address, length):
 		assert(0 <= start_address <= 0xffffffff)
 		assert(length > 0)
 		assert(start_address + length <= 0x100000000)
-		data = self.send_cmd("m%x,%x" % (start_address, length))
-		print(data)
-		return bytes.fromhex(data.text)
+		result = bytearray()
+		for offset in range(start_address, start_address + length, self._MAX_MEMREQUEST_CHUNK):
+			chunk_length = start_address + length
+			if chunk_length > self._MAX_MEMREQUEST_CHUNK:
+				chunk_length = self._MAX_MEMREQUEST_CHUNK
+			result += self._read_memory(offset, chunk_length)
+		return bytes(result)
 
 	def __enter__(self):
 		return self

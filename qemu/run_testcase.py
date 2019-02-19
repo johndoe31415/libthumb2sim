@@ -23,16 +23,45 @@
 #
 
 import os
+import sys
 import time
 import subprocess
 import tempfile
 import socket
 import hashlib
 import struct
+import zlib
+from FriendlyArgumentParser import FriendlyArgumentParser, baseint
 from DebuggingProtocol import ARMDebuggingProtocol
 
-class ConstantValue(object):
-	def __init__(self, name, value):
+parser = FriendlyArgumentParser()
+parser.add_argument("--bin-data", choices = [ "compressed", "uncompressed", "omit" ], default = "compressed", help = "For every trace step, include raw binary data. Can be in compressed form, uncompressed form or entirely ommited. Defaults to %(default)s.")
+parser.add_argument("--omit-raw-registers", action = "store_true", help = "By default, for every trace step, all register values as well as the PSR is included, not just the hashed values. This omits the raw data as well.")
+parser.add_argument("--rom-base", metavar = "address", type = baseint, default = 0, help = "ROM base address, defaults to 0x%(default)x bytes.")
+parser.add_argument("--ram-base", metavar = "address", type = baseint, default = 0x20000000, help = "RAM base address, defaults to 0x%(default)x bytes.")
+parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 0x10000, help = "RAM size, defaults to 0x%(default)x bytes.")
+parser.add_argument("bin_image", metavar = "filename", type = str, help = "Binary image which to load into QEMU for tracing")
+args = parser.parse_args(sys.argv[1:])
+
+class TraceType(object):
+	def __init__(self, args):
+		self._args = args
+
+	def _add_data(self, result_dict, data):
+		if self._args.bin_data == "compressed":
+			result_dict.update({
+				"data":			zlib.compress(data),
+				"data_type":	"compressed",
+			})
+		elif self._args.bin_data == "compressed":
+			result_dict.update({
+				"data":			data,
+				"data_type":	"uncompressed",
+			})
+
+class ConstantValue(TraceType):
+	def __init__(self, args, name, value):
+		TraceType.__init__(self, args)
 		assert(isinstance(value, bytes))
 		self._name = name
 		self._value = value
@@ -55,10 +84,8 @@ class ConstantValue(object):
 			"result":	self._value,
 		}
 
-class RegisterHash(object):
+class RegisterHash(TraceType):
 	_RegStruct = struct.Struct("< 17L")
-	def __init__(self):
-		pass
 
 	@property
 	def name(self):
@@ -69,14 +96,17 @@ class RegisterHash(object):
 		packed = [ regs["r%d" % (i)] for i in range(16) ]
 		packed.append(regs["psr"] & 0xf8000000)
 		data = self._RegStruct.pack(*packed)
-		return {
-			"regs":		regs,
-			"data":		data,
+		result = {
 			"result":	hashlib.md5(data).digest()
 		}
+		self._add_data(result, data)
+		if not self._args.omit_raw_registers:
+			result["regs"] = regs
+		return result
 
-class MemoryHash(object):
-	def __init__(self, name, address, length, is_constant):
+class MemoryHash(TraceType):
+	def __init__(self, args, name, address, length, is_constant):
+		TraceType.__init__(self, args)
 		self._name = name
 		self._address = address
 		self._length = length
@@ -88,16 +118,16 @@ class MemoryHash(object):
 
 	def get(self, target):
 		data = target.read_memory(self._address, self._length)
-		return {
-			"regs":		regs,
-			"data":		data,
+		result = {
 			"result":	hashlib.md5(data).digest()
 		}
-
+		self._add_data(result, data)
+		return result
 
 class TraceFile(object):
-	def __init__(self, tracetypes):
-		self._previous_state = ConstantValue("prev_state", bytes(16))
+	def __init__(self, args, tracetypes):
+		self._args = args
+		self._previous_state = ConstantValue(self._args, "prev_state", bytes(16))
 		self._tracetypes = [
 			self._previous_state,
 		] + list(tracetypes)
@@ -117,10 +147,15 @@ class TraceFile(object):
 		print(state_hash)
 		return state_hash
 
-trace = TraceFile([
-	RegisterHash(),
-	MemoryHash("rom", 0x0, 0x800, is_constant = True),
-	MemoryHash("ram", 0x20000000, 0x10000, is_constant = False),
+def get_filesize(filename):
+	with open(filename, "rb") as f:
+		f.seek(0, os.SEEK_END)
+		return f.tell()
+
+trace = TraceFile(args, [
+	RegisterHash(args),
+	MemoryHash(args, "rom", args.rom_base, get_filesize(args.bin_image), is_constant = True),
+	MemoryHash(args, "ram", args.ram_base, args.ram_size, is_constant = False),
 ])
 
 with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
@@ -133,7 +168,7 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
 
 	# Then fire up QEMU and have it connect to socket
 	try:
-		qemu_process = subprocess.Popen([ "qemu-system-arm", "-S", "-machine", "lm3s6965evb", "-display", "none", "-monitor", "none", "-gdb", "unix:%s" % (f.name), "-kernel", "qemu_test.bin" ])
+		qemu_process = subprocess.Popen([ "qemu-system-arm", "-S", "-machine", "lm3s6965evb", "-display", "none", "-monitor", "none", "-gdb", "unix:%s" % (f.name), "-kernel", args.bin_image ])
 
 		# Accept debugging connection from QEMU
 		(conn, peer_address) = sock.accept()
