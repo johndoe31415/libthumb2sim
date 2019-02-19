@@ -38,13 +38,27 @@ main:
 	msr APSR_nzcvq, r0
 
 
-	mov r0, r15
-	mov r4, r2
-	mov r7, r9
-	mov r2, r11
-	mov r6, r11
-	mov r6, r9
-	mov r3, r9
+
+	// Randomize all registers, including LR, except for SP or PC
+	ldr r0, =0xb5dee7a8
+	ldr r1, =0xcf99e73f
+	ldr r2, =0x35315388
+	ldr r3, =0x10e83ce2
+	ldr r4, =0xcf65f7fb
+	ldr r5, =0x862c55e9
+	ldr r6, =0x3da1a388
+	ldr r7, =0xbaaa315b
+	ldr r8, =0x7ffc8359
+	ldr r9, =0x4ff5174b
+	ldr r10, =0x75fd169a
+	ldr r11, =0x7d175e99
+	ldr r12, =0x629267b2
+	ldr r14, =0xb060499
+	b .tclbl_1
+	// Generate literal table here so we don't run out of offset space
+	.ltorg
+	.tclbl_1:
+
 	mov r3, r1
 	mov r10, r13
 	mov r10, r6
@@ -1038,6 +1052,13 @@ main:
 	mov r9, r7
 	mov r11, r11
 	mov r8, r11
+	mov r1, r15
+	mov r7, r9
+	mov r0, r13
+	mov r12, r12
+	mov r3, r10
+	mov r12, r1
+	mov r1, r3
 
 
 testcase_end:

@@ -13,13 +13,16 @@ OBJS := ivt.o qemu_test.o
 all: $(TARGETS)
 
 clean:
-	rm -f $(OBJS) $(TARGETS)
+	rm -f $(OBJS) $(TARGETS) qemu_trace.json
 
 qemu: qemu_test.bin
 	qemu-system-arm -S -machine lm3s6965evb -display none -monitor stdio -gdb tcp::1234 -kernel qemu_test.bin
 
 gdb:
 	arm-none-eabi-gdb -q -ex 'target remote :1234' -ex 'source example.py' qemu_test
+
+qemu_trace: qemu_test.bin
+	./run_testcase.py --bin-data uncompressed --bin-format hex --pretty-json qemu_test.bin qemu_trace.json
 
 qemu_test: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
