@@ -59,22 +59,9 @@
 	_asm_memcpy_end_\@:
 .endm
 
-.macro _semihosting_exit
-	ldr r0, =0x18
-	ldr r1, =0x20026
-	bkpt #0xab
-.endm
-
 .section .text
 .type Reset_Handler, %function
 Reset_Handler:
-	# Painting of all RAM
-	ldr r0, =_sram
-	ldr r1, =0xdeadbeef
-	ldr r2, =_eram
-	subs r2, r0
-	_asm_memset
-
 	# Load .data section
 	ldr r0, =_sdata
 	ldr r1, =_sidata
@@ -89,9 +76,6 @@ Reset_Handler:
 	subs r2, r0
 	_asm_memset
 
-#	_semihosting_exit
-
-	ldr lr, =0x57a0057a
 	bl main
 
 	_exit_loop:

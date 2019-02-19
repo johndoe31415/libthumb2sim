@@ -2,7 +2,7 @@
 
 CC := arm-none-eabi-gcc
 OBJCOPY := arm-none-eabi-objcopy
-CFLAGS := -O3 -std=c11 -I../include -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wshadow -nostdlib
+CFLAGS := -O3 -std=c11 -I../include -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wshadow -nostdlib -DNO_DATA_SECTION -DNO_BSS_SECTION
 CFLAGS += -g -D_XOPEN_SOURCE=500
 
 LDFLAGS := -Tqemu.ld
