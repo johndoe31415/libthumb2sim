@@ -150,6 +150,10 @@ class TraceFile(object):
 		] + list(tracetypes)
 		self._trace = [ ]
 
+	@property
+	def length(self):
+		return len(self._trace)
+
 	def set_prev_state(self, previous_state):
 		self._previous_state.value = previous_state
 
@@ -181,7 +185,6 @@ class TraceFile(object):
 			},
 			"trace": self._trace,
 		}
-		print(self._trace)
 		with open(filename, "w") as f:
 			json.dump(data, f, cls = CustomJSONEncoderB64 if (self._args.bin_format == "b64") else CustomJSONEncoderHex, sort_keys = self._args.pretty_json, indent = None if (not self._args.pretty_json) else 4)
 			f.write("\n")
@@ -207,16 +210,32 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
 
 	# Then fire up QEMU and have it connect to socket
 	try:
+		# TODO: Cool idea: Write an application that links to libthumbsim2 and
+		# that emulates the GDB API as well. So we can re-use this program to
+		# generate traces and can compare in Python! That would be cool.
 		qemu_process = subprocess.Popen([ "qemu-system-arm", "-S", "-machine", "lm3s6965evb", "-display", "none", "-monitor", "none", "-gdb", "unix:%s" % (f.name), "-kernel", args.img_filename ])
 
 		# Accept debugging connection from QEMU
 		(conn, peer_address) = sock.accept()
 		conn.settimeout(0.1)
 
+		last_pc = None
 		with ARMDebuggingProtocol(conn) as dbg:
-			trace.record_state(dbg)
-			dbg.singlestep()
-			trace.record_state(dbg)
+#			print(trace)
+			t0 = time.time()
+			while True:
+				trace.record_state(dbg)
+				current_pc = dbg.get_regs()["r15"]
+
+				if (trace.length % 100) == 0:
+					now = time.time()
+					tdiff = now - t0
+					print("%d instructions, PC 0x%x, %.1f insns/sec" % (trace.length, current_pc, trace.length / tdiff))
+				if current_pc == last_pc:
+					# Infinite loop (probably? what about looping instructions?), end trace.
+					break
+				last_pc = current_pc
+				dbg.singlestep()
 
 	finally:
 		qemu_process.kill()
