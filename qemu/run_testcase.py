@@ -38,43 +38,65 @@ from FriendlyArgumentParser import FriendlyArgumentParser, baseint
 from DebuggingProtocol import ARMDebuggingProtocol
 
 parser = FriendlyArgumentParser()
-parser.add_argument("--bin-data", choices = [ "compressed", "uncompressed", "omit" ], default = "compressed", help = "For every trace step, include raw binary data. Can be in compressed form, uncompressed form or entirely ommited. Defaults to %(default)s.")
 parser.add_argument("--bin-format", choices = [ "b64", "hex" ], default = "b64", help = "For binary data, chooses the representation inside JSON. Can be one of %(choices)s, defaults to %(default)s.")
+parser.add_argument("--include-raw-data", action = "store_true", help = "By default, only the hashes of large amounts of data (such as ROM or RAM) are recorded. This option forces all that data to be included verbatim as well.")
 parser.add_argument("--omit-raw-registers", action = "store_true", help = "By default, for every trace step, all register values as well as the PSR is included, not just the hashed values. This omits the raw data as well.")
+parser.add_argument("--omit-rom-image", action = "store_true", help = "Do not include the binary ROM image into the trace file output.")
 parser.add_argument("--rom-base", metavar = "address", type = baseint, default = 0, help = "ROM base address, defaults to 0x%(default)x bytes.")
 parser.add_argument("--ram-base", metavar = "address", type = baseint, default = 0x20000000, help = "RAM base address, defaults to 0x%(default)x bytes.")
 parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 0x10000, help = "RAM size, defaults to 0x%(default)x bytes.")
 parser.add_argument("-d", "--decimation", metavar = "step", type = int, default = 1, help = "Record only every n-th step, i.e., decimate trace data by a factor of n. By default, n is %(default)d (i.e., no decimation occurs).")
+parser.add_argument("--max-insn-cnt", type = int, default = 0, help = "Abort after a maximum of n executed instructions.")
+parser.add_argument("--no-compression", action = "store_true", help = "When long raw binary is included, it is by default compressed using zlib. This option forces inclusion as uncompressed data. Short pieces (less or equal to 16 bytes) are never compressed.")
 parser.add_argument("--pretty-json", action = "store_true", help = "Output a nicely formatted, human-readable JSON document.")
+parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Show more verbose output. Can be specified multiple times.")
 parser.add_argument("img_filename", metavar = "image_filename", type = str, help = "Binary image which to load into QEMU for tracing")
 parser.add_argument("trc_filename", metavar = "trace_filename", type = str, help = "JSON trc_filename to write")
 args = parser.parse_args(sys.argv[1:])
 
-class CustomJSONEncoderB64(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, bytes):
-			return base64.b64encode(obj).decode("ascii")
-		return json.JSONEncoder.default(self, obj)
 
-class CustomJSONEncoderHex(json.JSONEncoder):
+class CustomJSONEncoder(json.JSONEncoder):
+	def __init__(self, cmdline_args, **kwargs):
+		json.JSONEncoder.__init__(self, **kwargs)
+		self._cmdline_args = args
+
 	def default(self, obj):
 		if isinstance(obj, bytes):
-			return obj.hex()
+			data = obj
+			if len(data) <= 16:
+				# Short fragments always uncompressed and as hex, prefixed with
+				# ">" to indicate special handling
+				data = ">" + data.hex()
+			else:
+				if not self._cmdline_args.no_compression:
+					data = zlib.compress(data)
+				if self._cmdline_args.bin_format == "b64":
+					data = base64.b64encode(data).decode("ascii")
+				elif self._cmdline_args.bin_format == "hex":
+					data = data.hex()
+				else:
+					raise NotImplementedError(self._cmdline_args.bin_format)
+			return data
 		return json.JSONEncoder.default(self, obj)
 
 class TraceType(object):
 	def __init__(self, args):
 		self._args = args
 
+	def _custom_to_dict(self):
+		return { }
+
+	def to_dict(self):
+		result = {
+			"type":		self.__class__.__name__,
+			"name":		self.name,
+		}
+		result.update(self._custom_to_dict())
+		return result
+
 	def _add_data(self, result_dict, data):
-		if self._args.bin_data == "compressed":
-			result_dict.update({
-				"raw":			zlib.compress(data),
-			})
-		elif self._args.bin_data == "uncompressed":
-			result_dict.update({
-				"raw":			data,
-			})
+		if self._args.include_raw_data:
+			result_dict["raw"] = data
 
 class ConstantValue(TraceType):
 	def __init__(self, args, name, value):
@@ -108,6 +130,11 @@ class RegisterHash(TraceType):
 	def name(self):
 		return "register_set"
 
+	def _custom_to_dict(self):
+		return {
+			"order":	"r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,psr&0xf8000000",
+		}
+
 	def get(self, target):
 		regs = target.get_regs()
 		packed = [ regs["r%d" % (i)] for i in range(16) ]
@@ -133,6 +160,13 @@ class MemoryHash(TraceType):
 	def name(self):
 		return "memory_hash/%s" % (self._region_name)
 
+	def _custom_to_dict(self):
+		return {
+			"address":		self._address,
+			"length":		self._length,
+			"is_constant":	self._is_constant,
+		}
+
 	def get(self, target):
 		data = target.read_memory(self._address, self._length)
 		result = {
@@ -142,61 +176,84 @@ class MemoryHash(TraceType):
 		return result
 
 class TraceFile(object):
-	def __init__(self, args, tracetypes):
+	def __init__(self, args, rom_image, tracetypes):
 		self._args = args
-		self._previous_state = ConstantValue(self._args, "prev_state", bytes(16))
+		self._rom_image = rom_image
+		self._previous_state = ConstantValue(self._args, "prev_state_hash", bytes(16))
 		self._tracetypes = [
 			self._previous_state,
 		] + list(tracetypes)
 		self._trace = [ ]
+		self._executed_insn_count = 0
 
 	@property
-	def length(self):
+	def trace_length(self):
 		return len(self._trace)
 
-	def set_prev_state(self, previous_state):
+	@property
+	def executed_insn_cnt(self):
+		return self._executed_insn_count
+
+	def set_prev_state_hash(self, previous_state):
 		self._previous_state.value = previous_state
 
-	def record_state(self, target):
+	def record_state(self, target, append_to_trace = True, do_step = True):
+		if do_step:
+			target.singlestep()
+			self._executed_insn_count += 1
+
 		all_state = bytearray()
 
 		components = [ ]
 		for tracetype in self._tracetypes:
 			component = tracetype.get(target)
-#			component["name"] = tracetype.name
 			components.append(component)
 			all_state += component["value"]
 		state_hash = hashlib.md5(all_state).digest()
 		self._previous_state.value = state_hash
 		tracepoint = {
-			"executed_insns":	len(self._trace),
+			"executed_insns":	self._executed_insn_count,
 			"components":		components,
 			"state_hash":		state_hash,
 		}
-		self._trace.append(tracepoint)
+		if not do_step:
+			tracepoint["did_step"] = False
+		if append_to_trace or (not do_step):
+			# If we omit a step, but record a tracepoint, this modifies the
+			# internal state, so we need to record it.
+			self._trace.append(tracepoint)
 
 	def write(self, filename):
 		data = {
 			"meta": {
-				"trace_date_utc":		datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+				"trace_date_utc":					datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+				"rom_image_md5":					hashlib.md5(self._rom_image).digest(),
+				"rom_image_length":					len(self._rom_image),
+				"compression":						not self._args.no_compression,
+				"binary_format":					self._args.bin_format,
 			},
 			"structure": {
-				# TODO: Only have repeating info (name, compression, etc) appear once
+				"components": [
+					component_structure.to_dict() for component_structure in self._tracetypes
+					],
 			},
 			"trace": self._trace,
 		}
+		if not self._args.omit_rom_image:
+			data["meta"]["raw_rom_image"] = self._rom_image
+
 		with open(filename, "w") as f:
-			json.dump(data, f, cls = CustomJSONEncoderB64 if (self._args.bin_format == "b64") else CustomJSONEncoderHex, sort_keys = self._args.pretty_json, indent = None if (not self._args.pretty_json) else 4)
+			encoder = CustomJSONEncoder(self._args, indent = None if (not self._args.pretty_json) else 4)
+			json_data = encoder.encode(data)
+			f.write(json_data)
 			f.write("\n")
 
-def get_filesize(filename):
-	with open(filename, "rb") as f:
-		f.seek(0, os.SEEK_END)
-		return f.tell()
+with open(args.img_filename, "rb") as f:
+	rom_image = f.read()
 
-trace = TraceFile(args, [
+trace = TraceFile(args, rom_image, [
 	RegisterHash(args),
-	MemoryHash(args, "rom", args.rom_base, get_filesize(args.img_filename), is_constant = True),
+	MemoryHash(args, "rom", args.rom_base, len(rom_image), is_constant = True),
 	MemoryHash(args, "ram", args.ram_base, args.ram_size, is_constant = False),
 ])
 
@@ -221,21 +278,37 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
 
 		last_pc = None
 		with ARMDebuggingProtocol(conn) as dbg:
-#			print(trace)
 			t0 = time.time()
-			while True:
-				trace.record_state(dbg)
-				current_pc = dbg.get_regs()["r15"]
 
-				if (trace.length % 100) == 0:
+			# Before stepping, record state initially
+			trace.record_state(dbg, append_to_trace = True, do_step = False)
+
+			while True:
+				trace.record_state(dbg, append_to_trace = (trace.executed_insn_cnt > 0) and ((trace.executed_insn_cnt % args.decimation) == 0))
+				regs = dbg.get_regs()
+				current_pc = regs["r15"]
+
+				if (trace.executed_insn_cnt % 100) == 0:
 					now = time.time()
 					tdiff = now - t0
-					print("%d instructions, PC 0x%x, %.1f insns/sec" % (trace.length, current_pc, trace.length / tdiff))
+					if args.verbose >= 1:
+						print("%d instructions, PC 0x%x, %.1f insns/sec, %d tracepoints." % (trace.executed_insn_cnt, current_pc, trace.executed_insn_cnt / tdiff, trace.trace_length), file = sys.stderr)
 				if current_pc == last_pc:
 					# Infinite loop (probably? what about looping instructions?), end trace.
+					if args.verbose >= 1:
+						print("Exiting tracing at PC 0x%x, infinite loop detected." % (current_pc), file = sys.stderr)
+					break
+				elif (args.max_insn_cnt != 0) and (trace.executed_insn_cnt >= args.max_insn_cnt):
+					if args.verbose >= 1:
+						print("Exiting tracing at PC 0x%x, %d instructions executed." % (current_pc, trace.executed_insn_cnt), file = sys.stderr)
 					break
 				last_pc = current_pc
-				dbg.singlestep()
+
+			# After exiting, record state one last time
+			trace.record_state(dbg, append_to_trace = True, do_step = False)
+
+			if args.verbose >= 1:
+				print("Trace finished: %d executed instructions, %d tracepoints." % (trace.executed_insn_cnt, trace.trace_length), file = sys.stderr)
 
 	finally:
 		qemu_process.kill()

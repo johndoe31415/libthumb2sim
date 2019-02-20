@@ -22,7 +22,7 @@ gdb:
 	arm-none-eabi-gdb -q -ex 'target remote :1234' -ex 'source example.py' qemu_test
 
 qemu_trace: qemu_test.bin
-	./run_testcase.py --bin-data uncompressed --bin-format hex --pretty-json qemu_test.bin qemu_trace.json
+	./run_testcase.py -v --max-insn-cnt 150 --bin-format hex --pretty-json qemu_test.bin qemu_trace.json
 
 qemu_test: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)

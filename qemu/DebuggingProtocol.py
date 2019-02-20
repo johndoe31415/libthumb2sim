@@ -182,7 +182,7 @@ class DebuggingProtocol(object):
 		assert(start_address + length <= 0x100000000)
 		result = bytearray()
 		for offset in range(start_address, start_address + length, self._MAX_MEMREQUEST_CHUNK):
-			chunk_length = start_address + length
+			chunk_length = start_address + length - offset
 			if chunk_length > self._MAX_MEMREQUEST_CHUNK:
 				chunk_length = self._MAX_MEMREQUEST_CHUNK
 			result += self._read_memory(offset, chunk_length)
