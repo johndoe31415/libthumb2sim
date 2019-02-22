@@ -9,6 +9,7 @@ LDFLAGS := -Tqemu.ld
 
 TARGETS := qemu_test.bin
 OBJS := ivt.o qemu_test.o
+TRACE_OPTS := --max-insn-cnt 150 --bin-format hex --pretty-json -v --include-raw-data
 
 all: $(TARGETS)
 
@@ -22,7 +23,10 @@ gdb:
 	arm-none-eabi-gdb -q -ex 'target remote :1234' -ex 'source example.py' qemu_test
 
 qemu_trace: qemu_test.bin
-	./run_testcase.py -v --max-insn-cnt 150 --bin-format hex --pretty-json qemu_test.bin qemu_trace.json
+	./run_testcase.py -e qemu $(TRACE_OPTS) qemu_test.bin qemu_trace.json
+
+t2sim_trace: qemu_test.bin
+	./run_testcase.py -e t2sim $(TRACE_OPTS) qemu_test.bin t2sim_trace.json
 
 qemu_test: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)

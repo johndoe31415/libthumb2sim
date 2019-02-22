@@ -154,6 +154,16 @@ struct hardware_params_t {
 struct emu_ctx_t* init_cortexm(const struct hardware_params_t *hwparams);
 void free_cortexm(struct emu_ctx_t *emu_ctx);
 
+uint8_t *addrspace_memptr(struct addrspace_t *address_space, uint32_t address, unsigned int length);
+uint8_t addrspace_read8(struct addrspace_t *address_space, uint32_t address);
+void addrspace_write8(struct addrspace_t *address_space, uint32_t address, uint8_t value);
+void addrspace_write16(struct addrspace_t *address_space, uint32_t address, uint16_t value);
+uint16_t addrspace_read16(struct addrspace_t *address_space, uint32_t address);
+uint32_t addrspace_read32(struct addrspace_t *address_space, uint32_t address);
+void addrspace_write32(struct addrspace_t *address_space, uint32_t address, uint32_t value);
+void addrspace_add_region(struct addrspace_t *address_space, const char *name, uint32_t start_addr, uint32_t length, void *data, bool read_only, bool shadow_mapping);
+void addrspace_init(struct addrspace_t *address_space);
+
 void cpu_print_state(const struct emu_ctx_t *emu_ctx);
 void cpu_print_memory(struct emu_ctx_t *emu_ctx, uint32_t address, unsigned int length);
 void cpu_dump_file(struct emu_ctx_t *emu_ctx, enum emu_dump_t dump_type, const char *filename);

@@ -230,6 +230,7 @@ void cpu_reset(struct emu_ctx_t *emu_ctx) {
 	emu_ctx->cpu.insn_ctr = 0;
 
 	/* Load stack pointer and program counter */
+	emu_ctx->cpu.reg[REG_LR] = 0xffffffff;
 	emu_ctx->cpu.reg[REG_SP] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 0);
 	emu_ctx->cpu.reg[REG_PC] = addrspace_read32(&emu_ctx->addr_space, emu_ctx->ivt_base_address + 4) & ~1;
 	//fprintf(stderr, "CPU reset, IVT base 0x%x: SP 0x%x, PC 0x%x\n", emu_ctx->ivt_base_address, emu_ctx->cpu.reg[REG_SP], emu_ctx->cpu.reg[REG_PC]);

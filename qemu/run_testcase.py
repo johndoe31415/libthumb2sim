@@ -46,9 +46,11 @@ parser.add_argument("--rom-base", metavar = "address", type = baseint, default =
 parser.add_argument("--ram-base", metavar = "address", type = baseint, default = 0x20000000, help = "RAM base address, defaults to 0x%(default)x bytes.")
 parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 0x10000, help = "RAM size, defaults to 0x%(default)x bytes.")
 parser.add_argument("-d", "--decimation", metavar = "step", type = int, default = 1, help = "Record only every n-th step, i.e., decimate trace data by a factor of n. By default, n is %(default)d (i.e., no decimation occurs).")
-parser.add_argument("--max-insn-cnt", type = int, default = 0, help = "Abort after a maximum of n executed instructions.")
+parser.add_argument("--max-insn-cnt", metavar = "cnt", type = int, default = 0, help = "Abort after a maximum of n executed instructions.")
 parser.add_argument("--no-compression", action = "store_true", help = "When long raw binary is included, it is by default compressed using zlib. This option forces inclusion as uncompressed data. Short pieces (less or equal to 16 bytes) are never compressed.")
 parser.add_argument("--pretty-json", action = "store_true", help = "Output a nicely formatted, human-readable JSON document.")
+parser.add_argument("-e", "--emulator", choices = [ "t2sim", "qemu" ], default = "t2sim", help = "Decides whether to use libthumb2sim or QEMU as the underlying emulator.")
+parser.add_argument("--emulator-binary", metavar = "filename", help = "Full path to the emulator binary. Defaults to  t2sim-gdbserver for thumb2sim and qemu-system-arm for QEMU emulation.")
 parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Show more verbose output. Can be specified multiple times.")
 parser.add_argument("img_filename", metavar = "image_filename", type = str, help = "Binary image which to load into QEMU for tracing")
 parser.add_argument("trc_filename", metavar = "trace_filename", type = str, help = "JSON trc_filename to write")
@@ -210,15 +212,19 @@ class TraceFile(object):
 			components.append(component)
 			all_state += component["value"]
 		state_hash = hashlib.md5(all_state).digest()
-		self._previous_state.value = state_hash
 		tracepoint = {
 			"executed_insns":	self._executed_insn_count,
 			"components":		components,
 			"state_hash":		state_hash,
 		}
-		if not do_step:
+		if do_step:
+			# Only advance the previous state when we actually did stepping.
+			# Intermediate snapshots do not modify state.
+			self._previous_state.value = state_hash
+		else:
 			tracepoint["did_step"] = False
-		if append_to_trace or (not do_step):
+
+		if append_to_trace:
 			# If we omit a step, but record a tracepoint, this modifies the
 			# internal state, so we need to record it.
 			self._trace.append(tracepoint)
@@ -231,12 +237,9 @@ class TraceFile(object):
 				"rom_image_length":					len(self._rom_image),
 				"compression":						not self._args.no_compression,
 				"binary_format":					self._args.bin_format,
+				"emulator":							self._args.emulator,
 			},
-			"structure": {
-				"components": [
-					component_structure.to_dict() for component_structure in self._tracetypes
-					],
-			},
+			"structure": [ component_structure.to_dict() for component_structure in self._tracetypes	],
 			"trace": self._trace,
 		}
 		if not self._args.omit_rom_image:
@@ -267,10 +270,14 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
 
 	# Then fire up QEMU and have it connect to socket
 	try:
-		# TODO: Cool idea: Write an application that links to libthumbsim2 and
-		# that emulates the GDB API as well. So we can re-use this program to
-		# generate traces and can compare in Python! That would be cool.
-		qemu_process = subprocess.Popen([ "qemu-system-arm", "-S", "-machine", "lm3s6965evb", "-display", "none", "-monitor", "none", "-gdb", "unix:%s" % (f.name), "-kernel", args.img_filename ])
+		if args.emulator == "qemu":
+			cmd = [ args.emulator_binary or "qemu-system-arm", "-S", "-machine", "lm3s6965evb", "-display", "none", "-monitor", "none", "-gdb", "unix:%s" % (f.name), "-kernel", args.img_filename ]
+		elif args.emulator == "t2sim":
+			cmd = [ args.emulator_binary or "t2sim-gdbserver", args.img_filename,  f.name ]
+		else:
+			raise NotImplementedError(args.emulator)
+		emu_process = None
+		emu_process = subprocess.Popen(cmd)
 
 		# Accept debugging connection from QEMU
 		(conn, peer_address) = sock.accept()
@@ -284,7 +291,7 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
 			trace.record_state(dbg, append_to_trace = True, do_step = False)
 
 			while True:
-				trace.record_state(dbg, append_to_trace = (trace.executed_insn_cnt > 0) and ((trace.executed_insn_cnt % args.decimation) == 0))
+				trace.record_state(dbg, append_to_trace = (trace.executed_insn_cnt % args.decimation) == 0)
 				regs = dbg.get_regs()
 				current_pc = regs["r15"]
 
@@ -311,6 +318,7 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f:
 				print("Trace finished: %d executed instructions, %d tracepoints." % (trace.executed_insn_cnt, trace.trace_length), file = sys.stderr)
 
 	finally:
-		qemu_process.kill()
+		if emu_process is not None:
+			emu_process.kill()
 
 trace.write(args.trc_filename)

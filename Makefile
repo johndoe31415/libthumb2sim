@@ -1,4 +1,4 @@
-.PHONY: all clean install disas test gdb app
+.PHONY: all clean install disas test gdb app gdbserver
 
 CFLAGS := -O3 -shared -fPIC -std=c11 -Iinclude -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wimplicit-fallthrough -Wshadow
 CFLAGS += -g -D_XOPEN_SOURCE=500
@@ -8,14 +8,18 @@ LDFLAGS :=
 OBJS := address_space.o cpu_cm3.o decoder.o hexdump.o impl_disassembly.o impl_emulation.o convenience.o
 TARGETS := libthumb2sim.so
 
-all: $(TARGETS) app
+all: $(TARGETS) app gdbserver
 
 app:
 	make -C app
 
+gdbserver:
+	make -C gdbserver
+
 clean:
 	rm -f $(OBJS) $(TARGETS)
 	make -C app clean
+	make -C gdbserver clean
 
 install: libthumb2sim.so
 	cp libthumb2sim.so "$(INSTALL_DIR)/libthumb2sim.so.$(VERSION)"
