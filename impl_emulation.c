@@ -162,7 +162,6 @@ static uint32_t addCondCode(uint32_t aX, uint32_t aY) {
 	condCode |= (result == 0) ? FLAG_ZERO : 0;
 	condCode |= ((int32_t)result < 0) ? FLAG_NEGATIVE : 0;
 	condCode |= ((result < aX) || (result < aY)) ? FLAG_CARRY : 0;
-	//condCode |= (((int32_t)aX + (int32_t)aY) != result) ? FLAG_OVERFLOW : 0;
 	if ((aX & 0x80000000) == (aY & 0x80000000)) {
 		condCode |= ((aX & 0x80000000) != (result & 0x80000000)) ? FLAG_OVERFLOW : 0;
 	}
@@ -266,7 +265,9 @@ static void emulation_i32_add_SPi_T4(void *vctx, uint8_t Rd, uint16_t imm) {
 }
 
 static void emulation_i16_add_SPr_T1(void *vctx, uint8_t Rdm) {
-	EMU_ERROR("instruction not implemented");
+	EMU_WARNING("instruction poorly tested");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	ctx->emu_ctx->cpu.reg[Rdm] += ctx->emu_ctx->cpu.reg[REG_SP];
 }
 
 static void emulation_i16_add_SPr_T2(void *vctx, uint8_t Rm) {
@@ -274,7 +275,13 @@ static void emulation_i16_add_SPr_T2(void *vctx, uint8_t Rm) {
 }
 
 static void emulation_i32_add_SPr_T3(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	EMU_ERROR("instruction not implemented");
+	EMU_WARNING("instruction poorly tested");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	if (S) {
+		setAddCondCode(ctx, true, ctx->emu_ctx->cpu.reg[REG_SP], bsOut.value);
+	}
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[REG_SP] + bsOut.value;
 }
 
 static void emulation_i16_add_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm) {
@@ -303,8 +310,8 @@ static void emulation_i32_add_imm_T4(void *vctx, uint8_t Rd, uint8_t Rn, uint16_
 
 static void emulation_i16_add_reg_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] + ctx->emu_ctx->cpu.reg[Rm];
 	setAddCondCode(ctx, false, ctx->emu_ctx->cpu.reg[Rn], ctx->emu_ctx->cpu.reg[Rm]);
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] + ctx->emu_ctx->cpu.reg[Rm];
 }
 
 static void emulation_i16_add_reg_T2(void *vctx, uint8_t Rdn, uint8_t Rm) {
