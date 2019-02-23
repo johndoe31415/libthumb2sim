@@ -34,6 +34,7 @@
 #include <arpa/inet.h>
 
 #include <thumb2sim.h>
+#include "md5.h"
 
 /* Using this allows to to end emulation prematurely */
 struct user_ctx_t {
@@ -117,18 +118,57 @@ static bool gdb_dump_register_set(FILE *f, struct emu_ctx_t *emu_ctx) {
 	return true;
 }
 
+static char nibble_to_hexchar(uint8_t nibble) {
+	nibble &= 0xf;
+	if (nibble < 10) {
+		return '0' + nibble;
+	} else {
+		return 'a' + nibble - 10;
+	}
+}
+
+static void memory_to_hexstr(char *dest, const uint8_t *src, unsigned int length) {
+	for (unsigned int i = 0; i < length; i++) {
+		dest[(2 * i) + 0] = nibble_to_hexchar(src[i] >> 4);
+		dest[(2 * i) + 1] = nibble_to_hexchar(src[i] >> 0);
+	}
+	dest[2 * length] = 0;
+}
+
 static bool gdb_dump_memory(FILE *f, struct emu_ctx_t *emu_ctx, uint32_t start_address, uint32_t length) {
-	char reply_buffer[4096 * 2];
-	reply_buffer[0] = 0;
-	char *reply = reply_buffer;
+	char reply[(2 * length) + 1];
+	reply[0] = 0;
 
 	const uint8_t *memory = addrspace_memptr(&emu_ctx->addr_space, start_address, length);
-	for (unsigned int i = 0; i < length; i++) {
-		reply += snprintf(reply, reply_buffer + sizeof(reply_buffer) - reply, "%02x", memory ? memory[i] : 0);
+	if (memory) {
+		memory_to_hexstr(reply, memory, length);
+		tx_frame(f, reply);
+		return true;
+	} else {
+		fprintf(f, "-");
+		return false;
 	}
+}
 
-	tx_frame(f, reply_buffer);
-	return true;
+static bool gdb_hash_memory(FILE *f, struct emu_ctx_t *emu_ctx, uint32_t start_address, uint32_t length) {
+	char reply[(2 * 16) + 1];
+	reply[0] = 0;
+
+	const uint8_t *memory = addrspace_memptr(&emu_ctx->addr_space, start_address, length);
+	if (memory) {
+		MD5_CTX md5_ctx;
+		uint8_t digest[16];
+
+		MD5_Init(&md5_ctx);
+		MD5_Update(&md5_ctx, memory, length);
+		MD5_Final(digest, &md5_ctx);
+		memory_to_hexstr(reply, digest, 16);
+		tx_frame(f, reply);
+		return true;
+	} else {
+		fprintf(f, "-");
+		return false;
+	}
 }
 
 static bool gdb_handle_command(FILE *f, struct emu_ctx_t *emu_ctx, char *msg) {
@@ -149,6 +189,19 @@ static bool gdb_handle_command(FILE *f, struct emu_ctx_t *emu_ctx, char *msg) {
 	} else if (!strcmp(msg, "vCont;s:1;c")) {
 		cpu_single_step(emu_ctx);
 		tx_frame(f, "");
+	} else if (msg[0] == 'k') {
+		exit(EXIT_SUCCESS);
+	} else if (!strncmp(msg, "qmemhash:", 9)) {
+		char *comma_char = strchr(msg + 9, ',');
+		if (comma_char) {
+			*comma_char = 0;
+			long long int start_address = strtoll(msg + 9, NULL, 16);
+			long long int length = strtoll(comma_char + 1, NULL, 16);
+			gdb_hash_memory(f, emu_ctx, start_address, length);
+		} else {
+			fprintf(f, "-");
+			return false;
+		}
 	} else {
 		fprintf(stderr, "Unknown debugger command: %s\n", msg);
 		fprintf(f, "-");
@@ -186,8 +239,12 @@ static bool handle_connection(struct emu_ctx_t *ctx, int fd) {
 		};
 		int ready_fds = select(fd + 1, &readfds, NULL, NULL, &timeout);
 		if (ready_fds == -1) {
-			perror("select");
-			break;
+			if (errno == EINTR) {
+				continue;
+			} else {
+				perror("select");
+				break;
+			}
 		}
 
 		if (ready_fds == 0) {

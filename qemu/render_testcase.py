@@ -26,7 +26,10 @@ import os
 import sys
 import hashlib
 import mako.lookup
+import mako.template
 from FriendlyArgumentParser import FriendlyArgumentParser
+
+base_path = os.path.realpath(os.path.dirname(__file__))
 
 class PRNG(object):
 	def __init__(self, seed = 0):
@@ -48,6 +51,9 @@ class PRNG(object):
 		return_data = self._buffer[ : length]
 		self._buffer = self._buffer[length : ]
 		return return_data
+
+	def randbool(self):
+		return bool(self.uint8() & 1)
 
 	def uint8(self):
 		return int.from_bytes(self._get_data(1), byteorder = "little")
@@ -104,6 +110,17 @@ class PRNG(object):
 		candidates = self.shuffle(candidates)
 		return candidates
 
+	def choices(self, values):
+		if not isinstance(values, dict):
+			values = { key: 1 for key in values }
+
+		value_sum = sum(values.values())
+		choice_value = self.randint(value_sum)
+		s = 0
+		for (key, value) in sorted(values.items()):
+			s += value
+			if choice_value < s:
+				return key
 
 class ThumbGenerator(object):
 	def __init__(self, prng):
@@ -131,7 +148,7 @@ parser = FriendlyArgumentParser()
 parser.add_argument("-s", "--seed", metavar = "value", type = int, default = 0, help = "Seed value to use for PRNG. Defaults to %(default)s. Different seed will generate different testcases.")
 parser.add_argument("-l", "--length", metavar = "count", type = int, default = 1000, help = "Length of code to be generated. Defaults to %(default)d. Exact interpretation dependent on template, but usually correlates with the number of test cases.")
 parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite output file if it exists.")
-parser.add_argument("-o", "--outfile", metavar = "filename", type = str, default = "qemu_test.s", help = "Output file to write rendered template to. Defaults to %(default)s.")
+parser.add_argument("-o", "--outfile", metavar = "filename", type = str, default = "testcase.s", help = "Output file to write rendered template to. Defaults to %(default)s.")
 parser.add_argument("infile", metavar = "filename", help = "Input testcase body file to render.")
 args = parser.parse_args(sys.argv[1:])
 
@@ -139,12 +156,15 @@ if (not args.force) and os.path.exists(args.outfile):
 	print("Output file \"%s\" already exists, aborting." % (args.outfile))
 	sys.exit(1)
 
-lookup = mako.lookup.TemplateLookup([ "." ], input_encoding = "utf-8", strict_undefined = True)
-template = lookup.get_template(args.infile)
+lookup = mako.lookup.TemplateLookup(directories = [ base_path, base_path + "/templates" ], input_encoding = "utf-8", strict_undefined = True)
+with open(args.infile) as f:
+	template_src = f.read()
+template = mako.template.Template(template_src, lookup = lookup)
 
 prng = PRNG(args.seed)
 thumbgen = ThumbGenerator(prng)
-args = {
+template_args = {
+	"randb":		prng.randbool,
 	"rand8":		prng.uint8,
 	"rand16":		prng.uint16,
 	"rand32":		prng.uint32,
@@ -156,8 +176,11 @@ args = {
 	"new_label":	thumbgen.new_label,
 	"label":		thumbgen.label,
 	"length":		args.length,
+	"seed":			args.seed,
+	"infile":		args.infile,
+	"choices":		prng.choices,
 }
-result = template.render(**args)
+result = template.render(**template_args)
 
-with open("qemu_test.s", "w") as f:
+with open(args.outfile, "w") as f:
 	f.write(result)

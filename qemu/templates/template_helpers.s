@@ -1,13 +1,14 @@
+<%def name="randomize_register(regname)">
+	ldr ${regname}, =${hex(rand32())}
+</%def>
+
 <%def name="randomize_registers()">
 	// Randomize all registers, including LR, except for SP or PC
 %for i in range(13):
 	ldr r${i}, =${hex(rand32())}
 %endfor
 	ldr r14, =${hex(rand32())}
-	b ${new_label()}
-	// Generate literal table here so we don't run out of offset space
-	.ltorg
-	${label()}:
+	${place_literal_pool()}
 </%def>
 
 
@@ -36,4 +37,11 @@
 
 <%def name="rand_psr(save_r0 = True)">
 	${set_psr(rand32(), save_r0)}
+</%def>
+
+<%def name="place_literal_pool()">
+	b ${new_label()}
+	// Generate literal table here so we don't run out of offset space
+	.ltorg
+	${label()}:
 </%def>

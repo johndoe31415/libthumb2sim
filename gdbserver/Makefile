@@ -5,7 +5,7 @@ CFLAGS += -g -D_XOPEN_SOURCE=500
 
 LDFLAGS := -L.. -lthumb2sim
 
-OBJS := gdbserver.o
+OBJS := gdbserver.o md5.o
 TARGETS := t2sim-gdbserver
 TEST_IMG := ../qemu/qemu_test.bin
 

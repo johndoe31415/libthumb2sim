@@ -103,6 +103,12 @@ class FieldShift(object):
 			result = "%s(%s)" % (self._extend, result)
 		return result
 
+	def pyexpression(self, varname = "inval"):
+		result = self.origcexpression(varname)
+		if self._extend is not None:
+			result = "cls._%s(%s)" % (self._extend, result)
+		return result
+
 	@property
 	def hasextension(self):
 		return self._extend is not None

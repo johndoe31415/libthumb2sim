@@ -31,8 +31,8 @@
 #include "cpu_cm3.h"
 #include "address_space.h"
 
-#define EMU_WARNING(msg)		fprintf(stderr, "Emulation warning at %s / %s:%d -- %s\n", __FUNCTION__, __FILE__, __LINE__, (msg))
-#define EMU_ERROR(msg)			fprintf(stderr, "Emulation error at %s / %s:%d -- %s\n", __FUNCTION__, __FILE__, __LINE__, (msg))
+#define EMU_WARNING(msg, ...)			fprintf(stderr, "Emulation warning at %s / %s:%d -- " msg "\n", __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__)
+#define EMU_ERROR(msg, ...)				fprintf(stderr, "Emulation error at %s / %s:%d -- " msg "\n", __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__)
 
 #define OPCODE_WIDE						(1 << 0)
 #define OPCODE_NARROW					(1 << 1)
@@ -40,6 +40,11 @@
 #define OPCODE_SETFLAGS_IF_UNCOND		(1 << 3)
 #define OPCODE_FORCE_CONDITION			(1 << 4)
 #define OPCODE_ISCONDITIONAL(cond)		(OPCODE_FORCE_CONDITION | (((cond) & 0xf) << 8))
+
+#define BITMASK_FULL(bit)				((uint32_t)(((uint64_t)1 << (bit)) - 1))
+#define BITMASK(hi, lo)					(BITMASK_FULL((hi) + 1) & ~BITMASK_FULL(lo))
+#define BITMASK_SH(hi, lo)				(BITMASK((hi), (lo)) >> (lo))
+#define BITMASK_MOVE(dst, src, hi, lo)	(dst) = ((dst) & ~BITMASK((hi), (lo))) | ((src) & BITMASK((hi), (lo)))
 
 static uint32_t relative_branch_target(uint32_t aPC, uint32_t aImmediate, uint8_t aImmBits) {
 	if (aImmediate >= (1 << (aImmBits - 1))) {
@@ -155,9 +160,12 @@ static uint32_t addCondCode(uint32_t aX, uint32_t aY) {
 	uint32_t condCode = 0;
 	uint32_t result = aX + aY;
 	condCode |= (result == 0) ? FLAG_ZERO : 0;
-	condCode |= (aY > aY) ? FLAG_NEGATIVE : 0;			/* TODO: THIS SEEMS LIKE A BUG, one of these aYs should probably be aX */
-	condCode |= ((result < aX) || (result < aY)) ? FLAG_CARRY: 0;
-	condCode |= ((aX ^ result) & (aY ^ result) & 0x80000000) ? FLAG_OVERFLOW : 0;
+	condCode |= ((int32_t)result < 0) ? FLAG_NEGATIVE : 0;
+	condCode |= ((result < aX) || (result < aY)) ? FLAG_CARRY : 0;
+	//condCode |= (((int32_t)aX + (int32_t)aY) != result) ? FLAG_OVERFLOW : 0;
+	if ((aX & 0x80000000) == (aY & 0x80000000)) {
+		condCode |= ((aX & 0x80000000) != (result & 0x80000000)) ? FLAG_OVERFLOW : 0;
+	}
 	return condCode;
 }
 
@@ -224,7 +232,15 @@ static void emulation_i16_adc_reg_T1(void *vctx, uint8_t Rdn, uint8_t Rm) {
 }
 
 static void emulation_i32_adc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	EMU_ERROR("instruction not implemented");
+	EMU_WARNING("instruction poorly tested");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	bsOut.value += (ctx->emu_ctx->cpu.psr & FLAG_CARRY) ? 1 : 0;
+	if (S) {
+		setAddCondCode(ctx, true, ctx->emu_ctx->cpu.reg[Rd], bsOut.value);
+	}
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] + bsOut.value;
 }
 
 static void emulation_i16_add_SPi_T1(void *vctx, uint8_t Rd, uint8_t imm) {
@@ -995,6 +1011,9 @@ static void emulation_i32_mov_imm_T3(void *vctx, uint8_t Rd, uint16_t imm) {
 static void emulation_i16_mov_reg_T1(void *vctx, uint8_t Rd, uint8_t Rm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rm];
+	if (Rm == REG_PC) {
+		ctx->emu_ctx->cpu.reg[Rd] += 4;
+	}
 }
 
 static void emulation_i16_mov_reg_T2(void *vctx, uint8_t Rd, uint8_t Rm) {
@@ -1033,7 +1052,20 @@ static void emulation_i32_mrs_T1(void *vctx, uint8_t Rd, uint8_t SYSm) {
 }
 
 static void emulation_i32_msr_T1(void *vctx, uint8_t Rn, uint8_t mask, uint8_t SYSm) {
-	EMU_ERROR("instruction not implemented");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	if ((SYSm & BITMASK_SH(7, 3)) == 0) {
+		if ((SYSm & (1 << 2)) == 0) {
+			if (mask & (1 << 0)) {
+				/* Assume we have DSP extensions */
+				BITMASK_MOVE(ctx->emu_ctx->cpu.psr, ctx->emu_ctx->cpu.reg[Rn], 19, 16);
+			}
+			if (mask & (1 << 1)) {
+				BITMASK_MOVE(ctx->emu_ctx->cpu.psr, ctx->emu_ctx->cpu.reg[Rn], 31, 27);
+			}
+		}
+	} else {
+		EMU_ERROR("instruction not implemented for SYSm == 0x%x", SYSm);
+	}
 }
 
 static void emulation_i16_mul_T1(void *vctx, uint8_t Rdm, uint8_t Rn) {
@@ -1041,7 +1073,9 @@ static void emulation_i16_mul_T1(void *vctx, uint8_t Rdm, uint8_t Rn) {
 }
 
 static void emulation_i32_mul_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
-	EMU_ERROR("instruction not implemented");
+	EMU_ERROR("cond codes not implemented");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[Rn] * ctx->emu_ctx->cpu.reg[Rm];
 }
 
 static void emulation_i32_mvn_imm_T1(void *vctx, uint8_t Rd, int32_t imm, bool S) {
@@ -1254,7 +1288,12 @@ static void emulation_i32_sbc_reg_T2(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t
 static void emulation_i32_sdiv_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t Rm) {
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	EMU_ERROR("condition codes not implemented");
-	ctx->emu_ctx->cpu.reg[Rd] = (int32_t)ctx->emu_ctx->cpu.reg[Rn] / (int32_t)ctx->emu_ctx->cpu.reg[Rm];
+	if (!ctx->emu_ctx->cpu.reg[Rm]) {
+		EMU_ERROR("division by zero not implemented");
+		ctx->emu_ctx->cpu.reg[Rd] = 0;
+	} else {
+		ctx->emu_ctx->cpu.reg[Rd] = (int32_t)ctx->emu_ctx->cpu.reg[Rn] / (int32_t)ctx->emu_ctx->cpu.reg[Rm];
+	}
 }
 
 static void emulation_i16_sev_T1(void *vctx) {

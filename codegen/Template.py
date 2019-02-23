@@ -22,13 +22,14 @@
 import sys
 
 import mako.template, mako.exceptions
-from mako.lookup import TemplateLookup
+import mako.lookup
 
 class Template():
 	def __init__(self, filename):
-		lookupdir = "./"
-		lookup = TemplateLookup([ lookupdir ])
-		self._template = mako.lookup.Template(open(lookupdir + filename, "r").read(), lookup = lookup)
+		lookup = mako.lookup.TemplateLookup([ "." ], strict_undefined = True)
+		print(filename)
+		self._template = lookup.get_template(filename)
+		#self._template = mako.lookup.Template(open(lookupdir + filename, "r").read(), lookup = lookup)
 
 	def render(self, **args):
 		parameters = {

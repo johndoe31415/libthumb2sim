@@ -28,6 +28,8 @@ import threading
 import queue
 import collections
 
+class NoResponseFromTargetException(Exception): pass
+
 class DebuggingProtocolResponse(object):
 	def __init__(self, success, data, rx_cksum):
 		self._success = success
@@ -159,15 +161,20 @@ class DebuggingProtocol(object):
 		cksum &= 0xff
 		return cksum
 
-	def send_cmd(self, command):
-		command = command.encode("ascii")
+	def send_cmd(self, str_command, wait_reply = True):
+		command = str_command.encode("ascii")
 		cksum = self._checksum(command)
 		frame = b"+$" + command + ("#%02x" % (cksum)).encode("ascii")
 		self._conn.send(frame)
 #		print("->", command)
-		reply = self._rxbuf.wait(timeout = 1)
-#		print("<-", reply)
-		return reply
+		if wait_reply:
+			timeout = 1.0
+			try:
+				reply = self._rxbuf.wait(timeout = timeout)
+			except queue.Empty:
+				raise NoResponseFromTargetException("No response after sending command '%s' to emulator after %.1f secs." % (str_command, timeout))
+#			print("<-", reply)
+			return reply
 
 	def singlestep(self):
 		self.send_cmd("vCont;s:1;c")
@@ -187,6 +194,16 @@ class DebuggingProtocol(object):
 				chunk_length = self._MAX_MEMREQUEST_CHUNK
 			result += self._read_memory(offset, chunk_length)
 		return bytes(result)
+
+	def hash_memory(self, start_address, length):
+		assert(0 <= start_address <= 0xffffffff)
+		assert(length > 0)
+		assert(start_address + length <= 0x100000000)
+		hash_value = self.send_cmd("qmemhash:%x,%x" % (start_address, length))
+		return bytes.fromhex(hash_value.text)
+
+	def kill_request(self):
+		self.send_cmd("k", wait_reply = False)
 
 	def __enter__(self):
 		return self

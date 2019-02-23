@@ -1,37 +1,40 @@
-.PHONY: all qemu
+.PHONY: all
 
 CC := arm-none-eabi-gcc
 OBJCOPY := arm-none-eabi-objcopy
-CFLAGS := -O3 -std=c11 -I../include -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wshadow -nostdlib -DNO_DATA_SECTION -DNO_BSS_SECTION
-CFLAGS += -g -D_XOPEN_SOURCE=500
+CFLAGS := -O3 -std=c11 -I../include -Wall -Wmissing-prototypes -Wstrict-prototypes -Werror=implicit-function-declaration -Wshadow -nostdlib
 
-LDFLAGS := -Tqemu.ld
+LDFLAGS := -Ttestcase.ld
 
-TARGETS := qemu_test.bin
-OBJS := ivt.o qemu_test.o
-TRACE_OPTS := --max-insn-cnt 150 --bin-format hex --pretty-json -v --include-raw-data
+TARGETS := testcase.bin
+OBJS := ivt.o testcase.o
+TRACE_OPTS := --pretty-json -v
 
 all: $(TARGETS)
 
 clean:
 	rm -f $(OBJS) $(TARGETS) qemu_trace.json
 
-qemu: qemu_test.bin
-	qemu-system-arm -S -machine lm3s6965evb -display none -monitor stdio -gdb tcp::1234 -kernel qemu_test.bin
-
 gdb:
-	arm-none-eabi-gdb -q -ex 'target remote :1234' -ex 'source example.py' qemu_test
+	arm-none-eabi-gdb -q -ex 'target remote :1234' -ex 'source example.py' testcase
 
-qemu_trace: qemu_test.bin
-	./run_testcase.py -e qemu $(TRACE_OPTS) qemu_test.bin qemu_trace.json
+qemu: testcase.bin
+	qemu-system-arm -S -machine lm3s6965evb -display none -monitor stdio -gdb tcp::1234 -kernel testcase.bin
 
-t2sim_trace: qemu_test.bin
-	./run_testcase.py -e t2sim $(TRACE_OPTS) qemu_test.bin t2sim_trace.json
+qemu_trace: testcase.bin
+	./run_testcase.py -e qemu $(TRACE_OPTS) testcase.bin qemu_trace.json
 
-qemu_test: $(OBJS)
+t2sim_trace: testcase.bin
+	./run_testcase.py -e t2sim $(TRACE_OPTS) testcase.bin t2sim_trace.json
+
+user_trace: testcase.bin
+	rm -f dbg_socket
+	./run_testcase.py -e user --unix-socket dbg_socket $(TRACE_OPTS) testcase.bin t2sim_trace.json
+
+testcase: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-qemu_test.bin: qemu_test
+testcase.bin: testcase
 	$(OBJCOPY) -O binary $< $@
 
 .c.o:

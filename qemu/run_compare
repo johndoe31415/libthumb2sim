@@ -1,6 +1,7 @@
-#!/usr/bin/python3
+#!/bin/bash
+#
 #	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-#	Copyright (C) 2014-2019 Johannes Bauer
+#	Copyright (C) 2019-2019 Johannes Bauer
 #
 #	This file is part of libthumb2sim.
 #
@@ -19,24 +20,13 @@
 #	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
+#
 
-from InsnSet import InsnSet
-from Template import Template
-#from Parititioner import Partitioner
+REFERENCE_TRACE="$1"
+if [ ! -f "$REFERENCE_TRACE" ]; then
+	echo "$0 [reference trace]"
+	exit 1
+fi
 
-iset = InsnSet("instructions.xml")
-
-templates = [
-	("cpu_stub.mako", "cpu_stub.c"),
-	("decoder_c.mako", "decoder.c"),
-	("decoder_h.mako", "decoder.h"),
-	("implementation_c.mako", "implementation.c"),
-	("implementation_h.mako", "implementation.h"),
-	("decoder_py.mako", "decoder.py"),
-]
-
-for (infile, outfile) in templates:
-	tmpl = Template(infile)
-	output = tmpl.render(i = iset)
-	open(outfile, "w").write(output)
-
+./run_testcase.py --recreate-trace "$REFERENCE_TRACE" t2sim_trace.json
+./cmp_trace.py "$REFERENCE_TRACE" t2sim_trace.json
