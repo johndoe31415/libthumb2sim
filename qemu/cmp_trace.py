@@ -25,16 +25,45 @@
 import sys
 import json
 import zlib
+import subprocess
+import tempfile
+import re
 from FriendlyArgumentParser import FriendlyArgumentParser
+
+def disassemble_insn(rom_image, pc):
+	with tempfile.NamedTemporaryFile(suffix = ".bin") as f:
+		f.write(rom_image)
+		f.flush()
+		disas = subprocess.check_output([ "arm-none-eabi-objdump", "-D", f.name, "-b", "binary", "-m", "armv5t", "-M", "force-thumb" ])
+		lines = disas.decode("ascii").split("\n")
+
+		search_re = re.compile("\s*%x:" % (pc))
+		for (lineno, line) in enumerate(lines):
+			if search_re.match(line):
+				return (lines[lineno - 3 : lineno], line, lines[lineno + 1: lineno + 4])
+
+class DeviationException(Exception): pass
 
 class TraceFile(object):
 	def __init__(self, filename):
 		with open(filename) as f:
 			self._trace = json.load(f)
+		self._tracepoint_by_insn_cnt = { tracepoint["executed_insns"]: tracepoint for tracepoint in self._trace["trace"] }
+
+	@property
+	def flash_rom(self):
+		rom_image = self._trace["meta"].get("raw_rom_image")
+		if rom_image is not None:
+			return (self.getbytes(rom_image), self._trace["meta"]["rom_base"])
+		else:
+			return None
 
 	@property
 	def structure(self):
 		return self._trace["structure"]
+
+	def get_tracepoint_by_insn_cnt(self, insn_cnt):
+		return self._tracepoint_by_insn_cnt.get(insn_cnt)
 
 	def getbytes(self, text):
 		if text.startswith(">"):
@@ -59,7 +88,7 @@ class TraceFile(object):
 			pt2 = other[j]
 			(key1, key2) = (pt1["executed_insns"], pt2["executed_insns"])
 			if key1 == key2:
-				callback(i, pt1, j, pt2)
+				callback(self, pt1, other, pt2)
 				i += 1
 				j += 1
 			elif key1 < key2:
@@ -92,6 +121,14 @@ class TraceComparator(object):
 		return psr_str
 
 	@staticmethod
+	def _regname(regname):
+		return {
+			"r13":		"sp",
+			"r14":		"lr",
+			"r15":		"pc",
+		}.get(regname, regname)
+
+	@staticmethod
 	def _hexdump(data):
 		hex_data = " ".join("%02x" % (c) for c in data)
 		return hex_data
@@ -118,7 +155,7 @@ class TraceComparator(object):
 		if ("regs" in comp1) and ("regs" in comp2):
 			for regname in [ "r%d" % (i) for i in range(16) ]:
 				if comp1["regs"][regname] != comp2["regs"][regname]:
-					print("%3s %08x %08x" % (regname, comp1["regs"][regname], comp2["regs"][regname]))
+					print("%3s %08x %08x" % (self._regname(regname), comp1["regs"][regname], comp2["regs"][regname]))
 			if (comp1["regs"]["psr"] & 0xf8000000) != (comp2["regs"]["psr"] & 0xf8000000):
 				print("PSR %08x %08x = %5s | %5s" % (comp1["regs"]["psr"], comp2["regs"]["psr"], self._decode_psr(comp1["regs"]["psr"]), self._decode_psr(comp2["regs"]["psr"])))
 
@@ -137,7 +174,41 @@ class TraceComparator(object):
 		elif self._trace1.structure[component_no]["type"] == "MemoryHash":
 			self._print_deviation_memory(self._trace1.structure[component_no]["address"], comp1, comp2)
 
-	def _compare_point(self, no1, pt1, no2, pt2):
+	def _print_tracepoint(self, point):
+		for component in point["components"]:
+			if "regs" in component:
+				regs = component["regs"]
+				print("Register set:")
+				for regname in [ "r%d" % (i) for i in range(16) ]:
+					print("%3s %08x" % (self._regname(regname), regs[regname]))
+				print("PSR %08x %s" % (regs["psr"], self._decode_psr(regs["psr"])))
+
+				print()
+				flash_rom = self._trace1.flash_rom or self._trace2.flash_rom
+				if flash_rom is not None:
+					(flash_rom, rom_base) = flash_rom
+					rel_pc = regs["r15"] - rom_base
+					if rel_pc >= 0:
+						insn_data = flash_rom[rel_pc : rel_pc + 4]
+
+					insn_hex = " ".join("%02x" % (c) for c in insn_data)
+					disassembled = disassemble_insn(flash_rom, rel_pc)
+					if disassembled is not None:
+						(prefix, insn, suffix) = disassembled
+						for line in prefix:
+							print("    %s" % (line))
+						print()
+						print(">>> %-60s  <<< deviating instruction" % (insn))
+						print()
+						for line in suffix:
+							print("    %s" % (line))
+
+#					print("%8x: %-20s %s" % (regs["r15"], disassembled, insn_hex))
+
+				else:
+					print("No flash ROM available to decode instruction at PC.")
+
+	def _compare_tracepoint(self, trace1, pt1, trace2, pt2):
 		deviation = [ ]
 		for (component_no, (comp1, comp2)) in enumerate(zip(pt1["components"], pt2["components"])):
 			v1 = self._trace1.getbytes(comp1["value"])
@@ -150,14 +221,17 @@ class TraceComparator(object):
 			print("Deviation in tracepoint at number of executed instructions: %d" % (pt1["executed_insns"]))
 			for component_no in deviation:
 				self._print_deviation(component_no, pt1["components"][component_no], pt2["components"][component_no])
-			raise Exception("Deviation.")
+			print()
+			previous_tracepoint = trace1.get_tracepoint_by_insn_cnt(pt1["executed_insns"] - 1) or trace2.get_tracepoint_by_insn_cnt(pt2["executed_insns"] - 1)
+			if previous_tracepoint is None:
+				print("Unable to determine instruction that led to that deviation.")
+			else:
+				print("This was the cause of the deviation:")
+				self._print_tracepoint(previous_tracepoint)
+			raise DeviationException()
 
 	def compare(self):
-		self._trace1.align(self._trace2, self._compare_point)
-
-def compare_point(no1, pt1, no2, pt2):
-#	print(pt1, pt2)
-	print(no1, no2)
+		self._trace1.align(self._trace2, self._compare_tracepoint)
 
 parser = FriendlyArgumentParser()
 parser.add_argument("trace1", metavar = "trace_filename", type = str, help = "First trace for comparison")
@@ -165,4 +239,7 @@ parser.add_argument("trace2", metavar = "trace_filename", type = str, help = "Se
 args = parser.parse_args(sys.argv[1:])
 
 tc = TraceComparator(args)
-tc.compare()
+try:
+	tc.compare()
+except DeviationException:
+	sys.exit(1)
