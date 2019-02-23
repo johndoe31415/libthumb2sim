@@ -7,5 +7,6 @@ simulator
 codegen/cpu_stub.c
 codegen/decoder.c
 codegen/decoder.h
+codegen/decoder.py
 codegen/implementation.c
 codegen/implementation.h

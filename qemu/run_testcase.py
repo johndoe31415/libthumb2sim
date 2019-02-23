@@ -40,7 +40,7 @@ parser.add_argument("--omit-raw-registers", action = "store_true", help = "By de
 parser.add_argument("--omit-rom-image", action = "store_true", help = "Do not include the binary ROM image into the trace file output.")
 parser.add_argument("--rom-base", metavar = "address", type = baseint, default = 0, help = "ROM base address, defaults to 0x%(default)x bytes.")
 parser.add_argument("--ram-base", metavar = "address", type = baseint, default = 0x20000000, help = "RAM base address, defaults to 0x%(default)x bytes.")
-parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 0x10000, help = "RAM size, defaults to 0x%(default)x bytes.")
+parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 8 * 1024, help = "RAM size, defaults to 0x%(default)x bytes.")
 parser.add_argument("-d", "--decimation", metavar = "step", type = int, default = 1, help = "Record only every n-th step, i.e., decimate trace data by a factor of n. By default, n is %(default)d (i.e., no decimation occurs).")
 parser.add_argument("--minify-tracefile", action = "store_true", help = "Do maximum decimation by not recording any intermediate steps in the output trace, only the first and last step.")
 parser.add_argument("--max-insn-cnt", metavar = "cnt", type = int, default = 0, help = "Abort after a maximum of n executed instructions.")

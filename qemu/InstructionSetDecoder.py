@@ -22,6 +22,7 @@
 import collections
 
 class Instruction(object):
+	_REGISTER_NAMES = set([ "Rd", "Rn", "Rm", "Rt" ])
 	def __init__(self, opcode, variant, length, arguments = None):
 		if arguments is None:
 			arguments = { }
@@ -42,11 +43,18 @@ class Instruction(object):
 	def variant(self):
 		return self._variant
 
+	@classmethod
+	def is_register(cls, regname):
+		return regname in cls._REGISTER_NAMES
+
 	def get_arg_string(self, argname):
-		if argname in [ "Rd", "Rn", "Rm", "Rt" ]:
+		if self.is_register(argname):
 			return "%s = r%d" % (argname, self._arguments[argname])
 		else:
 			return "%s = 0x%x" % (argname, self._arguments[argname])
+
+	def __iter__(self):
+		return iter(self._arguments.items())
 
 	def __str__(self):
 		return "%s(%s)" % (self.variant, ", ".join(self.get_arg_string(argname) for argname in self._arguments))

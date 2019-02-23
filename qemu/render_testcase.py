@@ -134,6 +134,14 @@ class ThumbGenerator(object):
 		# Exclude SP, LR and PC
 		return "r%d" % (self._prng.randint(13))
 
+	def reg14(self):
+		# Exclude SP and PC
+		return self._prng.choices([ "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14" ])
+
+	def reg15(self):
+		# Exclude PC
+		return "r%d" % (self._prng.randint(15))
+
 	def reg16(self):
 		return "r%d" % (self._prng.randint(16))
 
@@ -172,6 +180,8 @@ template_args = {
 	"spec32_2":		lambda: tuple(prng.uint32_special(candidate_count = 2)[:2]),
 	"reg8":			thumbgen.reg8,
 	"reg13":		thumbgen.reg13,
+	"reg14":		thumbgen.reg14,
+	"reg15":		thumbgen.reg15,
 	"reg16":		thumbgen.reg16,
 	"new_label":	thumbgen.new_label,
 	"label":		thumbgen.label,

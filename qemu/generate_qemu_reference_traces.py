@@ -38,7 +38,10 @@ subprocess.check_call([ "make", "clean" ])
 
 def create_trace(input_filename, output_filename):
 	if os.path.exists(output_filename):
-		return
+		input_mtime = os.stat(input_filename).st_mtime
+		output_mtime = os.stat(output_filename).st_mtime
+		if input_mtime < output_mtime:
+			return
 
 	print("%s -> %s" % (input_filename, output_filename))
 	with contextlib.suppress(FileExistsError):

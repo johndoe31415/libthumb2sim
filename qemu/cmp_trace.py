@@ -158,6 +158,17 @@ class TraceComparator(object):
 					insn = InstructionSetDecoder.decode_data(insn_data)
 					print()
 					print("Instruction details: %s" % (insn))
+					for (param_name, value) in insn:
+						if insn.is_register(param_name):
+							reg_value = regs["r%d" % (value)]
+							if reg_value & 0x80000000:
+								# Negative
+								signed_reg_value = reg_value - (2 ** 32)
+								print("%5s r%-2d 0x%x / %d    signed: -%0x%x / %d" % (param_name, value, reg_value, reg_value, signed_reg_value, signed_reg_value))
+							else:
+								# Positive
+								print("%5s r%-2d 0x%x / %d" % (param_name, value, reg_value, reg_value))
+					print()
 				else:
 					print("No flash ROM available to decode instruction at PC.")
 
