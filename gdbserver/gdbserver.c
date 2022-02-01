@@ -275,7 +275,7 @@ static bool connect_gdb(struct emu_ctx_t *emu_ctx, const char *unix_socket) {
 	struct sockaddr_un sockaddr = {
 		.sun_family = AF_UNIX,
 	};
-	strncpy(sockaddr.sun_path, unix_socket, sizeof(sockaddr.sun_path));
+	strncpy(sockaddr.sun_path, unix_socket, sizeof(sockaddr.sun_path) - 1);
 	if (connect(sd, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) == -1) {
 		fprintf(stderr, "connect \"%s\": %s\n", sockaddr.sun_path, strerror(errno));
 		close(sd);
