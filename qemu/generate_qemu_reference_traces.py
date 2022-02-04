@@ -30,6 +30,7 @@ import contextlib
 from FriendlyArgumentParser import FriendlyArgumentParser
 
 parser = FriendlyArgumentParser()
+parser.add_argument("-m", "--minify-tracefiles", action = "store_true", help = "Minify all generated tracefiles")
 parser.add_argument("tc_dir", metavar = "tc_dir", type = str, help = "Testcase directory for input data")
 parser.add_argument("trace_dir", metavar = "trace_dir", type = str, help = "Trace output directory")
 args = parser.parse_args(sys.argv[1:])
@@ -48,7 +49,11 @@ def create_trace(input_filename, output_filename):
 		os.makedirs(os.path.dirname(output_filename))
 	subprocess.check_call([ "./render_testcase.py", "-f", "-o", "testcase.s", input_filename ])
 	subprocess.check_call([ "make", "testcase.bin" ])
-	subprocess.check_call([ "./run_testcase.py", "-e", "qemu", "testcase.bin", output_filename ])
+	cmd = [ "./run_testcase.py", "-e", "qemu" ]
+	if args.minify_tracefiles:
+		cmd += [ "--minify-tracefile", "--omit-raw-registers" ]
+	cmd += [ "testcase.bin", output_filename ]
+	subprocess.check_call(cmd)
 
 input_dir = args.tc_dir
 output_dir = args.trace_dir

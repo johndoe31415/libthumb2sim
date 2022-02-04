@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-#	Copyright (C) 2019-2019 Johannes Bauer
+#	Copyright (C) 2019-2022 Johannes Bauer
 #
 #	This file is part of libthumb2sim.
 #
@@ -30,35 +30,28 @@ import tempfile
 import socket
 from FriendlyArgumentParser import FriendlyArgumentParser, baseint
 from DebuggingProtocol import ARMDebuggingProtocol
-from TraceWriter import TraceWriter, RegisterHash, MemoryHash
+from TraceWriter import TraceWriter, TraceRegisterSet, TraceMemory
 from TraceReader import TraceReader
 
-parser = FriendlyArgumentParser()
-parser.add_argument("--bin-format", choices = [ "b64", "hex" ], default = "b64", help = "For binary data, chooses the representation inside JSON. Can be one of %(choices)s, defaults to %(default)s.")
-parser.add_argument("--include-raw-data", action = "store_true", help = "By default, only the hashes of large amounts of data (such as ROM or RAM) are recorded. This option forces all that data to be included verbatim as well.")
-parser.add_argument("--omit-raw-registers", action = "store_true", help = "By default, for every trace step, all register values as well as the PSR is included, not just the hashed values. This omits the raw data as well.")
-parser.add_argument("--omit-rom-image", action = "store_true", help = "Do not include the binary ROM image into the trace file output.")
-parser.add_argument("--rom-base", metavar = "address", type = baseint, default = 0, help = "ROM base address, defaults to 0x%(default)x bytes.")
-parser.add_argument("--ram-base", metavar = "address", type = baseint, default = 0x20000000, help = "RAM base address, defaults to 0x%(default)x bytes.")
-parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 8 * 1024, help = "RAM size, defaults to 0x%(default)x bytes.")
+parser = FriendlyArgumentParser(description = "Execute a binary either in libthumb2sim or in qemu and write a JSON trace file.")
+parser.add_argument("--rom-base", metavar = "address", type = baseint, default = 0, help = "ROM base address, defaults to 0x%(default)x bytes. Only relevant when a binary is specified as input file.")
+parser.add_argument("--ram-base", metavar = "address", type = baseint, default = 0x20000000, help = "RAM base address, defaults to 0x%(default)x bytes. Only relevant when a binary is specified as input file.")
+parser.add_argument("--ram-size", metavar = "length", type = baseint, default = 8 * 1024, help = "RAM size, defaults to 0x%(default)x bytes. Only relevant when a binary is specified as input file.")
 parser.add_argument("-d", "--decimation", metavar = "step", type = int, default = 1, help = "Record only every n-th step, i.e., decimate trace data by a factor of n. By default, n is %(default)d (i.e., no decimation occurs).")
-parser.add_argument("--minify-tracefile", action = "store_true", help = "Do maximum decimation by not recording any intermediate steps in the output trace, only the first and last step.")
 parser.add_argument("--max-insn-cnt", metavar = "cnt", type = int, default = 0, help = "Abort after a maximum of n executed instructions.")
-parser.add_argument("--no-compression", action = "store_true", help = "When long raw binary is included, it is by default compressed using zlib. This option forces inclusion as uncompressed data. Short pieces (less or equal to 16 bytes) are never compressed.")
-parser.add_argument("--pretty-json", action = "store_true", help = "Output a nicely formatted, human-readable JSON document.")
 parser.add_argument("-e", "--emulator", choices = [ "t2sim", "qemu", "user" ], default = "t2sim", help = "Decides whether to use libthumb2sim or QEMU as the underlying emulator. When 'user' is given, no emulator call is forked; instead, the created listening UNIX socket is printed and the user can connect to it.")
 parser.add_argument("--emulator-binary", metavar = "filename", help = "Full path to the emulator binary. Defaults to  t2sim-gdbserver for thumb2sim and qemu-system-arm for QEMU emulation.")
 parser.add_argument("--unix-socket", metavar = "filename", help = "By default, the UNIX socket is created temporarily. This allows specifying a filename for it.")
-parser.add_argument("-r", "--recreate-trace", action = "store_true", help = "Instead of supplying an input binary, supply a different trace file that has a binary ROM image embedded and take all options from that file.")
+parser.add_argument("-i", "--img-format", choices = [ "bin", "trace" ], default = "bin", help = "Specify the input image format. Can be one of %(choices)s, defaults to %(default)s.")
 parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Show more verbose output. Can be specified multiple times.")
-parser.add_argument("img_filename", metavar = "image_filename", type = str, help = "Binary image or trace containing a binary image (when --recreate-trace is given) which to load into QEMU for tracing")
+parser.add_argument("img_filename", metavar = "image_filename", type = str, help = "Binary image or trace containing a binary image, depending on the input image format, to load into the emulator for tracing")
 parser.add_argument("trc_filename", metavar = "trace_filename", type = str, help = "JSON trace filename to write")
 args = parser.parse_args(sys.argv[1:])
 
 class ArgumentWrapper(object):
 	def __init__(self, args):
 		self._args = args
-		if self._args.recreate_trace:
+		if self._args.img_format == "trace":
 			self._trace = TraceReader(self._args.img_filename)
 		else:
 			self._trace = None
@@ -66,13 +59,17 @@ class ArgumentWrapper(object):
 
 	@property
 	def rom_image(self):
-		if self._image is None:
-			if self._trace is None:
-				with open(self._args.img_filename, "rb") as f:
-					self._image = f.read()
-			else:
-				self._image = self._trace.rom_image
-		return self._image
+		print("ROMY")
+		try:
+			if self._image is None:
+				if self._trace is None:
+					with open(self._args.img_filename, "rb") as f:
+						self._image = f.read()
+				else:
+					self._image = self._trace.rom_image
+			return self._image
+		except Exception as e:
+			print(e)
 
 	@property
 	def rom_base(self):
@@ -100,9 +97,9 @@ class ArgumentWrapper(object):
 
 args = ArgumentWrapper(args)
 trace = TraceWriter(args, args.rom_image, [
-	RegisterHash(args),
-	MemoryHash(args, "rom", args.rom_base, len(args.rom_image), is_constant = True),
-	MemoryHash(args, "ram", args.ram_base, args.ram_size, is_constant = False),
+	TraceRegisterSet(),
+	TraceMemory("rom", args.rom_base, len(args.rom_image)),
+	TraceMemory("ram", args.ram_base, args.ram_size),
 ])
 
 with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f, tempfile.NamedTemporaryFile(prefix = "rom_", suffix = ".bin") as rom_img:
@@ -152,7 +149,7 @@ with tempfile.NamedTemporaryFile(prefix = "qemu_gdb_") as f, tempfile.NamedTempo
 			trace.record_state(dbg, append_to_trace = True, do_step = False)
 
 			while True:
-				trace.record_state(dbg, append_to_trace = ((trace.executed_insn_cnt % args.decimation) == 0) and (not args.minify_tracefile))
+				trace.record_state(dbg, append_to_trace = ((trace.executed_insn_cnt % args.decimation) == 0))
 				regs = dbg.get_regs()
 				current_pc = regs["r15"]
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-#	Copyright (C) 2019-2019 Johannes Bauer
+#	Copyright (C) 2019-2022 Johannes Bauer
 #
 #	This file is part of libthumb2sim.
 #
@@ -47,7 +47,7 @@ def disassemble_insn_objdump(rom_image, pc):
 
 class DeviationException(Exception): pass
 
-class TraceComparator(object):
+class TraceComparator():
 	def __init__(self, args):
 		self._args = args
 		self._trace1 = TraceReader(args.trace1)
@@ -91,8 +91,8 @@ class TraceComparator(object):
 				print("%8x: %s     %s" % (address, self._hexdump(row1), self._hexdump(row2)))
 
 	def _print_deviation_constant(self, comp1, comp2):
-		v1 = self._trace1.get_bytes(comp1["value"])
-		v2 = self._trace2.get_bytes(comp2["value"])
+		v1 = self._trace1.getbytes(comp1["value"])
+		v2 = self._trace2.getbytes(comp2["value"])
 		self._print_bytes_difference(v1, v2)
 
 	def _print_deviation_registers(self, comp1, comp2):
@@ -174,14 +174,18 @@ class TraceComparator(object):
 
 	def _compare_tracepoint(self, trace1, pt1, trace2, pt2):
 		deviation = [ ]
+		print(pt1["components"])
 		for (component_no, (comp1, comp2)) in enumerate(zip(pt1["components"], pt2["components"])):
+			print(component_no)
 			v1 = self._trace1.getbytes(comp1["value"])
 			v2 = self._trace2.getbytes(comp2["value"])
+			print(v1, v2)
 #			print(component_no, v1, v2)
 			if v1 != v2:
 				deviation.append(component_no)
 
 		if len(deviation) > 0:
+			print(deviation)
 			print("Deviation in tracepoint at number of executed instructions: %d" % (pt1["executed_insns"]))
 			for component_no in deviation:
 				self._print_deviation(component_no, pt1["components"][component_no], pt2["components"][component_no])
@@ -198,9 +202,9 @@ class TraceComparator(object):
 	def compare(self):
 		self._trace1.align(self._trace2, self._compare_tracepoint)
 
-parser = FriendlyArgumentParser()
-parser.add_argument("trace1", metavar = "trace_filename", type = str, help = "First trace for comparison")
-parser.add_argument("trace2", metavar = "trace_filename", type = str, help = "Second trace for comparison")
+parser = FriendlyArgumentParser(description = "Compare two trace files; where they differ, show the instruction and deviation details.")
+parser.add_argument("trace1", metavar = "trace1_filename", help = "First trace for comparison")
+parser.add_argument("trace2", metavar = "trace2_filename", help = "Second trace for comparison")
 args = parser.parse_args(sys.argv[1:])
 
 tc = TraceComparator(args)

@@ -1,6 +1,6 @@
 #
 #       libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-#       Copyright (C) 2019-2019 Johannes Bauer
+#       Copyright (C) 2019-2022 Johannes Bauer
 #
 #       This file is part of libthumb2sim.
 #
@@ -21,58 +21,32 @@
 #       Johannes Bauer <JohannesBauer@gmx.de>
 #
 
-import zlib
-import json
-import base64
+from Tools import JSONTools
 
 class TraceReader(object):
 	def __init__(self, filename):
 		with open(filename) as f:
-			self._trace = json.load(f)
-		self._tracepoint_by_insn_cnt = { tracepoint["executed_insns"]: tracepoint for tracepoint in self._trace["trace"] }
+			self._trace = JSONTools.load(f)
 
 	@property
 	def rom_image(self):
-		rom_image = self._trace["meta"].get("raw_rom_image")
-		if rom_image is not None:
-			return self.getbytes(rom_image)
-		else:
-			return None
+		return self._trace["meta"]["raw_rom_image"]
 
 	@property
 	def rom_base(self):
-		return self._trace["meta"].get("rom_base")
+		return self._trace["meta"]["rom_base"]
 
 	@property
 	def ram_base(self):
-		return self._trace["meta"].get("ram_base")
+		return self._trace["meta"]["ram_base"]
 
 	@property
 	def ram_size(self):
-		return self._trace["meta"].get("ram_size")
+		return self._trace["meta"]["ram_size"]
 
 	@property
 	def structure(self):
 		return self._trace["structure"]
-
-	def get_tracepoint_by_insn_cnt(self, insn_cnt):
-		return self._tracepoint_by_insn_cnt.get(insn_cnt)
-
-	def getbytes(self, text):
-		if text.startswith(">"):
-			# Short literal
-			data = bytes.fromhex(text[1:])
-		else:
-			if self._trace["meta"]["binary_format"] == "hex":
-				data = bytes.fromhex(text)
-			elif self._trace["meta"]["binary_format"] == "b64":
-				data = base64.b64decode(text)
-			else:
-				raise NotImplementedError(self._trace["meta"]["binary_format"])
-
-			if self._trace["meta"]["compression"]:
-				data = zlib.decompress(data)
-		return data
 
 	def align(self, other, callback):
 		(i, j) = (0, 0)
@@ -90,9 +64,3 @@ class TraceReader(object):
 			elif key2 < key1:
 				# No alignment an j is lagging behind
 				j += 1
-
-	def __getitem__(self, index):
-		return self._trace["trace"][index]
-
-	def __len__(self):
-		return len(self._trace["trace"])

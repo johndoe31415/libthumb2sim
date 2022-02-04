@@ -1,6 +1,6 @@
 #
 #       libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-#       Copyright (C) 2019-2019 Johannes Bauer
+#       Copyright (C) 2019-2022 Johannes Bauer
 #
 #       This file is part of libthumb2sim.
 #
@@ -27,142 +27,71 @@ import hashlib
 import datetime
 import zlib
 import base64
+from Tools import JSONTools
+from BytesDiff import BytesDiff
 
-class CustomJSONEncoder(json.JSONEncoder):
-	def __init__(self, cmdline_args, **kwargs):
-		json.JSONEncoder.__init__(self, **kwargs)
-		self._cmdline_args = cmdline_args
-
-	def default(self, obj):
-		if isinstance(obj, bytes):
-			data = obj
-			if len(data) <= 16:
-				# Short fragments always uncompressed and as hex, prefixed with
-				# ">" to indicate special handling
-				data = ">" + data.hex()
-			else:
-				if not self._cmdline_args.no_compression:
-					data = zlib.compress(data)
-				if self._cmdline_args.bin_format == "b64":
-					data = base64.b64encode(data).decode("ascii")
-				elif self._cmdline_args.bin_format == "hex":
-					data = data.hex()
-				else:
-					raise NotImplementedError(self._cmdline_args.bin_format)
-			return data
-		return json.JSONEncoder.default(self, obj)
-
-class TraceType(object):
-	def __init__(self, args):
-		self._args = args
-
-	def _custom_to_dict(self):
-		return { }
-
-	def to_dict(self):
-		result = {
-			"type":		self.__class__.__name__,
-			"name":		self.name,
-		}
-		result.update(self._custom_to_dict())
-		return result
-
-	def _add_data(self, result_dict, data):
-		if self._args.include_raw_data:
-			result_dict["raw"] = data
-
-class ConstantValue(TraceType):
-	def __init__(self, args, name, value):
-		TraceType.__init__(self, args)
-		assert(isinstance(value, bytes))
-		self._name = name
-		self._value = value
-
+class TraceComponent():
 	@property
-	def name(self):
-		return self._name
-
-	@property
-	def value(self):
-		return self._value
-
-	@value.setter
-	def value(self, value):
-		assert(isinstance(value, bytes))
-		self._value = value
+	def properties(self):
+		return None
 
 	def get(self, target):
-		return {
-			"value":	self._value,
-		}
+		raise NotImplementedError()
 
-class RegisterHash(TraceType):
-	_RegStruct = struct.Struct("< 17L")
 
+class TraceRegisterSet(TraceComponent):
 	@property
 	def name(self):
 		return "register_set"
 
-	def _custom_to_dict(self):
+	@property
+	def properties(self):
 		return {
-			"order":	"r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,psr&0xf0000000",
+			"name": self.name,
 		}
 
 	def get(self, target):
-		regs = target.get_regs()
-		packed = [ regs["r%d" % (i)] for i in range(16) ]
-		packed.append(regs["psr"] & 0xf0000000)
-		data = self._RegStruct.pack(*packed)
-		result = {
-			"value":	hashlib.md5(data).digest()
-		}
-		self._add_data(result, data)
-		if not self._args.omit_raw_registers:
-			result["regs"] = regs
-		return result
+		return target.get_regs()
 
-class MemoryHash(TraceType):
-	def __init__(self, args, region_name, address, length, is_constant):
-		TraceType.__init__(self, args)
+
+class TraceMemory(TraceComponent):
+	def __init__(self, region_name, address, length, is_constant = False):
 		self._region_name = region_name
 		self._address = address
 		self._length = length
 		self._is_constant = is_constant
+		self._cached_memory = None
 
 	@property
 	def name(self):
-		return "memory_hash/%s" % (self._region_name)
+		return "memory/%s" % (self._region_name)
 
-	def _custom_to_dict(self):
+	@property
+	def properties(self):
 		return {
+			"name":			self.name,
 			"address":		self._address,
 			"length":		self._length,
 			"is_constant":	self._is_constant,
 		}
 
-	def get(self, target):
-		if self._args.include_raw_data or (self._args.emulator == "qemu"):
-			data = target.read_memory(self._address, self._length)
-			result = {
-				"value":	hashlib.md5(data).digest()
-			}
-			self._add_data(result, data)
-		else:
-			# We use the t2sim-specific hashing call for faster evaluation of
-			# MD5 directly inside the target.
-			result = {
-				"value":	target.hash_memory(self._address, self._length)
-			}
-		return result
+	def _get_memory(self, target):
+		return target.read_memory(self._address, self._length)
 
-class TraceWriter(object):
-	def __init__(self, args, rom_image, tracetypes):
+	def get(self, target):
+		if not self._is_constant:
+			return self._get_memory(target)
+		else:
+			if self._cached_memory is None:
+				self._cached_memory = self._get_memory(target)
+			return self._cached_memory
+
+class TraceWriter():
+	def __init__(self, args, rom_image, trace_components):
 		self._args = args
 		self._rom_image = rom_image
-		self._previous_state = ConstantValue(self._args, "prev_state_hash", bytes(16))
-		self._tracetypes = [
-			self._previous_state,
-		] + list(tracetypes)
+		self._trace_components = trace_components
+		self._last_component_state = [ None for _ in range(len(self._trace_components)) ]
 		self._trace = [ ]
 		self._executed_insn_count = 0
 
@@ -177,34 +106,38 @@ class TraceWriter(object):
 	def set_prev_state_hash(self, previous_state):
 		self._previous_state.value = previous_state
 
+	def _dict_diff(self, old, new):
+		diff_dict = { }
+		for key in new.keys():
+			if old[key] != new[key]:
+				diff_dict[key] = new[key]
+		return diff_dict
+
+	def _diff_state(self, old, new):
+		if old is None:
+			return new
+		if old == new:
+			return None
+		if isinstance(old, bytes):
+			return BytesDiff.diff_data(old, new)
+		else:
+			return self._dict_diff(old, new)
+		return new
+
 	def record_state(self, target, append_to_trace = True, do_step = True):
 		if do_step:
 			target.singlestep()
 			self._executed_insn_count += 1
 
-		all_state = bytearray()
-
-		components = [ ]
-		for tracetype in self._tracetypes:
-			component = tracetype.get(target)
-			components.append(component)
-			all_state += component["value"]
-		state_hash = hashlib.md5(all_state).digest()
-		tracepoint = {
-			"executed_insns":	self._executed_insn_count,
-			"components":		components,
-			"state_hash":		state_hash,
-		}
-		if do_step:
-			# Only advance the previous state when we actually did stepping.
-			# Intermediate snapshots do not modify state.
-			self._previous_state.value = state_hash
-		else:
-			tracepoint["did_step"] = False
-
 		if append_to_trace:
-			# If we omit a step, but record a tracepoint, this modifies the
-			# internal state, so we need to record it.
+			# We might want to step only and record every nth state
+			component_state = [ component.get(target) for component in self._trace_components ]
+			diffed_component_state = [ self._diff_state(old, new) for (old, new) in zip(self._last_component_state, component_state) ]
+			tracepoint = {
+				"executed_insns":	self._executed_insn_count,
+				"state":			diffed_component_state,
+			}
+			self._last_component_state = component_state
 			self._trace.append(tracepoint)
 
 	def write(self, filename):
@@ -216,18 +149,12 @@ class TraceWriter(object):
 				"rom_base":							self._args.rom_base,
 				"ram_base":							self._args.ram_base,
 				"ram_size":							self._args.ram_size,
-				"compression":						not self._args.no_compression,
-				"binary_format":					self._args.bin_format,
 				"emulator":							self._args.emulator,
+				"version":							2,
+				"components":						[ component.properties for component in self._trace_components ],
+				"raw_rom_image":					self._rom_image,
 			},
-			"structure": [ component_structure.to_dict() for component_structure in self._tracetypes	],
 			"trace": self._trace,
 		}
-		if not self._args.omit_rom_image:
-			data["meta"]["raw_rom_image"] = self._rom_image
-
 		with open(filename, "w") as f:
-			encoder = CustomJSONEncoder(self._args, indent = None if (not self._args.pretty_json) else 4)
-			json_data = encoder.encode(data)
-			f.write(json_data)
-			f.write("\n")
+			JSONTools.dump(data, f)
