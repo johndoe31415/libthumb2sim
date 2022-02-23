@@ -427,17 +427,19 @@ static void emulation_i32_bfc_T1(void *vctx, uint8_t Rd, uint8_t imm, uint8_t ms
 }
 
 static void emulation_i32_bfi_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm, uint8_t msb) {
-	EMU_ERROR("instruction not fully implemented (condition codes unset), not properly tested");
-
+	const uint8_t width = msb - imm + 1;
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
-	const uint32_t src_mask = (1 << msb) - 1;
+	const uint32_t src_mask = (1 << width) - 1;
 	const uint32_t dest_mask = src_mask << imm;
+
+	/* First memorize source value (in case Rn == Rd) */
+	uint32_t src = ctx->emu_ctx->cpu.reg[Rn];
 
 	/* First clear out all bits in destination register */
 	ctx->emu_ctx->cpu.reg[Rd] &= ~dest_mask;
 
 	/* Then copy over the bits from the source */
-	ctx->emu_ctx->cpu.reg[Rd] |= (ctx->emu_ctx->cpu.reg[Rn] & src_mask) << imm;
+	ctx->emu_ctx->cpu.reg[Rd] |= (src & src_mask) << imm;
 }
 
 static void emulation_i32_bic_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, int32_t imm, bool S) {
