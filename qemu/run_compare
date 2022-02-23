@@ -28,5 +28,5 @@ if [ ! -f "$REFERENCE_TRACE" ]; then
 	exit 1
 fi
 
-./run_testcase.py --recreate-trace "$REFERENCE_TRACE" t2sim_trace.json
+./run_testcase.py -i trace "$REFERENCE_TRACE" t2sim_trace.json
 ./cmp_trace.py "$REFERENCE_TRACE" t2sim_trace.json

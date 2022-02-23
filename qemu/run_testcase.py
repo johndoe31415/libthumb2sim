@@ -59,7 +59,6 @@ class ArgumentWrapper(object):
 
 	@property
 	def rom_image(self):
-		print("ROMY")
 		try:
 			if self._image is None:
 				if self._trace is None:

@@ -48,10 +48,18 @@ def disassemble_insn_objdump(rom_image, pc):
 class DeviationException(Exception): pass
 
 class TraceComparator():
+	_REGNAMES = [ "r%d" % (i) for i in range(16) ] + [ "psr" ]
+
 	def __init__(self, args):
 		self._args = args
 		self._trace1 = TraceReader(args.trace1)
 		self._trace2 = TraceReader(args.trace2)
+		if self._trace1.structure != self._trace2.structure:
+			raise Exception("Traces are structurally incompatible, cannot proceed with compare.")
+
+	@property
+	def structure(self):
+		return self._trace1.structure
 
 	@staticmethod
 	def _decode_psr(psr):
@@ -60,7 +68,7 @@ class TraceComparator():
 		psr_str += " Z"[bool(psr & (1 << 30))]
 		psr_str += " C"[bool(psr & (1 << 29))]
 		psr_str += " V"[bool(psr & (1 << 28))]
-		#psr_str += " Q"[bool(psr & (1 << 27))]
+		psr_str += " Q"[bool(psr & (1 << 27))]
 		return psr_str
 
 	@staticmethod
@@ -77,7 +85,7 @@ class TraceComparator():
 		hex_data = " ".join("%02x" % (c) for c in data)
 		return hex_data
 
-	def _print_bytes_difference(self, data1, data2, fixed_offset = 0):
+	def TODO_print_bytes_difference(self, data1, data2, fixed_offset = 0):
 		if len(data1) != len(data2):
 			print("Length different: %d bytes / %d bytes" % (len(data1), len(data2)))
 
@@ -90,12 +98,12 @@ class TraceComparator():
 			if row1 != row2:
 				print("%8x: %s     %s" % (address, self._hexdump(row1), self._hexdump(row2)))
 
-	def _print_deviation_constant(self, comp1, comp2):
+	def TODO_print_deviation_constant(self, comp1, comp2):
 		v1 = self._trace1.getbytes(comp1["value"])
 		v2 = self._trace2.getbytes(comp2["value"])
 		self._print_bytes_difference(v1, v2)
 
-	def _print_deviation_registers(self, comp1, comp2):
+	def TODO_print_deviation_registers(self, comp1, comp2):
 		if ("regs" in comp1) and ("regs" in comp2):
 			for regname in [ "r%d" % (i) for i in range(16) ]:
 				if comp1["regs"][regname] != comp2["regs"][regname]:
@@ -103,48 +111,26 @@ class TraceComparator():
 			if (comp1["regs"]["psr"] & 0xf8000000) != (comp2["regs"]["psr"] & 0xf8000000):
 				print("PSR %08x %08x = %5s | %5s" % (comp1["regs"]["psr"], comp2["regs"]["psr"], self._decode_psr(comp1["regs"]["psr"]), self._decode_psr(comp2["regs"]["psr"])))
 
-	def _print_deviation_memory(self, offset, comp1, comp2):
+	def TODO_print_deviation_memory(self, offset, comp1, comp2):
 		if ("raw" in comp1) and ("raw" in comp2):
 			data1 = self._trace1.getbytes(comp1["raw"])
 			data2 = self._trace2.getbytes(comp2["raw"])
 			self._print_bytes_difference(data1, data2, fixed_offset = offset)
 
-	def _print_deviation(self, component_no, comp1, comp2):
-		print(("=" * 45) + " Deviating %s " % (self._trace1.structure[component_no]["name"]) + ("=" * 45))
-		if self._trace1.structure[component_no]["type"] == "ConstantValue":
-			self._print_deviation_constant(comp1, comp2)
-		elif self._trace1.structure[component_no]["type"] == "RegisterHash":
-			self._print_deviation_registers(comp1, comp2)
-		elif self._trace1.structure[component_no]["type"] == "MemoryHash":
-			self._print_deviation_memory(self._trace1.structure[component_no]["address"], comp1, comp2)
-
 	def _print_tracepoint(self, point):
-		for component in point["components"]:
-			if "regs" in component:
-				regs = component["regs"]
-				print("Register set:")
-				register_values = [ ]
-				for regname in [ "r%d" % (i) for i in range(16) ]:
-					register_values.append("%3s %08x" % (self._regname(regname), regs[regname]))
+		for (structure, state) in zip(self.structure, point):
+			if structure["name"] == "register_set":
+				regstr = [ ]
+				for regname in self._REGNAMES:
+					regstr.append("%-3s %08x" % (self._regname(regname), state.data[regname]))
+				for i in range(0, len(regstr), 4):
+					print("  ".join(regstr[i : i + 4]))
 
-				regs_per_line = 4
-				for rowno in range(len(register_values) // regs_per_line):
-					row = (register_values[rowno + (i * regs_per_line) ] for i in range(regs_per_line))
-					print("   ".join(row))
-				print("PSR %08x %s" % (regs["psr"], self._decode_psr(regs["psr"])))
-
-				print()
-				(rom_image, rom_base) = (self._trace1.rom_image, self._trace1.rom_base)
-				if rom_image is None:
-					(rom_image, rom_base) = (self._trace2.rom_image, self._trace2.rom_base)
-
-				if rom_image is not None:
-					rel_pc = regs["r15"] - rom_base
-					if rel_pc >= 0:
-						insn_data = rom_image[rel_pc : rel_pc + 4]
-
-					insn_hex = " ".join("%02x" % (c) for c in insn_data)
-					disassembled = disassemble_insn_objdump(rom_image, rel_pc)
+				rel_pc = state.data["r15"] - self._trace1.rom_base
+				if rel_pc >= 0:
+					print()
+					insn_data = self._trace1.rom_image[rel_pc : rel_pc + 4]
+					disassembled = disassemble_insn_objdump(self._trace1.rom_image, rel_pc)
 					if disassembled is not None:
 						(prefix, insn, suffix) = disassembled
 						for line in prefix:
@@ -155,43 +141,63 @@ class TraceComparator():
 						for line in suffix:
 							print("    %s" % (line))
 
-					insn = InstructionSetDecoder.decode_data(insn_data)
-					print()
-					print("Instruction details: %s" % (insn))
-					for (param_name, value) in insn:
-						if insn.is_register(param_name):
-							reg_value = regs["r%d" % (value)]
-							if reg_value & 0x80000000:
-								# Negative
-								signed_reg_value = reg_value - (2 ** 32)
-								print("%5s r%-2d 0x%x / %d    signed: -%0x%x / %d" % (param_name, value, reg_value, reg_value, signed_reg_value, signed_reg_value))
-							else:
-								# Positive
-								print("%5s r%-2d 0x%x / %d" % (param_name, value, reg_value, reg_value))
-					print()
-				else:
-					print("No flash ROM available to decode instruction at PC.")
+				insn = InstructionSetDecoder.decode_data(insn_data)
+				print()
+				print("Instruction details: %s" % (insn))
+				for (param_name, value) in insn:
+					if insn.is_register(param_name):
+						reg_value = state.data["r%d" % (value)]
+						if reg_value & 0x80000000:
+							# Negative
+							signed_reg_value = reg_value - (2 ** 32)
+							print("%5s r%-2d 0x%x / %d    signed: -%0x%x / %d" % (param_name, value, reg_value, reg_value, signed_reg_value, signed_reg_value))
+						else:
+							# Positive
+							print("%5s r%-2d 0x%x / %d" % (param_name, value, reg_value, reg_value))
+				print()
 
-	def _compare_tracepoint(self, trace1, pt1, trace2, pt2):
+	def _print_deviation(self, struct_definition, state1_data, state2_data):
+		if struct_definition["name"] == "register_set":
+			for regname in self._REGNAMES:
+				value1 = state1_data[regname]
+				value2 = state2_data[regname]
+				if value1 != value2:
+					regname = self._regname(regname)
+					if regname != "psr":
+						print("%-5s   %08x  |  %08x    (XOR %08x)" % (regname, value1, value2, (value1 ^ value2) & 0xffffffff))
+					else:
+						print("%-5s   %-8s  |  %-80s" % (regname, self._decode_psr(value1), self._decode_psr(value2)))
+
+
+			pass
+		else:
+			raise NotImplementedError(struct_definition["name"])
+
+	def _compare_regset(self, regset):
+		regset = dict(regset)
+		#regset["psr"] = regset["psr"] & 0xf8000000
+		regset["psr"] = regset["psr"] & 0xf0000000			# TODO THIS DOES NOT CHECK THE Q FLAG
+		return regset
+
+	def _compare_tracepoint(self, executed_insn_cnt, state1, state2):
 		deviation = [ ]
-		print(pt1["components"])
-		for (component_no, (comp1, comp2)) in enumerate(zip(pt1["components"], pt2["components"])):
-			print(component_no)
-			v1 = self._trace1.getbytes(comp1["value"])
-			v2 = self._trace2.getbytes(comp2["value"])
-			print(v1, v2)
-#			print(component_no, v1, v2)
-			if v1 != v2:
-				deviation.append(component_no)
+
+		for (struct_definition, state1_element, state2_element) in zip(self._trace1.structure, state1, state2):
+			state1_data = state1_element.data
+			state2_data = state2_element.data
+			if struct_definition["name"] == "register_set":
+				state1_data = self._compare_regset(state1_data)
+				state2_data = self._compare_regset(state2_data)
+			if state1_data != state2_data:
+				deviation.append((struct_definition, state1_data, state2_data))
 
 		if len(deviation) > 0:
-			print(deviation)
-			print("Deviation in tracepoint at number of executed instructions: %d" % (pt1["executed_insns"]))
-			for component_no in deviation:
-				self._print_deviation(component_no, pt1["components"][component_no], pt2["components"][component_no])
+			print("Deviation in tracepoint after %d executed instructions in %d structural elements." % (executed_insn_cnt, len(deviation)))
+			for (struct_definition, state1_data, state2_data) in deviation:
+				self._print_deviation(struct_definition, state1_data, state2_data)
 			print()
 			print("~" * 120)
-			previous_tracepoint = trace1.get_tracepoint_by_insn_cnt(pt1["executed_insns"] - 1) or trace2.get_tracepoint_by_insn_cnt(pt2["executed_insns"] - 1)
+			previous_tracepoint = self._trace1.get_state_at(executed_insn_cnt - 1) or self._trace2.get_state_at(executed_insn_cnt - 1)
 			if previous_tracepoint is None:
 				print("Unable to determine instruction that led to that deviation.")
 			else:
@@ -200,7 +206,8 @@ class TraceComparator():
 			raise DeviationException()
 
 	def compare(self):
-		self._trace1.align(self._trace2, self._compare_tracepoint)
+		for (executed_insn_cnt, state1, state2) in self._trace1.align(self._trace2):
+			self._compare_tracepoint(executed_insn_cnt, state1, state2)
 
 parser = FriendlyArgumentParser(description = "Compare two trace files; where they differ, show the instruction and deviation details.")
 parser.add_argument("trace1", metavar = "trace1_filename", help = "First trace for comparison")

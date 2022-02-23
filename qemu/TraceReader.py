@@ -23,7 +23,40 @@
 
 from Tools import JSONTools
 
-class TraceReader(object):
+class TraceReaderRegisterSet():
+	def __init__(self):
+		self._regset = { "r%d" % (i): 0 for i in range(16) }
+		self._regset["psr"] = 0
+
+	@property
+	def data(self):
+		return self._regset
+
+	def update(self, change):
+		self._regset.update(change)
+
+	def __repr__(self):
+		return str(self._regset)
+
+class TraceReaderMemory():
+	def __init__(self, length):
+		self._memory = None
+		self._length = length
+
+	@property
+	def data(self):
+		return self._memory
+
+	def update(self, change):
+		if change is None:
+			return
+		if self._memory is None:
+			self._memory = change
+		else:
+			print(change)
+			TODOPATCH
+
+class TraceReader():
 	def __init__(self, filename):
 		with open(filename) as f:
 			self._trace = JSONTools.load(f)
@@ -46,21 +79,52 @@ class TraceReader(object):
 
 	@property
 	def structure(self):
-		return self._trace["structure"]
+		return self._trace["meta"]["components"]
 
-	def align(self, other, callback):
-		(i, j) = (0, 0)
-		while (i < len(self)) and (j < len(other)):
-			pt1 = self[i]
-			pt2 = other[j]
-			(key1, key2) = (pt1["executed_insns"], pt2["executed_insns"])
-			if key1 == key2:
-				callback(self, pt1, other, pt2)
-				i += 1
-				j += 1
-			elif key1 < key2:
-				# No alignment an i is lagging behind
-				i += 1
-			elif key2 < key1:
-				# No alignment an j is lagging behind
-				j += 1
+	def _initialize_states(self):
+		states = [ ]
+		for component in self.structure:
+			if component["name"] == "register_set":
+				state = TraceReaderRegisterSet()
+			elif component["name"].startswith("memory/"):
+				state = TraceReaderMemory(component["length"])
+			else:
+				raise NotImplementedError(component["name"])
+			states.append(state)
+		return states
+
+	def get_state_at(self, at_insn_cnt):
+		for (insn_cnt, state) in self:
+			if insn_cnt == at_insn_cnt:
+				return state
+			elif insn_cnt > at_insn_cnt:
+				return None
+		return None
+
+	def __iter__(self):
+		states = self._initialize_states()
+		for tracepoint in self._trace["trace"]:
+			for (old_state, change) in zip(states, tracepoint["state"]):
+				old_state.update(change)
+			yield (tracepoint["executed_insns"], states)
+
+	def align(self, other):
+		iter1 = iter(self)
+		iter2 = iter(other)
+
+		try:
+			cur1 = next(iter1)
+			cur2 = next(iter2)
+			while True:
+				(insn1, state1) = cur1
+				(insn2, state2) = cur2
+				if insn1 == insn2:
+					yield (insn1, state1, state2)
+					cur1 = next(iter1)
+					cur2 = next(iter2)
+				elif insn1 < insn2:
+					cur1 = next(iter1)
+				elif insn2 < insn1:
+					cur2 = next(iter2)
+		except StopIteration:
+			pass
