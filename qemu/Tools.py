@@ -77,35 +77,4 @@ class JSONTools():
 
 	@classmethod
 	def dump(cls, data, f):
-		json.dump(data, f, default = cls._json_encode_default)
-
-
-#class CustomJSONEncoder(json.JSONEncoder):
-#-       def __init__(self, cmdline_args, **kwargs):
-#-               json.JSONEncoder.__init__(self, **kwargs)
-#-               self._cmdline_args = cmdline_args
-#-
-#-       def default(self, obj):
-#-               if isinstance(obj, bytes):
-#-                       data = obj
-#-                       if len(data) <= 16:
-#-                               # Short fragments always uncompressed and as hex, prefixed with
-#-                               # ">" to indicate special handling
-#-                               data = ">" + data.hex()
-#-                       else:
-#-                               if not self._cmdline_args.no_compression:
-#-                                       data = zlib.compress(data)
-#-                               if self._cmdline_args.bin_format == "b64":
-#-                                       data = base64.b64encode(data).decode("ascii")
-#-                               elif self._cmdline_args.bin_format == "hex":
-#-                                       data = data.hex()
-#-                               else:
-#-                                       raise NotImplementedError(self._cmdline_args.bin_format)
-#-                       return data
-#-               return json.JSONEncoder.default(self, obj)
-#
-#			json.dump(data, f)
-#			encoder = CustomJSONEncoder(self._args, indent = None if (not self._args.pretty_json) else 4)
-#			json_data = encoder.encode(data)
-#			f.write(json_data)
-#			f.write("\n")
+		json.dump(data, f, default = cls._json_encode_default, separators = (",", ":"))

@@ -23,12 +23,10 @@
 #
 
 import sys
-import json
-import zlib
 import subprocess
 import tempfile
 import re
-import base64
+import argparse
 from FriendlyArgumentParser import FriendlyArgumentParser
 from TraceReader import TraceReader
 from InstructionSetDecoder import InstructionSetDecoder
@@ -150,7 +148,7 @@ class TraceComparator():
 						if reg_value & 0x80000000:
 							# Negative
 							signed_reg_value = reg_value - (2 ** 32)
-							print("%5s r%-2d 0x%x / %d    signed: -%0x%x / %d" % (param_name, value, reg_value, reg_value, signed_reg_value, signed_reg_value))
+							print("%5s r%-2d 0x%x / %d    signed: %#x / %d" % (param_name, value, reg_value, reg_value, signed_reg_value, signed_reg_value))
 						else:
 							# Positive
 							print("%5s r%-2d 0x%x / %d" % (param_name, value, reg_value, reg_value))
@@ -158,6 +156,8 @@ class TraceComparator():
 
 	def _print_deviation(self, struct_definition, state1_data, state2_data):
 		if struct_definition["name"] == "register_set":
+			if self._args.name is not None:
+				print("        %s  |  %s" % (self._args.name[0], self._args.name[1]))
 			for regname in self._REGNAMES:
 				value1 = state1_data[regname]
 				value2 = state2_data[regname]
@@ -209,7 +209,13 @@ class TraceComparator():
 		for (executed_insn_cnt, state1, state2) in self._trace1.align(self._trace2):
 			self._compare_tracepoint(executed_insn_cnt, state1, state2)
 
+def _names(text):
+	if ":" not in text:
+		raise argparse.ArgumentTypeError("'%s' does not contain a ':' character" % (text))
+	return text.split(":", maxsplit = 1)
+
 parser = FriendlyArgumentParser(description = "Compare two trace files; where they differ, show the instruction and deviation details.")
+parser.add_argument("-n", "--name", metavar = "name1:name2", type = _names, help = "Name of trace1 and trace2 separated by colon.")
 parser.add_argument("trace1", metavar = "trace1_filename", help = "First trace for comparison")
 parser.add_argument("trace2", metavar = "trace2_filename", help = "Second trace for comparison")
 args = parser.parse_args(sys.argv[1:])
@@ -217,5 +223,6 @@ args = parser.parse_args(sys.argv[1:])
 tc = TraceComparator(args)
 try:
 	tc.compare()
+	print("Traces are identical.")
 except DeviationException:
 	sys.exit(1)

@@ -24,9 +24,12 @@
 
 REFERENCE_TRACE="$1"
 if [ ! -f "$REFERENCE_TRACE" ]; then
-	echo "$0 [reference trace]"
+	echo "$0 [QEmu reference trace]"
+	echo
+	echo "Re-runs the image embedded in the reference trace using libthumb2sim and shows"
+	echo "any deviations."
 	exit 1
 fi
 
 ./run_testcase.py -i trace "$REFERENCE_TRACE" t2sim_trace.json
-./cmp_trace.py "$REFERENCE_TRACE" t2sim_trace.json
+./compare_traces.py --name "QEmu:lt2sim" "$REFERENCE_TRACE" t2sim_trace.json

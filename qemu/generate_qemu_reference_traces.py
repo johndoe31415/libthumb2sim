@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
 #	libthumb2sim - Emulator for the Thumb-2 ISA (Cortex-M)
-#	Copyright (C) 2019-2019 Johannes Bauer
+#	Copyright (C) 2019-2022 Johannes Bauer
 #
 #	This file is part of libthumb2sim.
 #
@@ -31,7 +31,7 @@ from FriendlyArgumentParser import FriendlyArgumentParser
 
 parser = FriendlyArgumentParser()
 parser.add_argument("-m", "--minify-tracefiles", action = "store_true", help = "Minify all generated tracefiles")
-parser.add_argument("tc_dir", metavar = "tc_dir", type = str, help = "Testcase directory for input data")
+parser.add_argument("tc_dir", metavar = "tc_dir", type = str, help = "Testcase template directory for input data")
 parser.add_argument("trace_dir", metavar = "trace_dir", type = str, help = "Trace output directory")
 args = parser.parse_args(sys.argv[1:])
 

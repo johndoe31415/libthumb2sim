@@ -33,6 +33,8 @@ class TraceReaderRegisterSet():
 		return self._regset
 
 	def update(self, change):
+		if change is None:
+			return
 		self._regset.update(change)
 
 	def __repr__(self):
