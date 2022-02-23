@@ -120,6 +120,9 @@ typedef void (*bkpt_callback_t)(struct emu_ctx_t *emu_ctx, uint8_t bkpt_number);
  * abort emulation */
 typedef bool (*end_emulation_callback_t)(struct emu_ctx_t *emu_ctx);
 
+/* Called when single stepped operation is requested */
+typedef void (*post_step_callback_t)(struct emu_ctx_t *emu_ctx);
+
 /* Syscalls for communication between guest/host */
 typedef uint32_t (*syscall_read_t)(struct emu_ctx_t *emu_ctx, void *data, uint32_t max_length);
 typedef void (*syscall_write_t)(struct emu_ctx_t *emu_ctx, const void *data, uint32_t length);
@@ -132,6 +135,7 @@ struct emu_ctx_t {
 	uint32_t ivt_base_address;
 	bkpt_callback_t bkpt_callback;
 	end_emulation_callback_t end_emulation_callback;
+	post_step_callback_t post_step_callback;
 	syscall_read_t emulator_syscall_read;
 	syscall_write_t emulator_syscall_write;
 	syscall_puts_t emulator_syscall_puts;

@@ -214,6 +214,9 @@ void cpu_run(struct emu_ctx_t *emu_ctx) {
 	//	memcpy(localContext.registerCopy, cpu_state->reg, sizeof(uint32_t) * 16);
 	//	localContext.disassemblyBuffer[0] = 0;
 		cpu_single_step(emu_ctx);
+		if (emu_ctx->post_step_callback) {
+			emu_ctx->post_step_callback(emu_ctx);
+		}
 #if 0
 #if DO_TRACE == 1
 		if (ctx.count_next_insn) {
