@@ -271,7 +271,9 @@ static void emulation_i16_add_SPr_T1(void *vctx, uint8_t Rdm) {
 }
 
 static void emulation_i16_add_SPr_T2(void *vctx, uint8_t Rm) {
-	EMU_ERROR("instruction not implemented");
+	EMU_WARNING("instruction poorly tested");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	ctx->emu_ctx->cpu.reg[REG_SP] += ctx->emu_ctx->cpu.reg[Rm];
 }
 
 static void emulation_i32_add_SPr_T3(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
@@ -1472,7 +1474,13 @@ static void emulation_i32_sub_SPimm_T3(void *vctx, uint8_t Rd, uint16_t imm) {
 }
 
 static void emulation_i32_sub_SPreg_T1(void *vctx, uint8_t Rd, uint8_t Rm, uint8_t imm, uint8_t type, bool S) {
-	EMU_ERROR("instruction not implemented");
+	EMU_WARNING("not properly tested");
+	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
+	struct barrelshifter_output_t bsOut = barrel_shift(ctx->emu_ctx->cpu.reg[Rm], type, imm);
+	if (S) {
+		setSubCondCode(ctx, true, ctx->emu_ctx->cpu.reg[REG_SP], bsOut.value);
+	}
+	ctx->emu_ctx->cpu.reg[Rd] = ctx->emu_ctx->cpu.reg[REG_SP] - bsOut.value;
 }
 
 static void emulation_i16_sub_imm_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm) {
