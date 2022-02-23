@@ -55,8 +55,7 @@ class TraceReaderMemory():
 		if self._memory is None:
 			self._memory = change
 		else:
-			print(change)
-			TODOPATCH
+			change.apply(self._memory)
 
 class TraceReader():
 	def __init__(self, filename):
