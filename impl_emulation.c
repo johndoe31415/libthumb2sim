@@ -1580,6 +1580,7 @@ static void emulation_i32_tst_reg_T2(void *vctx, uint8_t Rn, uint8_t Rm, uint8_t
 }
 
 static void emulation_i32_ubfx_T1(void *vctx, uint8_t Rd, uint8_t Rn, uint8_t imm, uint8_t width) {
+	width += 1;
 	struct insn_emu_ctx_t *ctx = (struct insn_emu_ctx_t*)vctx;
 	ctx->emu_ctx->cpu.reg[Rd] = (ctx->emu_ctx->cpu.reg[Rn] >> imm) & ((1 << width) - 1);
 }
